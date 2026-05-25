@@ -1,13 +1,9 @@
 "use client";
 
 import * as React from "react";
-import {
-  Building2,
-  Command,
-  Users,
-} from "lucide-react";
+import { Building2, Command, Users, LayoutDashboard } from "lucide-react";
 
-import { NavSecondary } from "@/components/nav-secondary";
+import { NavItems } from "@/components/nav-items";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -26,6 +22,11 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navItems: [
+    {
+      title: "Dashboard",
+      url: "/",
+      icon: LayoutDashboard,
+    },
     {
       title: "Organizations",
       url: "/organizations",
@@ -60,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavSecondary items={data.navItems} />
+        <NavItems items={data.navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
