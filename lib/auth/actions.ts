@@ -6,6 +6,9 @@ import * as session from "@/lib/auth/session";
 import { bootEnv } from "@/lib/config/bootConfig";
 import { loginFormSchema } from "@/schemas/auth";
 import type { LoginFormState, LoginResponse } from "@/types/auth";
+import { getLogger } from "../utils/logger";
+
+const logger = getLogger().setTag("actions.ts");
 
 const invalidCredentialsMessage = "Check your credentials and try again.";
 const serviceErrorMessage = "Something went wrong. Try again later.";
@@ -29,7 +32,8 @@ async function getLoginSession(credentials: {
         cache: "no-store",
       },
     );
-  } catch {
+  } catch (error) {
+    logger.error("Unexpected error while logging in", error);
     return { ok: false, message: serviceErrorMessage } as const;
   }
 
@@ -38,6 +42,12 @@ async function getLoginSession(credentials: {
   }
 
   if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to login user in authenticator", {
+        error: body?.message,
+      });
+    }
     return { ok: false, message: serviceErrorMessage } as const;
   }
 
@@ -93,7 +103,7 @@ export const logoutAction = async () => {
         cache: "no-store",
       });
     } catch (error) {
-      console.error("Failed to revoke authenticator session", error);
+      logger.error("Failed to revoke authenticator session", error);
     }
   }
 

@@ -17,3 +17,8 @@ export type LoginResponse = {
     sessionId: string;
   };
 };
+
+export type SessionTokens = {
+  token: string;
+  refreshToken: string;
+};

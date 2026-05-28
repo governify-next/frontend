@@ -3,12 +3,10 @@ import "server-only";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
-import { LoginResponse } from "@/types/auth";
+import { LoginResponse, SessionTokens } from "@/types/auth";
+import { getLogger } from "../utils/logger";
 
-type SessionTokens = {
-  token: string;
-  refreshToken: string;
-};
+const logger = getLogger().setTag("sessions.ts");
 
 const cookieOptions = {
   httpOnly: true,
@@ -81,11 +79,20 @@ export const refreshSession = async (refreshToken: string) => {
       },
     );
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      if (response.status >= 500) {
+        const body = await response.json().catch(() => null);
+        logger.error("Failed to refresh session with authenticator", {
+          error: body?.message,
+        });
+      }
+      return null;
+    }
 
     const body = (await response.json()) as LoginResponse;
     return body.data;
-  } catch {
+  } catch (error) {
+    logger.error("Unexpected error while refreshing user session", error);
     return null;
   }
 };

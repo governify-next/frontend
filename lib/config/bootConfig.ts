@@ -3,6 +3,7 @@ import "server-only";
 export const bootEnv = {
   // Service configuration
   NODE_ENV: process.env.NODE_ENV || "development",
+  GOV_LOG_LEVEL: process.env.GOV_LOG_LEVEL || "INFO",
   GOV_SERVICE_NAME: process.env.GOV_SERVICE_NAME || "frontend",
   PORT: process.env.PORT || "3000",
 
