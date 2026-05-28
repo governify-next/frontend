@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Building2, Command, Users, LayoutDashboard } from "lucide-react";
+import { Building2, Command, Users } from "lucide-react";
 
 import { NavItems } from "@/components/nav-items";
 import { NavUser } from "@/components/nav-user";
