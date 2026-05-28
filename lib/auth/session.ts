@@ -3,6 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
+import { LoginResponse } from "@/types/auth";
 
 type SessionTokens = {
   token: string;
@@ -63,4 +64,28 @@ export const setSessionResponseCookies = (
 export const deleteSessionResponseCookies = (response: NextResponse) => {
   response.cookies.delete(bootEnv.AUTH_ACCESS_COOKIE_NAME);
   response.cookies.delete(bootEnv.AUTH_REFRESH_COOKIE_NAME);
+};
+
+export const refreshSession = async (refreshToken: string) => {
+  try {
+    const response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/refresh`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as LoginResponse;
+    return body.data;
+  } catch {
+    return null;
+  }
 };

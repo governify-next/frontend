@@ -2,12 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-
-import {
-  createSessionTokens,
-  deleteSessionTokens,
-  getRefreshToken,
-} from "@/lib/auth/session";
+import * as session from "@/lib/auth/session";
 import { bootEnv } from "@/lib/config/bootConfig";
 import { loginFormSchema } from "@/schemas/auth";
 import type { LoginFormState, LoginResponse } from "@/types/auth";
@@ -78,13 +73,13 @@ export const loginAction = async (
     };
   }
 
-  await createSessionTokens(loginResult.session);
+  await session.createSessionTokens(loginResult.session);
 
   redirect("/");
 };
 
 export const logoutAction = async () => {
-  const refreshToken = await getRefreshToken();
+  const refreshToken = await session.getRefreshToken();
 
   if (refreshToken) {
     try {
@@ -102,6 +97,6 @@ export const logoutAction = async () => {
     }
   }
 
-  await deleteSessionTokens();
+  await session.deleteSessionTokens();
   redirect("/login");
 };
