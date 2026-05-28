@@ -13,5 +13,7 @@ export type LoginResponse = {
   message?: string;
   data: {
     token: string;
+    refreshToken: string;
+    sessionId: string;
   };
 };

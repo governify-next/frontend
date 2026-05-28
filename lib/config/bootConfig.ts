@@ -1,11 +1,4 @@
 import "server-only";
-import dotenv from "dotenv";
-import path from "path";
-
-// Load .env file
-const envPath =
-  process.env.GOV_BOOT_ENV_PATH || path.resolve(process.cwd(), ".env");
-dotenv.config({ path: envPath, quiet: true });
 
 export const bootEnv = {
   // Service configuration
@@ -14,9 +7,18 @@ export const bootEnv = {
   PORT: process.env.PORT || "3000",
 
   // Internal service URLs
-  SCOPE_SERVICE_URL: process.env.SCOPE_SERVICE_URL || "http://localhost:5901",
+  AUTHENTICATOR_SERVICE_URL:
+    process.env.AUTHENTICATOR_SERVICE_URL || "http://localhost:5900",
 
   // Cookie settings
-  AUTH_COOKIE_NAME: process.env.AUTH_COOKIE_NAME ?? "governify_next_session",
-  SESSION_MAX_AGE: Number(process.env.SESSION_MAX_AGE ?? 60 * 60 * 24),
+  AUTH_ACCESS_COOKIE_NAME:
+    process.env.AUTH_ACCESS_COOKIE_NAME ?? "governify_next_access_token",
+
+  AUTH_REFRESH_COOKIE_NAME:
+    process.env.AUTH_REFRESH_COOKIE_NAME ?? "governify_next_refresh_token",
+
+  ACCESS_TOKEN_MAX_AGE: Number(process.env.ACCESS_TOKEN_MAX_AGE ?? 15 * 60),
+  REFRESH_TOKEN_MAX_AGE: Number(
+    process.env.REFRESH_TOKEN_MAX_AGE ?? 7 * 24 * 60 * 60,
+  ),
 };
