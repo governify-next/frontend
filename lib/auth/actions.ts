@@ -3,7 +3,11 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { createSessionToken, deleteSessionToken } from "@/lib/auth/session";
+import {
+  createSessionTokens,
+  deleteSessionTokens,
+  getRefreshToken,
+} from "@/lib/auth/session";
 import { bootEnv } from "@/lib/config/bootConfig";
 import { loginFormSchema } from "@/schemas/auth";
 import type { LoginFormState, LoginResponse } from "@/types/auth";
@@ -11,19 +15,25 @@ import type { LoginFormState, LoginResponse } from "@/types/auth";
 const invalidCredentialsMessage = "Check your credentials and try again.";
 const serviceErrorMessage = "Something went wrong. Try again later.";
 
-async function getLoginToken(credentials: { login: string; password: string }) {
+async function getLoginSession(credentials: {
+  login: string;
+  password: string;
+}) {
   let response: Response;
 
   try {
-    response = await fetch(`${bootEnv.SCOPE_SERVICE_URL}/api/v1/users/login`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/login`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+        cache: "no-store",
       },
-      body: JSON.stringify(credentials),
-      cache: "no-store",
-    });
+    );
   } catch {
     return { ok: false, message: serviceErrorMessage } as const;
   }
@@ -37,7 +47,7 @@ async function getLoginToken(credentials: { login: string; password: string }) {
   }
 
   const body = (await response.json()) as LoginResponse;
-  return { ok: true, token: body.data.token } as const;
+  return { ok: true, session: body.data } as const;
 }
 
 export const loginAction = async (
@@ -60,7 +70,7 @@ export const loginAction = async (
     };
   }
 
-  const loginResult = await getLoginToken(result.data);
+  const loginResult = await getLoginSession(result.data);
 
   if (!loginResult.ok) {
     return {
@@ -68,12 +78,30 @@ export const loginAction = async (
     };
   }
 
-  await createSessionToken(loginResult.token);
+  await createSessionTokens(loginResult.session);
 
   redirect("/");
 };
 
 export const logoutAction = async () => {
-  await deleteSessionToken();
+  const refreshToken = await getRefreshToken();
+
+  if (refreshToken) {
+    try {
+      await fetch(`${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/logout`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+        cache: "no-store",
+      });
+    } catch (error) {
+      console.error("Failed to revoke authenticator session", error);
+    }
+  }
+
+  await deleteSessionTokens();
   redirect("/login");
 };
