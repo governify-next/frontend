@@ -8,9 +8,8 @@ import { bootEnv } from "@/lib/config/bootConfig";
 import { loginFormSchema } from "@/schemas/auth";
 import type { LoginFormState, LoginResponse } from "@/types/auth";
 
-const invalidCredentialsMessage =
-  "Unable to sign in. Check your credentials and try again.";
-const serviceErrorMessage = "Unable to sign in right now. Try again later.";
+const invalidCredentialsMessage = "Check your credentials and try again.";
+const serviceErrorMessage = "Something went wrong. Try again later.";
 
 async function getLoginToken(credentials: { login: string; password: string }) {
   let response: Response;

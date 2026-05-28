@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { loginAction } from "@/lib/auth/actions";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -70,12 +72,15 @@ export function LoginForm({
           {passwordError ? <FieldError>{passwordError}</FieldError> : null}
         </Field>
 
+        {state?.message ? (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Unable to sign in</AlertTitle>
+            <AlertDescription>{state.message}</AlertDescription>
+          </Alert>
+        ) : null}
+
         <Field>
-          {state?.message ? (
-            <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {state.message}
-            </p>
-          ) : null}
           <Button type="submit">Login</Button>
         </Field>
       </FieldGroup>
