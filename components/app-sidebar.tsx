@@ -1,5 +1,7 @@
 "use client";
 
+import type { BasicUserInfo } from "@/types/user.types";
+import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Building2, Command, Users } from "lucide-react";
 
@@ -15,12 +17,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import useSWR from "swr";
+import { fetcher } from "@/lib/utils/fetcher";
+
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navItems: [
     {
       title: "Organizations",
@@ -35,7 +35,35 @@ const data = {
   ],
 };
 
+function NavUserSkeleton() {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="lg">
+          <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+          <div className="grid flex-1 gap-1">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: userResponse, isLoading } = useSWR<{
+    data: BasicUserInfo | null;
+  }>("/api/me", fetcher);
+  const user = userResponse?.data ?? {
+    username: "user123",
+    name: "Usuario",
+    email: "No disponible",
+    avatar: null,
+  };
+
+  console.log(user);
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -59,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavItems items={data.navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {isLoading ? <NavUserSkeleton /> : <NavUser user={user} />}
       </SidebarFooter>
     </Sidebar>
   );

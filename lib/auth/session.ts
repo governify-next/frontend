@@ -5,6 +5,7 @@ import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
 import { LoginResponse, SessionTokens } from "@/types/auth";
 import { getLogger } from "../utils/logger";
+import { BasicUserInfo } from "@/types/user.types";
 
 const logger = getLogger().setTag("sessions.ts");
 
@@ -95,4 +96,40 @@ export const refreshSession = async (refreshToken: string) => {
     logger.error("Unexpected error while refreshing user session", error);
     return null;
   }
+};
+
+export const getCurrentUser = async () => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/me`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while getting user info", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to get user info", {
+        error: body?.message,
+      });
+    }
+    return null;
+  }
+
+  const body = await response.json();
+
+  return body.data as BasicUserInfo;
 };
