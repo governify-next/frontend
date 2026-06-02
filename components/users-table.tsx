@@ -1,19 +1,16 @@
 "use client";
 
 import { columns } from "@/app/users/colums";
-import { UserInfo } from "@/types/user.types";
+import { UserInfo, UserPayload } from "@/types/user.types";
 import { DataTable } from "./data-table";
 import { useState } from "react";
-import { updateUserStatus } from "@/lib/users/actions";
+import { updateUser } from "@/lib/users/actions";
 
 export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
 
-  async function handleStatusChange(
-    userId: string,
-    status: UserInfo["status"],
-  ) {
-    const updatedUser = await updateUserStatus(userId, status);
+  const handleUserChange = async (userId: string, payload: UserPayload) => {
+    const updatedUser = await updateUser(userId, payload);
 
     if (!updatedUser) return;
 
@@ -22,10 +19,10 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
         user._id === updatedUser._id ? updatedUser : user,
       ),
     );
-  }
+  };
 
   const tableColumns = columns({
-    onStatusChange: handleStatusChange,
+    onUserChange: handleUserChange,
   });
 
   return (

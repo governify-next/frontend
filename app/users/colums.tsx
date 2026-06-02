@@ -7,13 +7,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserInfo, UserStatus } from "@/types/user.types";
+import {
+  SystemRole,
+  UserInfo,
+  UserPayload,
+  UserStatus,
+} from "@/types/user.types";
 import { ColumnDef } from "@tanstack/react-table";
 
 export const columns = ({
-  onStatusChange,
+  onUserChange,
 }: {
-  onStatusChange: (userId: string, status: UserInfo["status"]) => void;
+  onUserChange: (userId: string, payload: UserPayload) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -41,14 +46,18 @@ export const columns = ({
             <DropdownMenuContent align="start">
               <DropdownMenuItem
                 disabled={user.status === UserStatus.ACTIVE}
-                onClick={() => onStatusChange(user._id, UserStatus.ACTIVE)}
+                onClick={() =>
+                  onUserChange(user._id, { status: UserStatus.ACTIVE })
+                }
               >
                 Active
               </DropdownMenuItem>
 
               <DropdownMenuItem
                 disabled={user.status === UserStatus.DISABLED}
-                onClick={() => onStatusChange(user._id, UserStatus.DISABLED)}
+                onClick={() =>
+                  onUserChange(user._id, { status: UserStatus.DISABLED })
+                }
               >
                 Disabled
               </DropdownMenuItem>
@@ -60,6 +69,39 @@ export const columns = ({
     {
       accessorKey: "systemRole",
       header: "System Role",
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                {user.systemRole}
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                disabled={user.systemRole === SystemRole.ADMIN}
+                onClick={() =>
+                  onUserChange(user._id, { systemRole: SystemRole.ADMIN })
+                }
+              >
+                Admin
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                disabled={user.systemRole === SystemRole.USER}
+                onClick={() =>
+                  onUserChange(user._id, { systemRole: SystemRole.USER })
+                }
+              >
+                User
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
     {
       accessorKey: "lastLoginAt",

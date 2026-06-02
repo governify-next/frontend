@@ -1,6 +1,6 @@
 "use server";
 
-import { UserInfo } from "@/types/user.types";
+import { UserInfo, UserPayload } from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
@@ -8,9 +8,9 @@ import { revalidatePath } from "next/cache";
 
 const logger = getLogger().setTag("users.actions.ts");
 
-const updateUser = async (
+export const updateUser = async (
   userId: string,
-  payload: Partial<Pick<UserInfo, "status" | "systemRole">>,
+  payload: UserPayload,
 ): Promise<UserInfo | null> => {
   const token = await getAccessToken();
   let response;
@@ -46,15 +46,4 @@ const updateUser = async (
   const body = await response.json();
 
   return body.data as UserInfo;
-};
-
-export const updateUserStatus = async (
-  userId: string,
-  status: UserInfo["status"],
-) => {
-  const user = await updateUser(userId, { status });
-
-  if (user) revalidatePath("/users");
-
-  return user;
 };

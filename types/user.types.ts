@@ -21,3 +21,7 @@ export interface UserInfo extends BasicUserInfo {
   status: UserStatus;
   lastLoginAt?: Date;
 }
+
+// User payload for user table
+
+export type UserPayload = Partial<Pick<UserInfo, "status" | "systemRole">>;
