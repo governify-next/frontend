@@ -8,12 +8,16 @@ export enum UserStatus {
   DISABLED = "DISABLED",
 }
 
-export type BasicUserInfo = {
+export interface BasicUserInfo {
   username: string;
   email: string;
   name: string;
   avatar: null; // TODO: define avatar at authenticator
-  //systemRole: SystemRole;
-  //status: UserStatus;
-  //lastLoginAt?: Date;
-};
+}
+
+export interface UserInfo extends BasicUserInfo {
+  _id: string;
+  systemRole: SystemRole;
+  status: UserStatus;
+  lastLoginAt?: Date;
+}

@@ -62,8 +62,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: null,
   };
 
-  console.log(user);
-
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>

@@ -1,10 +1,31 @@
-import UserList from "@/components/UserList";
+import { AppSidebar } from "@/components/app-sidebar";
+import { DataTable } from "@/components/data-table";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { getUsers } from "@/lib/userService";
+import { columns } from "./colums";
 
-export default function UsersPage() {
+export default async function UsersPage() {
+  const users = (await getUsers()) ?? [];
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-black p-8">
-      <h1 className="text-2xl font-bold mb-6 text-black dark:text-zinc-50">Usuarios</h1>
-      <UserList />
-    </main>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <DataTable columns={columns} data={users} />
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
