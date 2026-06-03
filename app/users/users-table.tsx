@@ -24,15 +24,16 @@ import {
 import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
 import { IconDotsVertical } from "@tabler/icons-react";
+import { AlertDialogDestructive } from "@/components/alert-dialog";
 
 const columns = ({
   onUserChange,
   onDeleteUserSessions,
-  onDeleteUser,
+  onDeleteUserRequest,
 }: {
   onUserChange: (userId: string, payload: UserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
-  onDeleteUser: (userId: string) => void;
+  onDeleteUserRequest: (userId: string) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -140,14 +141,14 @@ const columns = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem>Edit user</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDeleteUserSessions(user._id)}>
+              <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
                 Remove sessions
               </DropdownMenuItem>
               <DropdownMenuItem>Change password</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
-                onClick={() => onDeleteUser(user._id)}
+                onSelect={() => onDeleteUserRequest(user._id)}
               >
                 Delete user
               </DropdownMenuItem>
@@ -161,6 +162,7 @@ const columns = ({
 
 export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
@@ -178,21 +180,36 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
     return await deleteUserSessions(userId);
   };
 
-  const handleUserDelete = async (userId: string) => {
-    const deleted = await deleteUser(userId);
+  const handleUserDelete = async () => {
+    const deleted = await deleteUser(userToDelete!);
 
     if (!deleted) return;
 
     setTableUsers((currentUsers) =>
-      currentUsers.filter((user) => user._id !== userId),
+      currentUsers.filter((user) => user._id !== userToDelete),
     );
+
+    setUserToDelete(null);
   };
 
   const tableColumns = columns({
     onUserChange: handleUserChange,
     onDeleteUserSessions: handleUserDeleteSessions,
-    onDeleteUser: handleUserDelete,
+    onDeleteUserRequest: setUserToDelete,
   });
 
-  return <DataTable columns={tableColumns} data={tableUsers} />;
+  return (
+    <>
+      <DataTable columns={tableColumns} data={tableUsers} />
+      <AlertDialogDestructive
+        open={userToDelete !== null}
+        onOpenChange={() => {
+          setUserToDelete(null);
+        }}
+        title="Delete User?"
+        description="This will permanently delete this user in the system."
+        onConfirm={handleUserDelete}
+      />
+    </>
+  );
 }
