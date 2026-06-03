@@ -4,7 +4,6 @@ import { UserInfo, UserPayload } from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
-import { revalidatePath } from "next/cache";
 
 const logger = getLogger().setTag("users.actions.ts");
 
@@ -71,6 +70,39 @@ export const deleteUserSessions = async (userId: string) => {
     if (response.status >= 500) {
       const body = await response.json().catch(() => null);
       logger.error("Failed to delete user sessions", {
+        error: body?.message,
+      });
+    }
+    return false;
+  }
+
+  return true;
+};
+
+export const deleteUser = async (userId: string) => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/${userId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while deleting user", error);
+    return false;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to delete user", {
         error: body?.message,
       });
     }

@@ -21,9 +21,11 @@ import { formatReadableDate } from "@/lib/utils/formatDates";
 export const columns = ({
   onUserChange,
   onDeleteUserSessions,
+  onDeleteUser,
 }: {
   onUserChange: (userId: string, payload: UserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
+  onDeleteUser: (userId: string) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -136,7 +138,10 @@ export const columns = ({
               </DropdownMenuItem>
               <DropdownMenuItem>Change password</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onDeleteUser(user._id)}
+              >
                 Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>

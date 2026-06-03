@@ -4,7 +4,11 @@ import { columns } from "@/app/users/colums";
 import { UserInfo, UserPayload } from "@/types/user.types";
 import { DataTable } from "./data-table";
 import { useState } from "react";
-import { deleteUserSessions, updateUser } from "@/lib/users/actions";
+import {
+  deleteUser,
+  deleteUserSessions,
+  updateUser,
+} from "@/lib/users/actions";
 
 export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
@@ -25,9 +29,20 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
     return await deleteUserSessions(userId);
   };
 
+  const handleUserDelete = async (userId: string) => {
+    const deleted = await deleteUser(userId);
+
+    if (!deleted) return;
+
+    setTableUsers((currentUsers) =>
+      currentUsers.filter((user) => user._id !== userId),
+    );
+  };
+
   const tableColumns = columns({
     onUserChange: handleUserChange,
     onDeleteUserSessions: handleUserDeleteSessions,
+    onDeleteUser: handleUserDelete,
   });
 
   return (
