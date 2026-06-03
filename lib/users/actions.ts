@@ -47,3 +47,35 @@ export const updateUser = async (
 
   return body.data as UserInfo;
 };
+
+export const deleteUserSessions = async (userId: string) => {
+  const token = await getAccessToken();
+  let response;
+  try {
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/${userId}/sessions`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while deleting user sessions", error);
+    return false;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to delete user sessions", {
+        error: body?.message,
+      });
+    }
+    return false;
+  }
+
+  return true;
+};

@@ -4,7 +4,7 @@ import { columns } from "@/app/users/colums";
 import { UserInfo, UserPayload } from "@/types/user.types";
 import { DataTable } from "./data-table";
 import { useState } from "react";
-import { updateUser } from "@/lib/users/actions";
+import { deleteUserSessions, updateUser } from "@/lib/users/actions";
 
 export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
@@ -21,8 +21,13 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
     );
   };
 
+  const handleUserDeleteSessions = async (userId: string) => {
+    return await deleteUserSessions(userId);
+  };
+
   const tableColumns = columns({
     onUserChange: handleUserChange,
+    onDeleteUserSessions: handleUserDeleteSessions,
   });
 
   return (

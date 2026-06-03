@@ -20,8 +20,10 @@ import { formatReadableDate } from "@/lib/utils/formatDates";
 
 export const columns = ({
   onUserChange,
+  onDeleteUserSessions,
 }: {
   onUserChange: (userId: string, payload: UserPayload) => void;
+  onDeleteUserSessions: (userId: string) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -113,29 +115,34 @@ export const columns = ({
     },
     {
       id: "actions",
-      cell: () => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem>Edit user</DropdownMenuItem>
-            <DropdownMenuItem>Remove sessions</DropdownMenuItem>
-            <DropdownMenuItem>Change password</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              Delete user
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({ row }) => {
+        const user = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem>Edit user</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDeleteUserSessions(user._id)}>
+                Remove sessions
+              </DropdownMenuItem>
+              <DropdownMenuItem>Change password</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive">
+                Delete user
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 };
