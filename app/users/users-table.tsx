@@ -1,24 +1,31 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SystemRole,
   UserInfo,
   UserPayload,
   UserStatus,
 } from "@/types/user.types";
+import { DataTable } from "../../components/data-table";
+import { useState } from "react";
+import {
+  deleteUser,
+  deleteUserSessions,
+  updateUser,
+} from "@/lib/users/actions";
 import { ColumnDef } from "@tanstack/react-table";
-import { IconDotsVertical } from "@tabler/icons-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
+import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
+import { IconDotsVertical } from "@tabler/icons-react";
 
-export const columns = ({
+const columns = ({
   onUserChange,
   onDeleteUserSessions,
   onDeleteUser,
@@ -151,3 +158,41 @@ export const columns = ({
     },
   ];
 };
+
+export function UsersTable({ users }: { users: UserInfo[] }) {
+  const [tableUsers, setTableUsers] = useState(users);
+
+  const handleUserChange = async (userId: string, payload: UserPayload) => {
+    const updatedUser = await updateUser(userId, payload);
+
+    if (!updatedUser) return;
+
+    setTableUsers((currentUsers) =>
+      currentUsers.map((user) =>
+        user._id === updatedUser._id ? updatedUser : user,
+      ),
+    );
+  };
+
+  const handleUserDeleteSessions = async (userId: string) => {
+    return await deleteUserSessions(userId);
+  };
+
+  const handleUserDelete = async (userId: string) => {
+    const deleted = await deleteUser(userId);
+
+    if (!deleted) return;
+
+    setTableUsers((currentUsers) =>
+      currentUsers.filter((user) => user._id !== userId),
+    );
+  };
+
+  const tableColumns = columns({
+    onUserChange: handleUserChange,
+    onDeleteUserSessions: handleUserDeleteSessions,
+    onDeleteUser: handleUserDelete,
+  });
+
+  return <DataTable columns={tableColumns} data={tableUsers} />;
+}
