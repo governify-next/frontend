@@ -7,7 +7,7 @@ import {
   UserStatus,
 } from "@/types/user.types";
 import { DataTable } from "../../components/data-table";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import {
   deleteUser,
   deleteUserSessions,
@@ -26,17 +26,20 @@ import { formatReadableDate } from "@/lib/utils/formatDates";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
+import { EditPasswordDialog } from "./password-form";
 
 const columns = ({
   onUserChange,
   onDeleteUserSessions,
   onDeleteUserRequest,
   onEditUser,
+  onEditUserPassword,
 }: {
   onUserChange: (userId: string, payload: UserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
   onEditUser: (user: UserInfo) => void;
+  onEditUserPassword: (user: UserInfo) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -68,7 +71,7 @@ const columns = ({
                   onUserChange(user._id, { status: UserStatus.ACTIVE })
                 }
               >
-                Active
+                ACTIVE
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -77,7 +80,7 @@ const columns = ({
                   onUserChange(user._id, { status: UserStatus.DISABLED })
                 }
               >
-                Disabled
+                DISABLED
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -149,7 +152,9 @@ const columns = ({
               <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
                 Remove sessions
               </DropdownMenuItem>
-              <DropdownMenuItem>Change password</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onEditUserPassword(user)}>
+                Change password
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
@@ -169,6 +174,8 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [userToEdit, setUserToEdit] = useState<UserInfo | null>(null);
+  const [userToChangePassword, setUserToChangePassword] =
+    useState<UserInfo | null>(null);
 
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
@@ -205,6 +212,7 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
     onDeleteUserSessions: handleUserDeleteSessions,
     onDeleteUserRequest: setUserToDelete,
     onEditUser: setUserToEdit,
+    onEditUserPassword: setUserToChangePassword,
   });
 
   return (
@@ -224,6 +232,14 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
           user={userToEdit}
           open={true}
           onOpenChange={() => setUserToEdit(null)}
+          onUserChange={handleUserChange}
+        />
+      )}
+      {userToChangePassword && (
+        <EditPasswordDialog
+          user={userToChangePassword}
+          open={true}
+          onOpenChange={() => setUserToChangePassword(null)}
           onUserChange={handleUserChange}
         />
       )}
