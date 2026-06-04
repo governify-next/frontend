@@ -17,6 +17,7 @@ export interface BasicUserInfo {
 
 export interface UserInfo extends BasicUserInfo {
   _id: string;
+  surname: string;
   systemRole: SystemRole;
   status: UserStatus;
   lastLoginAt?: Date;
@@ -24,4 +25,6 @@ export interface UserInfo extends BasicUserInfo {
 
 // User payload for user table
 
-export type UserPayload = Partial<Pick<UserInfo, "status" | "systemRole">>;
+export type UserPayload = Partial<
+  Pick<UserInfo, "status" | "systemRole" | "name" | "surname" | "email">
+>;

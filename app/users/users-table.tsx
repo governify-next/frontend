@@ -25,15 +25,18 @@ import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
+import { EditUserDialog } from "./edit-form";
 
 const columns = ({
   onUserChange,
   onDeleteUserSessions,
   onDeleteUserRequest,
+  onEditUser,
 }: {
   onUserChange: (userId: string, payload: UserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
+  onEditUser: (user: UserInfo) => void;
 }): ColumnDef<UserInfo>[] => {
   return [
     {
@@ -140,7 +143,9 @@ const columns = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem>Edit user</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onEditUser(user)}>
+                Edit user
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
                 Remove sessions
               </DropdownMenuItem>
@@ -163,6 +168,7 @@ const columns = ({
 export function UsersTable({ users }: { users: UserInfo[] }) {
   const [tableUsers, setTableUsers] = useState(users);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [userToEdit, setUserToEdit] = useState<UserInfo | null>(null);
 
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
@@ -196,6 +202,7 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
     onUserChange: handleUserChange,
     onDeleteUserSessions: handleUserDeleteSessions,
     onDeleteUserRequest: setUserToDelete,
+    onEditUser: setUserToEdit,
   });
 
   return (
@@ -210,6 +217,14 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
         description="This will permanently delete this user in the system."
         onConfirm={handleUserDelete}
       />
+      {userToEdit && (
+        <EditUserDialog
+          user={userToEdit}
+          open={true}
+          onOpenChange={() => setUserToEdit(null)}
+          onUserChange={handleUserChange}
+        />
+      )}
     </>
   );
 }
