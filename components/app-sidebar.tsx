@@ -1,6 +1,6 @@
 "use client";
 
-import type { BasicUserInfo } from "@/types/user.types";
+import { SystemRole, type BasicUserInfo } from "@/types/user.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Building2, Command, Users } from "lucide-react";
@@ -26,11 +26,13 @@ const data = {
       title: "Organizations",
       url: "/organizations",
       icon: Building2,
+      roles: [SystemRole.USER, SystemRole.ADMIN],
     },
     {
       title: "Users",
       url: "/users",
       icon: Users,
+      roles: [SystemRole.ADMIN],
     },
   ],
 };
@@ -57,6 +59,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }>("/api/me", fetcher);
   const user = userResponse?.data ?? {
     username: "user123",
+    systemRole: SystemRole.USER,
     name: "Usuario",
     email: "No disponible",
     avatar: null,
@@ -82,7 +85,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavItems items={data.navItems} />
+        <NavItems
+          items={data.navItems.filter((item) =>
+            item.roles.includes(user.systemRole),
+          )}
+        />
       </SidebarContent>
       <SidebarFooter>
         {isLoading ? <NavUserSkeleton /> : <NavUser user={user} />}

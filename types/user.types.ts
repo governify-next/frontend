@@ -12,13 +12,13 @@ export interface BasicUserInfo {
   username: string;
   email: string;
   name: string;
+  systemRole: SystemRole;
   avatar: null; // TODO: define avatar at authenticator
 }
 
 export interface UserInfo extends BasicUserInfo {
   _id: string;
   surname: string;
-  systemRole: SystemRole;
   status: UserStatus;
   lastLoginAt?: Date;
 }
