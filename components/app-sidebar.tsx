@@ -1,6 +1,7 @@
 import { SystemRole } from "@/types/user.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
+import { Suspense } from "react";
 import { Building2, Command, Users } from "lucide-react";
 
 import { NavItems } from "@/components/nav-items";
@@ -33,33 +34,7 @@ const data = {
   ],
 };
 
-function NavUserSkeleton() {
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton size="lg">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
-          <div className="grid flex-1 gap-1">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
-}
-
-export async function AppSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
-  const userInfo = (await getCurrentUser()) ?? {
-    username: "user123",
-    systemRole: SystemRole.USER,
-    name: "Usuario",
-    email: "No disponible",
-    avatar: null,
-  };
-
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -79,6 +54,26 @@ export async function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
+      <Suspense fallback={<SidebarUserSectionSkeleton />}>
+        <SidebarUserSection />
+      </Suspense>
+    </Sidebar>
+  );
+}
+
+async function SidebarUserSection() {
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+  const userInfo = (await getCurrentUser()) ?? {
+    username: "user123",
+    systemRole: SystemRole.USER,
+    name: "Usuario",
+    email: "No disponible",
+    avatar: null,
+  };
+
+  return (
+    <>
       <SidebarContent>
         <NavItems
           items={data.navItems.filter((item) =>
@@ -89,6 +84,38 @@ export async function AppSidebar({
       <SidebarFooter>
         <NavUser user={userInfo} />
       </SidebarFooter>
-    </Sidebar>
+    </>
+  );
+}
+
+function SidebarUserSectionSkeleton() {
+  return (
+    <>
+      <SidebarContent>
+        <SidebarMenu className="gap-2 p-2">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <SidebarMenuItem key={index}>
+              <div className="flex items-center gap-2 px-2 py-1.5">
+                <Skeleton className="size-4 shrink-0 rounded" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg">
+              <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+              <div className="grid flex-1 gap-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </>
   );
 }
