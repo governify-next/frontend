@@ -7,7 +7,7 @@ import {
   UserStatus,
 } from "@/types/user.types";
 import { DataTable } from "../../components/data-table";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import {
   deleteUser,
   deleteUserSessions,
@@ -173,13 +173,15 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
 
-    if (!updatedUser) return;
+    if (!updatedUser) return false;
 
     setTableUsers((currentUsers) =>
       currentUsers.map((user) =>
         user._id === updatedUser._id ? updatedUser : user,
       ),
     );
+
+    return true;
   };
 
   const handleUserDeleteSessions = async (userId: string) => {

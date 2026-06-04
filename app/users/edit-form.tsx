@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.email("Invalid email address"),
@@ -40,8 +43,10 @@ export function EditUserDialog({
   user: UserInfo;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUserChange: (userId: string, payload: UserPayload) => void;
+  onUserChange: (userId: string, payload: UserPayload) => Promise<boolean>;
 }) {
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm({
     defaultValues: {
       email: user.email,
@@ -52,8 +57,14 @@ export function EditUserDialog({
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      onUserChange(user._id, value);
-      onOpenChange(false);
+      setError(null);
+      const success = await onUserChange(user._id, value);
+
+      if (success) {
+        onOpenChange(false);
+      } else {
+        setError("Something went wrong while updating the user. Please try again.");
+      }
     },
   });
 
@@ -154,13 +165,30 @@ export function EditUserDialog({
           </FieldGroup>
         </form>
 
+        {error ? (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Unable to save changes</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        ) : null}
+
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button type="submit" form="edit-user-form">
-            Save changes
-          </Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button
+                type="submit"
+                form="edit-user-form"
+                disabled={isSubmitting}
+              >
+                {isSubmitting && <Loader2Icon className="animate-spin" />}
+                Save changes
+              </Button>
+            )}
+          </form.Subscribe>
         </DialogFooter>
       </DialogContent>
     </Dialog>
