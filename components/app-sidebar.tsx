@@ -1,6 +1,4 @@
-"use client";
-
-import { SystemRole, type BasicUserInfo } from "@/types/user.types";
+import { SystemRole } from "@/types/user.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Building2, Command, Users } from "lucide-react";
@@ -16,9 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-import useSWR from "swr";
-import { fetcher } from "@/lib/utils/fetcher";
+import { getCurrentUser } from "@/lib/auth/session";
 
 const data = {
   navItems: [
@@ -53,11 +49,10 @@ function NavUserSkeleton() {
   );
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: userResponse, isLoading } = useSWR<{
-    data: BasicUserInfo | null;
-  }>("/api/me", fetcher);
-  const user = userResponse?.data ?? {
+export async function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const userInfo = (await getCurrentUser()) ?? {
     username: "user123",
     systemRole: SystemRole.USER,
     name: "Usuario",
@@ -87,12 +82,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavItems
           items={data.navItems.filter((item) =>
-            item.roles.includes(user.systemRole),
+            item.roles.includes(userInfo.systemRole),
           )}
         />
       </SidebarContent>
       <SidebarFooter>
-        {isLoading ? <NavUserSkeleton /> : <NavUser user={user} />}
+        <NavUser user={userInfo} />
       </SidebarFooter>
     </Sidebar>
   );
