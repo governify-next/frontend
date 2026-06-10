@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Pagination,
   SystemRole,
   UserInfo,
   UserPayload,
@@ -27,6 +28,7 @@ import { IconDotsVertical } from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const columns = ({
   onUserChange,
@@ -170,23 +172,43 @@ const columns = ({
   ];
 };
 
-export function UsersTable({ users }: { users: UserInfo[] }) {
-  const [tableUsers, setTableUsers] = useState(users);
+export function UsersTable({
+  users,
+  pagination,
+}: {
+  users: UserInfo[];
+  pagination?: Pagination;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [userToEdit, setUserToEdit] = useState<UserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<UserInfo | null>(null);
+
+  const tablePagination = {
+    pageIndex: (pagination?.page ?? 1) - 1, // tan stack 1 based
+    pageSize: pagination?.limit ?? 20,
+  };
+
+  const handlePaginationChange = (next: {
+    pageIndex: number;
+    pageSize: number;
+  }) => {
+    const params = new URLSearchParams(searchParams);
+    const pageSizeChanged = next.pageSize !== tablePagination.pageSize;
+    params.set("limit", String(next.pageSize));
+    params.set("page", String(pageSizeChanged ? 1 : next.pageIndex + 1));
+    router.push(`?${params.toString()}`);
+  };
 
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
 
     if (!updatedUser) return false;
 
-    setTableUsers((currentUsers) =>
-      currentUsers.map((user) =>
-        user._id === updatedUser._id ? updatedUser : user,
-      ),
-    );
+    router.refresh();
 
     return true;
   };
@@ -200,11 +222,8 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
 
     if (!deleted) return;
 
-    setTableUsers((currentUsers) =>
-      currentUsers.filter((user) => user._id !== userToDelete),
-    );
-
     setUserToDelete(null);
+    router.refresh();
   };
 
   const tableColumns = columns({
@@ -217,7 +236,13 @@ export function UsersTable({ users }: { users: UserInfo[] }) {
 
   return (
     <>
-      <DataTable columns={tableColumns} data={tableUsers} />
+      <DataTable
+        columns={tableColumns}
+        data={users}
+        pageCount={pagination?.totalPages ?? 0}
+        pagination={tablePagination}
+        onPaginationChange={handlePaginationChange}
+      />
       <AlertDialogDestructive
         open={userToDelete !== null}
         onOpenChange={() => {

@@ -1,17 +1,17 @@
-import { UserInfo } from "@/types/user.types";
+import { Pagination, UserInfo } from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
 
 const logger = getLogger().setTag("users.fetch.ts");
 
-export const getUsers = async () => {
+export const getUsers = async (page = 1, limit = 20) => {
   const token = await getAccessToken();
   let response;
 
   try {
     response = await fetch(
-      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users`,
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users?page=${page}&limit=${limit}`,
       {
         method: "GET",
         headers: {
@@ -38,5 +38,5 @@ export const getUsers = async () => {
 
   const body = await response.json();
 
-  return body.data as UserInfo[];
+  return { users: body.data as UserInfo[], pagination: body.pagination as Pagination };
 };

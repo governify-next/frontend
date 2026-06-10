@@ -3,8 +3,18 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getUsers } from "@/lib/users/fetch";
 import { UsersTable } from "@/app/users/users-table";
 
-export default async function UsersPage() {
-  const users = (await getUsers()) ?? [];
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+}) {
+  const { page, limit } = await searchParams;
+  const currentPage = Number(page) || 1;
+  const currentLimit = Number(limit) || 20;
+
+  const result = await getUsers(currentPage, currentLimit);
+  const users = result?.users ?? [];
+  const pagination = result?.pagination;
 
   return (
     <SidebarProvider
@@ -21,7 +31,7 @@ export default async function UsersPage() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-                <UsersTable users={users} />
+                <UsersTable users={users} pagination={pagination} />
               </div>
             </div>
           </div>

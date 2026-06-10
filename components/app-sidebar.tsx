@@ -63,7 +63,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 }
 
 async function SidebarUserSection() {
-  await new Promise((resolve) => setTimeout(resolve, 10000));
   const userInfo = (await getCurrentUser()) ?? {
     username: "user123",
     systemRole: SystemRole.USER,

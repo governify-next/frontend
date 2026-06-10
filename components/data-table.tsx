@@ -6,6 +6,8 @@ import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
+  PaginationState,
+  OnChangeFn,
 } from "@tanstack/react-table";
 
 import {
@@ -21,17 +23,40 @@ import { DataTablePagination } from "./data-table-pagination";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pageCount?: number;
+  pagination?: { pageIndex: number; pageSize: number };
+  onPaginationChange?: (p: { pageIndex: number; pageSize: number }) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pageCount: externalPageCount,
+  pagination: externalPagination,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
+  const isManualPagination = externalPagination !== undefined;
+
+  const handlePaginationChange: OnChangeFn<PaginationState> = (updater) => {
+    if (!onPaginationChange || !externalPagination) return;
+    const next = typeof updater === "function" ? updater(externalPagination) : updater;
+    onPaginationChange(next);
+  };
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(isManualPagination
+      ? {
+          manualPagination: true,
+          pageCount: externalPageCount,
+          state: { pagination: externalPagination },
+          onPaginationChange: handlePaginationChange,
+        }
+      : {
+          getPaginationRowModel: getPaginationRowModel(),
+        }),
   });
 
   return (
