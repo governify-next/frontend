@@ -88,7 +88,7 @@ export function CreateUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add user</DialogTitle>
           <DialogDescription>
@@ -104,7 +104,7 @@ export function CreateUserDialog({
             form.handleSubmit();
           }}
         >
-          <FieldGroup>
+          <FieldGroup className="gap-3">
             <form.Field
               name="username"
               children={(field) => {
@@ -218,7 +218,7 @@ export function CreateUserDialog({
                     <Input
                       id={field.name}
                       name={field.name}
-                      type="password"
+                      type="off"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
