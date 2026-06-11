@@ -39,3 +39,8 @@ export type UserPayload = Partial<
     password?: string;
   }
 >;
+
+export type CreateUserPayload = Pick<
+  UserInfo,
+  "username" | "name" | "surname" | "email" | "systemRole" | "status"
+> & { password: string };

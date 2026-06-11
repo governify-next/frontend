@@ -6,10 +6,12 @@ import {
   UserInfo,
   UserPayload,
   UserStatus,
+  CreateUserPayload,
 } from "@/types/user.types";
 import { DataTable } from "../../components/data-table";
 import { useState } from "react";
 import {
+  createUser,
   deleteUser,
   deleteUserSessions,
   updateUser,
@@ -24,11 +26,12 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
-import { IconCheck, IconChevronDown, IconDotsVertical } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown, IconDotsVertical, IconPlus } from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
+import { CreateUserDialog } from "./create-form";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const columns = ({
@@ -209,6 +212,7 @@ export function UsersTable({
   const [userToEdit, setUserToEdit] = useState<UserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<UserInfo | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const tablePagination = {
     pageIndex: (pagination?.page ?? 1) - 1, // tan stack 1 based
@@ -230,6 +234,16 @@ export function UsersTable({
     const updatedUser = await updateUser(userId, payload);
 
     if (!updatedUser) return false;
+
+    router.refresh();
+
+    return true;
+  };
+
+  const handleUserCreate = async (payload: CreateUserPayload) => {
+    const createdUser = await createUser(payload);
+
+    if (!createdUser) return false;
 
     router.refresh();
 
@@ -259,7 +273,13 @@ export function UsersTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <UsersFilters totalItems={pagination?.totalItems} />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <UsersFilters totalItems={pagination?.totalItems} />
+        <Button onClick={() => setCreateOpen(true)}>
+          <IconPlus />
+          Add user
+        </Button>
+      </div>
       <DataTable
         columns={tableColumns}
         data={users}
@@ -292,6 +312,11 @@ export function UsersTable({
           onUserChange={handleUserChange}
         />
       )}
+      <CreateUserDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreate={handleUserCreate}
+      />
     </div>
   );
 }

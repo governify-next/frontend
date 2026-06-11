@@ -1,6 +1,6 @@
 "use server";
 
-import { UserInfo, UserPayload } from "@/types/user.types";
+import { CreateUserPayload, UserInfo, UserPayload } from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
@@ -110,4 +110,43 @@ export const deleteUser = async (userId: string) => {
   }
 
   return true;
+};
+
+export const createUser = async (
+  payload: CreateUserPayload,
+): Promise<UserInfo | null> => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while creating user", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to create user", {
+        error: body?.message,
+      });
+    }
+    return null;
+  }
+
+  const body = await response.json();
+
+  return body.data as UserInfo;
 };
