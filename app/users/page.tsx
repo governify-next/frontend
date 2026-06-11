@@ -1,18 +1,40 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { getUsers } from "@/lib/users/fetch";
+import { getUsers, searchUsers, UserSearchFilters } from "@/lib/users/fetch";
+import { SystemRole, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
 
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; limit?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    limit?: string;
+    q?: string;
+    field?: string;
+    status?: string;
+    systemRole?: string;
+  }>;
 }) {
-  const { page, limit } = await searchParams;
+  const { page, limit, q, field, status, systemRole } = await searchParams;
   const currentPage = Number(page) || 1;
   const currentLimit = Number(limit) || 20;
 
-  const result = await getUsers(currentPage, currentLimit);
+  const filters: UserSearchFilters = {};
+  if (q) {
+    if (field === "username") filters.username = q;
+    else if (field === "email") filters.email = q;
+    else filters.usernameOrEmail = q;
+  }
+  if (status) filters.status = status as UserStatus;
+  if (systemRole) filters.systemRole = systemRole as SystemRole;
+
+  const hasFilters = Object.keys(filters).length > 0;
+
+  const result = hasFilters
+    ? await searchUsers(filters, currentPage, currentLimit)
+    : await getUsers(currentPage, currentLimit);
+
   const users = result?.users ?? [];
   const pagination = result?.pagination;
 

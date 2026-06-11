@@ -1,4 +1,4 @@
-import { Pagination, UserInfo } from "@/types/user.types";
+import { Pagination, SystemRole, UserInfo, UserStatus } from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
@@ -39,4 +39,55 @@ export const getUsers = async (page = 1, limit = 20) => {
   const body = await response.json();
 
   return { users: body.data as UserInfo[], pagination: body.pagination as Pagination };
+};
+
+export type UserSearchFilters = {
+  usernameOrEmail?: string;
+  username?: string;
+  email?: string;
+  status?: UserStatus;
+  systemRole?: SystemRole;
+};
+
+export const searchUsers = async (
+  filters: UserSearchFilters,
+  page = 1,
+  limit = 20,
+) => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/search?page=${page}&limit=${limit}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(filters),
+        cache: "no-store",
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while searching users", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to search users", { error: body?.message });
+    }
+    return null;
+  }
+
+  const body = await response.json();
+
+  return {
+    users: body.data as UserInfo[],
+    pagination: body.pagination as Pagination,
+  };
 };

@@ -24,10 +24,11 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
-import { IconDotsVertical } from "@tabler/icons-react";
+import { IconCheck, IconChevronDown, IconDotsVertical } from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
+import { UsersFilters } from "./users-filters";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const columns = ({
@@ -45,8 +46,16 @@ const columns = ({
 }): ColumnDef<UserInfo>[] => {
   return [
     {
+      accessorKey: "username",
+      header: "Username",
+    },
+    {
       accessorKey: "name",
       header: "Name",
+    },
+    {
+      accessorKey: "surname",
+      header: "Surname",
     },
     {
       accessorKey: "email",
@@ -63,6 +72,7 @@ const columns = ({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 {user.status}
+                <IconChevronDown />
               </Button>
             </DropdownMenuTrigger>
 
@@ -74,6 +84,9 @@ const columns = ({
                 }
               >
                 ACTIVE
+                {user.status === UserStatus.ACTIVE && (
+                  <IconCheck className="ml-auto" />
+                )}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -83,6 +96,9 @@ const columns = ({
                 }
               >
                 DISABLED
+                {user.status === UserStatus.DISABLED && (
+                  <IconCheck className="ml-auto" />
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -100,6 +116,7 @@ const columns = ({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 {user.systemRole}
+                <IconChevronDown />
               </Button>
             </DropdownMenuTrigger>
 
@@ -111,6 +128,9 @@ const columns = ({
                 }
               >
                 Admin
+                {user.systemRole === SystemRole.ADMIN && (
+                  <IconCheck className="ml-auto" />
+                )}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -120,6 +140,9 @@ const columns = ({
                 }
               >
                 User
+                {user.systemRole === SystemRole.USER && (
+                  <IconCheck className="ml-auto" />
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -235,7 +258,8 @@ export function UsersTable({
   });
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
+      <UsersFilters totalItems={pagination?.totalItems} />
       <DataTable
         columns={tableColumns}
         data={users}
@@ -268,6 +292,6 @@ export function UsersTable({
           onUserChange={handleUserChange}
         />
       )}
-    </>
+    </div>
   );
 }
