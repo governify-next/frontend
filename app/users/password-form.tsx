@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
-import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long."),
@@ -37,8 +35,6 @@ export function EditPasswordDialog({
   onOpenChange: (open: boolean) => void;
   onUserChange: (userId: string, payload: UserPayload) => Promise<boolean>;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
   const form = useForm({
     defaultValues: {
       password: "",
@@ -47,15 +43,9 @@ export function EditPasswordDialog({
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      setError(null);
       const success = await onUserChange(user._id, value);
-
       if (success) {
         onOpenChange(false);
-      } else {
-        setError(
-          "Something went wrong while updating the user password. Please try again.",
-        );
       }
     },
   });
@@ -107,14 +97,6 @@ export function EditPasswordDialog({
             />
           </FieldGroup>
         </form>
-
-        {error ? (
-          <Alert variant="destructive">
-            <AlertCircleIcon />
-            <AlertTitle>Unable to save changes</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        ) : null}
 
         <DialogFooter>
           <DialogClose asChild>

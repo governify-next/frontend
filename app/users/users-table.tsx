@@ -26,13 +26,26 @@ import {
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
 import { formatReadableDate } from "@/lib/utils/formatDates";
-import { IconCheck, IconChevronDown, IconDotsVertical, IconPlus } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconChevronDown,
+  IconDotsVertical,
+  IconPlus,
+} from "@tabler/icons-react";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
 import { CreateUserDialog } from "./create-form";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+
+const updateMessage = (payload: UserPayload) => {
+  if ("password" in payload) return "Password updated.";
+  if ("status" in payload) return "User status updated.";
+  if ("systemRole" in payload) return "User role updated.";
+  return "User updated.";
+};
 
 const columns = ({
   onUserChange,
@@ -233,9 +246,13 @@ export function UsersTable({
   const handleUserChange = async (userId: string, payload: UserPayload) => {
     const updatedUser = await updateUser(userId, payload);
 
-    if (!updatedUser) return false;
+    if (!updatedUser) {
+      toast.error("Something went wrong. Please try again.");
+      return false;
+    }
 
     router.refresh();
+    toast.success(updateMessage(payload));
 
     return true;
   };
@@ -243,24 +260,46 @@ export function UsersTable({
   const handleUserCreate = async (payload: CreateUserPayload) => {
     const createdUser = await createUser(payload);
 
-    if (!createdUser) return false;
+    if (!createdUser) {
+      toast.error("Failed to create user. Please try again.");
+      return false;
+    }
 
     router.refresh();
+    toast.success("User created.");
 
     return true;
   };
 
   const handleUserDeleteSessions = async (userId: string) => {
-    return await deleteUserSessions(userId);
+    const deletedSessions = await deleteUserSessions(userId);
+
+    if (deletedSessions === null) {
+      toast.error("Failed to remove sessions. Please try again.");
+      return;
+    }
+
+    if (deletedSessions === 0) {
+      toast.info("No active sessions to remove.");
+      return;
+    }
+
+    toast.success(
+      `${deletedSessions} session${deletedSessions === 1 ? "" : "s"} removed.`,
+    );
   };
 
   const handleUserDelete = async () => {
     const deleted = await deleteUser(userToDelete!);
 
-    if (!deleted) return;
+    if (!deleted) {
+      toast.error("Failed to delete user. Please try again.");
+      return;
+    }
 
     setUserToDelete(null);
     router.refresh();
+    toast.success("User deleted.");
   };
 
   const tableColumns = columns({

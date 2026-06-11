@@ -47,7 +47,9 @@ export const updateUser = async (
   return body.data as UserInfo;
 };
 
-export const deleteUserSessions = async (userId: string) => {
+export const deleteUserSessions = async (
+  userId: string,
+): Promise<number | null> => {
   const token = await getAccessToken();
   let response;
   try {
@@ -63,7 +65,7 @@ export const deleteUserSessions = async (userId: string) => {
     );
   } catch (error) {
     logger.error("Unexpected error while deleting user sessions", error);
-    return false;
+    return null;
   }
 
   if (!response.ok) {
@@ -73,10 +75,12 @@ export const deleteUserSessions = async (userId: string) => {
         error: body?.message,
       });
     }
-    return false;
+    return null;
   }
 
-  return true;
+  const body = await response.json();
+
+  return body.data.deletedSessions as number;
 };
 
 export const deleteUser = async (userId: string) => {

@@ -25,9 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
-import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   username: z
@@ -57,8 +55,6 @@ export function CreateUserDialog({
   onOpenChange: (open: boolean) => void;
   onCreate: (payload: CreateUserPayload) => Promise<boolean>;
 }) {
-  const [error, setError] = useState<string | null>(null);
-
   const form = useForm({
     defaultValues: {
       username: "",
@@ -73,15 +69,10 @@ export function CreateUserDialog({
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      setError(null);
       const success = await onCreate(value);
       if (success) {
         form.reset();
         onOpenChange(false);
-      } else {
-        setError(
-          "Something went wrong while creating the user. Please try again.",
-        );
       }
     },
   });
@@ -286,14 +277,6 @@ export function CreateUserDialog({
             />
           </FieldGroup>
         </form>
-
-        {error ? (
-          <Alert variant="destructive">
-            <AlertCircleIcon />
-            <AlertTitle>Unable to create user</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        ) : null}
 
         <DialogFooter>
           <DialogClose asChild>
