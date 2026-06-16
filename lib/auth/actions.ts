@@ -58,7 +58,7 @@ async function getLoginSession(credentials: {
 export const loginAction = async (
   _state: LoginFormState,
   formData: FormData,
-): Promise<LoginFormState> => {
+) => {
   const result = loginFormSchema.safeParse({
     login: formData.get("login"),
     password: formData.get("password"),

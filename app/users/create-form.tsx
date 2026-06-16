@@ -1,6 +1,10 @@
 import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
-import { CreateUserPayload, SystemRole, UserStatus } from "@/types/user.types";
+import {
+  ICreateIUserPayload,
+  SystemRole,
+  UserStatus,
+} from "@/types/user.types";
 import {
   Dialog,
   DialogClose,
@@ -53,7 +57,7 @@ export function CreateUserDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (payload: CreateUserPayload) => Promise<boolean>;
+  onCreate: (payload: ICreateIUserPayload) => Promise<boolean>;
 }) {
   const form = useForm({
     defaultValues: {

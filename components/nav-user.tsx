@@ -19,9 +19,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { BasicUserInfo } from "@/types/user.types";
+import { IBasicIUserInfo } from "@/types/user.types";
 
-export function NavUser({ user }: { user: BasicUserInfo }) {
+export function NavUser({ user }: { user: IBasicIUserInfo }) {
   const { isMobile } = useSidebar();
   const avatarFallback = user.name.trim().charAt(0).toUpperCase() || "U";
 

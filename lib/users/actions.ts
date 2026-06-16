@@ -1,16 +1,17 @@
 "use server";
 
-import { CreateUserPayload, UserInfo, UserPayload } from "@/types/user.types";
+import {
+  ICreateIUserPayload,
+  IUserInfo,
+  IUserPayload,
+} from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
 
 const logger = getLogger().setTag("users.actions.ts");
 
-export const updateUser = async (
-  userId: string,
-  payload: UserPayload,
-): Promise<UserInfo | null> => {
+export const updateUser = async (userId: string, payload: IUserPayload) => {
   const token = await getAccessToken();
   let response;
 
@@ -44,12 +45,10 @@ export const updateUser = async (
 
   const body = await response.json();
 
-  return body.data as UserInfo;
+  return body.data as IUserInfo;
 };
 
-export const deleteUserSessions = async (
-  userId: string,
-): Promise<number | null> => {
+export const deleteUserSessions = async (userId: string) => {
   const token = await getAccessToken();
   let response;
   try {
@@ -116,9 +115,7 @@ export const deleteUser = async (userId: string) => {
   return true;
 };
 
-export const createUser = async (
-  payload: CreateUserPayload,
-): Promise<UserInfo | null> => {
+export const createUser = async (payload: ICreateIUserPayload) => {
   const token = await getAccessToken();
   let response;
 
@@ -152,5 +149,5 @@ export const createUser = async (
 
   const body = await response.json();
 
-  return body.data as UserInfo;
+  return body.data as IUserInfo;
 };

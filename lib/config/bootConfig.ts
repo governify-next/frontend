@@ -11,6 +11,8 @@ export const bootEnv = {
   AUTHENTICATOR_SERVICE_URL:
     process.env.AUTHENTICATOR_SERVICE_URL || "http://localhost:5900",
 
+  SCOPE_SERVICE_URL: process.env.SCOPE_SERVICE_URL || "http://localhost:5901",
+
   // Cookie settings
   AUTH_ACCESS_COOKIE_NAME:
     process.env.AUTH_ACCESS_COOKIE_NAME ?? "governify_next_access_token",

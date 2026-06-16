@@ -1,4 +1,9 @@
-import { Pagination, SystemRole, UserInfo, UserStatus } from "@/types/user.types";
+import {
+  Pagination,
+  SystemRole,
+  IUserInfo,
+  UserStatus,
+} from "@/types/user.types";
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
@@ -38,7 +43,10 @@ export const getUsers = async (page = 1, limit = 20) => {
 
   const body = await response.json();
 
-  return { users: body.data as UserInfo[], pagination: body.pagination as Pagination };
+  return {
+    users: body.data as IUserInfo[],
+    pagination: body.pagination as Pagination,
+  };
 };
 
 export type UserSearchFilters = {
@@ -87,7 +95,7 @@ export const searchUsers = async (
   const body = await response.json();
 
   return {
-    users: body.data as UserInfo[],
+    users: body.data as IUserInfo[],
     pagination: body.pagination as Pagination,
   };
 };

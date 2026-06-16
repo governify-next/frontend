@@ -3,10 +3,10 @@
 import {
   Pagination,
   SystemRole,
-  UserInfo,
-  UserPayload,
+  IUserInfo,
+  IUserPayload,
   UserStatus,
-  CreateUserPayload,
+  ICreateIUserPayload,
 } from "@/types/user.types";
 import { DataTable } from "../../components/data-table";
 import { useState } from "react";
@@ -40,7 +40,7 @@ import { CreateUserDialog } from "./create-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-const updateMessage = (payload: UserPayload) => {
+const updateMessage = (payload: IUserPayload) => {
   if ("password" in payload) return "Password updated.";
   if ("status" in payload) return "User status updated.";
   if ("systemRole" in payload) return "User role updated.";
@@ -54,12 +54,12 @@ const columns = ({
   onEditUser,
   onEditUserPassword,
 }: {
-  onUserChange: (userId: string, payload: UserPayload) => void;
+  onUserChange: (userId: string, payload: IUserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
-  onEditUser: (user: UserInfo) => void;
-  onEditUserPassword: (user: UserInfo) => void;
-}): ColumnDef<UserInfo>[] => {
+  onEditUser: (user: IUserInfo) => void;
+  onEditUserPassword: (user: IUserInfo) => void;
+}): ColumnDef<IUserInfo>[] => {
   return [
     {
       accessorKey: "username",
@@ -215,16 +215,16 @@ export function UsersTable({
   users,
   pagination,
 }: {
-  users: UserInfo[];
+  users: IUserInfo[];
   pagination?: Pagination;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
-  const [userToEdit, setUserToEdit] = useState<UserInfo | null>(null);
+  const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
-    useState<UserInfo | null>(null);
+    useState<IUserInfo | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
 
   const tablePagination = {
@@ -243,7 +243,7 @@ export function UsersTable({
     router.push(`?${params.toString()}`);
   };
 
-  const handleUserChange = async (userId: string, payload: UserPayload) => {
+  const handleUserChange = async (userId: string, payload: IUserPayload) => {
     const updatedUser = await updateUser(userId, payload);
 
     if (!updatedUser) {
@@ -257,7 +257,7 @@ export function UsersTable({
     return true;
   };
 
-  const handleUserCreate = async (payload: CreateUserPayload) => {
+  const handleUserCreate = async (payload: ICreateIUserPayload) => {
     const createdUser = await createUser(payload);
 
     if (!createdUser) {

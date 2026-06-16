@@ -63,7 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 }
 
 async function SidebarUserSection() {
-  const userInfo = (await getCurrentUser()) ?? {
+  const IUserInfo = (await getCurrentUser()) ?? {
     username: "user123",
     systemRole: SystemRole.USER,
     name: "Usuario",
@@ -76,12 +76,12 @@ async function SidebarUserSection() {
       <SidebarContent>
         <NavItems
           items={data.navItems.filter((item) =>
-            item.roles.includes(userInfo.systemRole),
+            item.roles.includes(IUserInfo.systemRole),
           )}
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userInfo} />
+        <NavUser user={IUserInfo} />
       </SidebarFooter>
     </>
   );

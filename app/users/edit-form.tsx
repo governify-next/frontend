@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
-import { UserInfo, UserPayload } from "@/types/user.types";
+import { IUserInfo, IUserPayload } from "@/types/user.types";
 import {
   Dialog,
   DialogClose,
@@ -38,10 +38,10 @@ export function EditUserDialog({
   onOpenChange,
   onUserChange,
 }: {
-  user: UserInfo;
+  user: IUserInfo;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUserChange: (userId: string, payload: UserPayload) => Promise<boolean>;
+  onUserChange: (userId: string, payload: IUserPayload) => Promise<boolean>;
 }) {
   const form = useForm({
     defaultValues: {

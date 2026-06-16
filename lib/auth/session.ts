@@ -5,7 +5,7 @@ import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
 import { LoginResponse, SessionTokens } from "@/types/auth";
 import { getLogger } from "../utils/logger";
-import { BasicUserInfo } from "@/types/user.types";
+import { IBasicIUserInfo } from "@/types/user.types";
 
 const logger = getLogger().setTag("sessions.ts");
 
@@ -131,5 +131,5 @@ export const getCurrentUser = async () => {
 
   const body = await response.json();
 
-  return body.data as BasicUserInfo;
+  return body.data as IBasicIUserInfo;
 };

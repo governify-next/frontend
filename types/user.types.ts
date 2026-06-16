@@ -17,7 +17,7 @@ export interface Pagination {
   hasPreviousPage: boolean;
 }
 
-export interface BasicUserInfo {
+export interface IBasicIUserInfo {
   username: string;
   email: string;
   name: string;
@@ -25,7 +25,7 @@ export interface BasicUserInfo {
   avatar: null; // TODO: define avatar at authenticator
 }
 
-export interface UserInfo extends BasicUserInfo {
+export interface IUserInfo extends IBasicIUserInfo {
   _id: string;
   surname: string;
   status: UserStatus;
@@ -34,13 +34,13 @@ export interface UserInfo extends BasicUserInfo {
 
 // User payload for user table
 
-export type UserPayload = Partial<
-  Pick<UserInfo, "status" | "systemRole" | "name" | "surname" | "email"> & {
+export type IUserPayload = Partial<
+  Pick<IUserInfo, "status" | "systemRole" | "name" | "surname" | "email"> & {
     password?: string;
   }
 >;
 
-export type CreateUserPayload = Pick<
-  UserInfo,
+export type ICreateIUserPayload = Pick<
+  IUserInfo,
   "username" | "name" | "surname" | "email" | "systemRole" | "status"
 > & { password: string };
