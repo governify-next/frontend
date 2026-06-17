@@ -1,5 +1,5 @@
-export interface IOrganization extends Document {
+export interface IOrganization {
   name: string;
-  displayName: string;
-  description: string;
+  displayName?: string;
+  description?: string;
 }
