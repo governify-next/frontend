@@ -84,3 +84,41 @@ const getOrganizationsUserBelongs = async (username: string) => {
     organizations: body.data as IOrganization[],
   };
 };
+
+export const getOrganization = async (name: string) => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${name}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while getting organization", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to get organization", {
+        error: body?.message,
+      });
+    }
+    return null;
+  }
+
+  const body = await response.json();
+
+  return {
+    organization: body.data as IOrganization,
+  };
+};
