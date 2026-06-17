@@ -33,7 +33,7 @@ export function OrganizationsList({
 }) {
   return (
     <ItemList
-      className="mx-auto w-full max-w-7xl"
+      className="w-full"
       data={organizations}
       renderItem={(org) => {
         const title = org.displayName || org.name;

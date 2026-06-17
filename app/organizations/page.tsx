@@ -17,13 +17,15 @@ import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getOrganizations } from "@/lib/organizations/fetch";
 import { OrganizationsList } from "./organizations-list";
+import { OrganizationsSearch } from "./organizations-search";
+import { OrganizationsAdminActions } from "./organizations-admin-actions";
 
 export default async function UsersPage() {
   const user = await getCurrentUser();
-  const result =
-    user!.systemRole === SystemRole.ADMIN
-      ? await getOrganizations()
-      : await getOrganizations(user!.username);
+  const isAdmin = user!.systemRole === SystemRole.ADMIN;
+  const result = isAdmin
+    ? await getOrganizations()
+    : await getOrganizations(user!.username);
   const organizations = result?.organizations ?? [];
 
   return (
@@ -61,7 +63,13 @@ export default async function UsersPage() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
               <div className="px-4 lg:px-6">
-                <OrganizationsList organizations={organizations} />
+                <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+                  <div className="flex items-center gap-2">
+                    <OrganizationsSearch />
+                    {isAdmin && <OrganizationsAdminActions />}
+                  </div>
+                  <OrganizationsList organizations={organizations} />
+                </div>
               </div>
             </div>
           </div>

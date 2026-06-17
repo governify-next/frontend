@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryParams } from "@/hooks/use-query-params";
 import {
   IconCheck,
   IconChevronDown,
@@ -27,22 +27,12 @@ import {
 type QueryField = "both" | "username" | "email" | null;
 
 export function UsersFilters({ totalItems }: { totalItems?: number }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { searchParams, setParams } = useQueryParams();
 
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [field, setField] = useState<QueryField>(
     (searchParams.get("field") as QueryField) ?? "both",
   );
-
-  const setParams = (values: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams);
-    for (const [key, value] of Object.entries(values)) {
-      value ? params.set(key, value) : params.delete(key);
-    }
-    params.set("page", "1");
-    router.push(`?${params.toString()}`);
-  };
 
   const submitSearch = () =>
     setParams({ q: query || null, field: query ? field : null });

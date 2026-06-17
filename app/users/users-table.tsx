@@ -37,7 +37,8 @@ import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
 import { CreateUserDialog } from "./create-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useQueryParams } from "@/hooks/use-query-params";
 import { toast } from "sonner";
 
 const updateMessage = (payload: IUserPayload) => {
@@ -219,7 +220,7 @@ export function UsersTable({
   pagination?: Pagination;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { setParams } = useQueryParams();
 
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
@@ -236,11 +237,11 @@ export function UsersTable({
     pageIndex: number;
     pageSize: number;
   }) => {
-    const params = new URLSearchParams(searchParams);
     const pageSizeChanged = next.pageSize !== tablePagination.pageSize;
-    params.set("limit", String(next.pageSize));
-    params.set("page", String(pageSizeChanged ? 1 : next.pageIndex + 1));
-    router.push(`?${params.toString()}`);
+    setParams({
+      limit: String(next.pageSize),
+      page: String(pageSizeChanged ? 1 : next.pageIndex + 1),
+    });
   };
 
   const handleUserChange = async (userId: string, payload: IUserPayload) => {
