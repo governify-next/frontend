@@ -38,7 +38,7 @@ export function OrganizationsList({
       renderItem={(org) => {
         const title = org.displayName || org.name;
         return (
-          <Item>
+          <Item variant="outline">
             <ItemMedia>
               <Avatar>
                 <AvatarFallback>{getInitials(title)}</AvatarFallback>

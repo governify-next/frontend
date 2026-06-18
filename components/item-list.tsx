@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { ItemGroup, ItemSeparator } from "@/components/ui/item";
+import { ItemGroup } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { DataTablePagination } from "./data-table-pagination";
 
@@ -28,16 +28,13 @@ export function ItemList<T>({
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      <ItemGroup className="rounded-md border">
+      <ItemGroup>
         {rows.length ? (
-          rows.map((row, i) => (
-            <Fragment key={row.id}>
-              {renderItem(row.original as T)}
-              {i !== rows.length - 1 && <ItemSeparator />}
-            </Fragment>
+          rows.map((row) => (
+            <Fragment key={row.id}>{renderItem(row.original as T)}</Fragment>
           ))
         ) : (
-          <div className="flex h-24 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex h-24 items-center justify-center rounded-md border text-sm text-muted-foreground">
             No results.
           </div>
         )}
