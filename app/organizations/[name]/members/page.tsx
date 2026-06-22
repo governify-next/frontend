@@ -28,7 +28,7 @@ export default async function OrganizationMembersPage({
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
       <div className="flex items-center gap-2">
         <MembersSearch />
-        {isOrgAdmin && <MembersAdminActions />}
+        {isOrgAdmin && <MembersAdminActions orgName={orgName} />}
       </div>
       <MembersList members={members} isOrgAdmin={isOrgAdmin} />
     </div>

@@ -30,7 +30,6 @@ export function MembersList({
           <Item variant="outline">
             <ItemMedia>
               <Avatar>
-                {/*TODO: hacer que las memberships devuelvan el avatar para meterlo y si no fallback*/}
                 <AvatarFallback>{avatarFallback(username)}</AvatarFallback>
               </Avatar>
             </ItemMedia>
