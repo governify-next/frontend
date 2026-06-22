@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -13,20 +14,22 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { SystemRole } from "@/types/user.types";
-import { getCurrentUser } from "@/lib/auth/session";
-import { getOrganizations } from "@/lib/organizations/fetch";
-import { OrganizationsList } from "./organizations-list";
-import { OrganizationsSearch } from "./organizations-search";
-import { OrganizationsAdminActions } from "./organizations-admin-actions";
+import { getOrganization } from "@/lib/organizations/fetch";
+import { OrganizationTabsNav } from "./organization-tabs-nav";
 
-export default async function OrganizationsPage() {
-  const user = await getCurrentUser();
-  const isAdmin = user!.systemRole === SystemRole.ADMIN;
-  const result = isAdmin
-    ? await getOrganizations()
-    : await getOrganizations(user!.username);
-  const organizations = result?.organizations ?? [];
+export default async function OrganizationLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ name: string }>;
+}) {
+  const { name } = await params;
+
+  const result = await getOrganization(decodeURIComponent(name));
+  if (!result) notFound();
+
+  const title = result.organization.displayName || result.organization.name;
 
   return (
     <SidebarProvider
@@ -52,8 +55,14 @@ export default async function OrganizationsPage() {
                   <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/organizations">
+                    Organizations
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Organizations</BreadcrumbPage>
+                  <BreadcrumbPage>{title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -63,13 +72,8 @@ export default async function OrganizationsPage() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
               <div className="px-4 lg:px-6">
-                <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <OrganizationsSearch />
-                    {isAdmin && <OrganizationsAdminActions />}
-                  </div>
-                  <OrganizationsList organizations={organizations} />
-                </div>
+                <OrganizationTabsNav orgName={name} />
+                {children}
               </div>
             </div>
           </div>

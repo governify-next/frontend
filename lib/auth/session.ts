@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
@@ -98,7 +99,7 @@ export const refreshSession = async (refreshToken: string) => {
   }
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = cache(async () => {
   const token = await getAccessToken();
   let response;
 
@@ -132,4 +133,4 @@ export const getCurrentUser = async () => {
   const body = await response.json();
 
   return body.data as IBasicIUserInfo;
-};
+});

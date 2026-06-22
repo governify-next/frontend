@@ -20,10 +20,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { IBasicIUserInfo } from "@/types/user.types";
+import { avatarFallback } from "@/lib/utils/trimName";
 
 export function NavUser({ user }: { user: IBasicIUserInfo }) {
   const { isMobile } = useSidebar();
-  const avatarFallback = user.name.trim().charAt(0).toUpperCase() || "U";
 
   return (
     <SidebarMenu>
@@ -37,7 +37,7 @@ export function NavUser({ user }: { user: IBasicIUserInfo }) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {avatarFallback}
+                  {avatarFallback(user.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -58,7 +58,7 @@ export function NavUser({ user }: { user: IBasicIUserInfo }) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {avatarFallback}
+                    {avatarFallback(user.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

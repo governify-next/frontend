@@ -1,7 +1,8 @@
 import { getAccessToken } from "../auth/session";
 import { bootEnv } from "../config/bootConfig";
 import { getLogger } from "../utils/logger";
-import { IOrganization } from "@/types/organization.types";
+import { cache } from "react";
+import { IMembership, IOrganization } from "@/types/organization.types";
 
 const logger = getLogger().setTag("organizations.fetch.ts");
 
@@ -85,7 +86,7 @@ const getOrganizationsUserBelongs = async (username: string) => {
   };
 };
 
-export const getOrganization = async (name: string) => {
+export const getOrganization = cache(async (name: string) => {
   const token = await getAccessToken();
   let response;
 
@@ -120,5 +121,43 @@ export const getOrganization = async (name: string) => {
 
   return {
     organization: body.data as IOrganization,
+  };
+});
+
+export const getOrganizationMembers = async (name: string) => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${name}/members?expand=names`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while getting organization members", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to get organization members", {
+        error: body?.message,
+      });
+    }
+    return null;
+  }
+
+  const body = await response.json();
+
+  return {
+    organization: body.data as IMembership[],
   };
 };
