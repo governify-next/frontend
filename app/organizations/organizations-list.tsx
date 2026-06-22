@@ -44,10 +44,12 @@ export function OrganizationsList({
                 <AvatarFallback>{getInitials(title)}</AvatarFallback>
               </Avatar>
             </ItemMedia>
-            <ItemContent>
+            <ItemContent className="min-w-0">
               <ItemTitle>{title}</ItemTitle>
               {org.description && (
-                <ItemDescription>{org.description}</ItemDescription>
+                <ItemDescription className="break-words">
+                  {org.description}
+                </ItemDescription>
               )}
             </ItemContent>
             <ItemActions>
