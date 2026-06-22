@@ -83,3 +83,41 @@ export const addOrganizationMember = async (
 
   return body.data as IMembership;
 };
+
+export const removeOrganizationMember = async (
+  orgName: string,
+  username: string,
+) => {
+  const token = await getAccessToken();
+  let response;
+
+  try {
+    response = await fetch(
+      `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/members/${username}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username }),
+      },
+    );
+  } catch (error) {
+    logger.error("Unexpected error while removing organization member", error);
+    return null;
+  }
+
+  if (!response.ok) {
+    if (response.status >= 500) {
+      const body = await response.json().catch(() => null);
+      logger.error("Failed to remove organization member", {
+        error: body?.message,
+      });
+    }
+    return null;
+  }
+
+  return true;
+};

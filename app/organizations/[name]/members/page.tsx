@@ -30,7 +30,12 @@ export default async function OrganizationMembersPage({
         <MembersSearch />
         {isOrgAdmin && <MembersAdminActions orgName={orgName} />}
       </div>
-      <MembersList members={members} isOrgAdmin={isOrgAdmin} />
+      <MembersList
+        members={members}
+        isOrgAdmin={isOrgAdmin}
+        orgName={orgName}
+        currentUsername={user?.username}
+      />
     </div>
   );
 }
