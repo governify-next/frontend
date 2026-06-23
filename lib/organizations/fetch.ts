@@ -158,6 +158,6 @@ export const getOrganizationMembers = async (name: string) => {
   const body = await response.json();
 
   return {
-    organization: body.data as IMembership[],
+    members: body.data as IMembership[],
   };
 };

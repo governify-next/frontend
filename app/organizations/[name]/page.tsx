@@ -19,7 +19,9 @@ export default async function OrganizationHomePage({
         {organization.displayName || organization.name}
       </h2>
       {organization.description && (
-        <p className="text-sm text-muted-foreground">{organization.description}</p>
+        <p className="text-sm text-muted-foreground">
+          {organization.description}
+        </p>
       )}
     </div>
   );

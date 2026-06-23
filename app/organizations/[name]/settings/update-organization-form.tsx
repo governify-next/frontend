@@ -1,15 +1,20 @@
+"use client";
+
 import { useForm } from "@tanstack/react-form";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 import { IOrganization } from "@/types/organization.types";
 import { organizationFormSchema } from "@/schemas/organization";
+import { updateOrganization } from "@/lib/organizations/actions";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Field,
   FieldError,
@@ -19,52 +24,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 
-export function CreateOrganizationDialog({
-  open,
-  onOpenChange,
-  onCreate,
+export function UpdateOrganizationForm({
+  organization,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCreate: (payload: IOrganization) => Promise<boolean>;
+  organization: IOrganization;
 }) {
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
-      name: "",
-      displayName: "",
-      description: "",
+      name: organization.name,
+      displayName: organization.displayName ?? "",
+      description: organization.description,
     },
     validators: {
       onSubmit: organizationFormSchema,
     },
     onSubmit: async ({ value }) => {
-      const success = await onCreate({
+      const payload = {
         name: value.name,
-        description: value.description,
         displayName: value.displayName || undefined,
-      });
-      if (success) {
-        form.reset();
-        onOpenChange(false);
+        description: value.description,
+      };
+      const updated = await updateOrganization(organization.name, payload);
+
+      if (!updated) {
+        toast.error("Failed to update organization. Please try again.");
+        return;
+      }
+
+      toast.success("Organization updated.");
+
+      if (updated.name !== organization.name) {
+        router.push(`/organizations/${updated.name}/settings`);
+      } else {
+        router.refresh();
       }
     },
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add organization</DialogTitle>
-          <DialogDescription>
-            Fill in the details to create a new organization. Click create when
-            you&apos;re done.
-          </DialogDescription>
-        </DialogHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle>Organization details</CardTitle>
+        <CardDescription>
+          Update the organization&apos;s public information.
+        </CardDescription>
+      </CardHeader>
 
+      <CardContent>
         <form
-          id="create-organization-form"
+          id="update-organization-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -87,7 +97,6 @@ export function CreateOrganizationDialog({
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       autoComplete="off"
-                      autoFocus={true}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -147,25 +156,22 @@ export function CreateOrganizationDialog({
             />
           </FieldGroup>
         </form>
+      </CardContent>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="create-organization-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Create organization
-              </Button>
-            )}
-          </form.Subscribe>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <CardFooter className="justify-end">
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => (
+            <Button
+              type="submit"
+              form="update-organization-form"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && <Loader2Icon className="animate-spin" />}
+              Save changes
+            </Button>
+          )}
+        </form.Subscribe>
+      </CardFooter>
+    </Card>
   );
 }

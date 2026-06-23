@@ -16,7 +16,7 @@ export default async function OrganizationMembersPage({
     getCurrentUser(),
     getOrganizationMembers(orgName),
   ]);
-  const members = result?.organization ?? [];
+  const members = result?.members ?? [];
 
   const isOrgAdmin = members.some(
     (m) =>
