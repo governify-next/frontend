@@ -50,6 +50,7 @@ export function UpdateOrganizationForm({
 
       if (!updated) {
         toast.error("Failed to update organization. Please try again.");
+        form.reset();
         return;
       }
 
