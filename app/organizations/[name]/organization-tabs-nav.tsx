@@ -9,6 +9,7 @@ export function OrganizationTabsNav({ orgName }: { orgName: string }) {
   const tabs = [
     { value: "home", label: "Home", href: base },
     { value: "members", label: "Members", href: `${base}/members` },
+    { value: "roles", label: "Roles", href: `${base}/roles` },
     { value: "settings", label: "Settings", href: `${base}/settings` },
   ];
   const active =
@@ -19,7 +20,12 @@ export function OrganizationTabsNav({ orgName }: { orgName: string }) {
     <Tabs value={active} className="w-full">
       <TabsList variant="line" className="gap-6">
         {tabs.map((t) => (
-          <TabsTrigger key={t.value} value={t.value} className="text-base" asChild>
+          <TabsTrigger
+            key={t.value}
+            value={t.value}
+            className="text-base"
+            asChild
+          >
             <Link href={t.href}>{t.label}</Link>
           </TabsTrigger>
         ))}

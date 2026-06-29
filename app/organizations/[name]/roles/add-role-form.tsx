@@ -1,6 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import { IOrganizationPayload } from "@/types/organization.types";
-import { organizationFormSchema } from "@/schemas/organization";
 import {
   Dialog,
   DialogClose,
@@ -17,33 +15,33 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
+import { IRolePayload } from "@/types/organization.types";
+import { Textarea } from "@/components/ui/textarea";
+import { roleFormSchema } from "@/schemas/organization";
 
-export function CreateOrganizationDialog({
+export function AddRoleDialog({
   open,
   onOpenChange,
   onCreate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (payload: IOrganizationPayload) => Promise<boolean>;
+  onCreate: (payload: IRolePayload) => Promise<boolean>;
 }) {
   const form = useForm({
     defaultValues: {
       name: "",
-      displayName: "",
       description: "",
     },
     validators: {
-      onSubmit: organizationFormSchema,
+      onSubmit: roleFormSchema,
     },
     onSubmit: async ({ value }) => {
       const success = await onCreate({
         name: value.name,
         description: value.description,
-        displayName: value.displayName || undefined,
       });
       if (success) {
         form.reset();
@@ -56,15 +54,14 @@ export function CreateOrganizationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add organization</DialogTitle>
+          <DialogTitle>Add role</DialogTitle>
           <DialogDescription>
-            Fill in the details to create a new organization. Click create when
-            you&apos;re done.
+            Enter the details of the role you want to add to this organization.
           </DialogDescription>
         </DialogHeader>
 
         <form
-          id="create-organization-form"
+          id="add-role-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -88,31 +85,6 @@ export function CreateOrganizationDialog({
                       aria-invalid={isInvalid}
                       autoComplete="off"
                       autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
-
-            <form.Field
-              name="displayName"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Display name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -156,11 +128,11 @@ export function CreateOrganizationDialog({
             {(isSubmitting) => (
               <Button
                 type="submit"
-                form="create-organization-form"
+                form="add-role-form"
                 disabled={isSubmitting}
               >
                 {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Create organization
+                Add role
               </Button>
             )}
           </form.Subscribe>

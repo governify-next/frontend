@@ -9,6 +9,7 @@ import { ItemGroup } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { DataTablePagination } from "./data-table-pagination";
 
+// Use this component when you need to render a list of items with pagination.
 export function ItemList<T>({
   data,
   renderItem,

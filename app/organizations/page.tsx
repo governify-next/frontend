@@ -17,8 +17,8 @@ import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getOrganizations } from "@/lib/organizations/fetch";
 import { OrganizationsList } from "./organizations-list";
-import { OrganizationsSearch } from "./organizations-search";
 import { OrganizationsAdminActions } from "./organizations-admin-actions";
+import { InputSearch } from "@/components/input-search";
 
 export default async function OrganizationsPage() {
   const user = await getCurrentUser();
@@ -65,7 +65,7 @@ export default async function OrganizationsPage() {
               <div className="px-4 lg:px-6">
                 <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
                   <div className="flex items-center gap-2">
-                    <OrganizationsSearch />
+                    <InputSearch placeholder="Search organizations..." />
                     {isAdmin && <OrganizationsAdminActions />}
                   </div>
                   <OrganizationsList organizations={organizations} />

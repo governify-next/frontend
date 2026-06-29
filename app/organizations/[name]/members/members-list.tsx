@@ -17,28 +17,37 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { ItemList } from "@/components/item-list";
-import { IMembership } from "@/types/organization.types";
+import { IMembership, IRole } from "@/types/organization.types";
 import { avatarFallback } from "@/lib/utils/trimName";
-import { removeOrganizationMember } from "@/lib/organizations/actions";
+import {
+  removeOrganizationMember,
+  updateOrganizationMemberRoles,
+} from "@/lib/organizations/actions";
+import { ChangeRoleDialog } from "./change-role-dialog";
 
 export function MembersList({
   members,
   isOrgAdmin,
   orgName,
   currentUsername,
+  roles,
 }: {
   members: IMembership[];
   isOrgAdmin: boolean;
   orgName: string;
   currentUsername?: string;
+  roles: IRole[];
 }) {
   const router = useRouter();
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+  const [memberToChangeRole, setMemberToChangeRole] = useState<{
+    username: string;
+    currentRoles: IRole[];
+  } | null>(null);
 
   const handleMemberRemove = async () => {
     const removed = await removeOrganizationMember(orgName, memberToRemove!);
@@ -51,6 +60,23 @@ export function MembersList({
     setMemberToRemove(null);
     router.refresh();
     toast.success("Member removed.");
+  };
+
+  const handleChangeRole = async (newRolesIds: string[]) => {
+    const changed = await updateOrganizationMemberRoles(
+      orgName,
+      memberToChangeRole!.username!,
+      newRolesIds,
+    );
+
+    if (!changed) {
+      toast.error("Failed to change role. Please try again.");
+      return;
+    }
+
+    setMemberToChangeRole(null);
+    router.refresh();
+    toast.success("Roles changed.");
   };
 
   return (
@@ -89,7 +115,16 @@ export function MembersList({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem>Change role</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() =>
+                          setMemberToChangeRole({
+                            username: member.userId.username,
+                            currentRoles: member.roles,
+                          })
+                        }
+                      >
+                        Change role
+                      </DropdownMenuItem>
                       {username !== currentUsername && (
                         <>
                           <DropdownMenuItem
@@ -115,6 +150,16 @@ export function MembersList({
         description="This will remove this user from the organization."
         onConfirm={handleMemberRemove}
       />
+      {memberToChangeRole && (
+        <ChangeRoleDialog
+          open={true}
+          onOpenChange={() => setMemberToChangeRole(null)}
+          username={memberToChangeRole.username}
+          currentRoles={memberToChangeRole.currentRoles}
+          roles={roles}
+          onSave={handleChangeRole}
+        />
+      )}
     </>
   );
 }

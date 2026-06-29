@@ -10,7 +10,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 
-export function OrganizationsSearch() {
+export function InputSearch({ placeholder }: { placeholder: string }) {
   const { searchParams, setParams } = useQueryParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
 
@@ -24,7 +24,7 @@ export function OrganizationsSearch() {
     >
       <InputGroup>
         <InputGroupInput
-          placeholder="Search organizations..."
+          placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
