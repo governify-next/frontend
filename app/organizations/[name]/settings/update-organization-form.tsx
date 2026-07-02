@@ -46,18 +46,18 @@ export function UpdateOrganizationForm({
         displayName: value.displayName || undefined,
         description: value.description,
       };
-      const updated = await updateOrganization(organization.name, payload);
+      const result = await updateOrganization(organization.name, payload);
 
-      if (!updated) {
-        toast.error("Failed to update organization. Please try again.");
+      if (!result.ok) {
+        toast.error(result.error);
         form.reset();
         return;
       }
 
       toast.success("Organization updated.");
 
-      if (updated.name !== organization.name) {
-        router.push(`/organizations/${updated.name}/settings`);
+      if (result.data.name !== organization.name) {
+        router.push(`/organizations/${result.data.name}/settings`);
       } else {
         router.refresh();
       }

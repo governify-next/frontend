@@ -12,10 +12,10 @@ export function MembersAdminActions({ orgName }: { orgName: string }) {
   const [createOpen, setCreateOpen] = useState(false);
 
   const handleMemberAdd = async (payload: { username: string }) => {
-    const created = await addOrganizationMember(orgName, payload);
+    const result = await addOrganizationMember(orgName, payload);
 
-    if (!created) {
-      toast.error("Failed to add member. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return false;
     }
 

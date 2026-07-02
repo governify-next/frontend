@@ -2,10 +2,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,18 +13,41 @@ import {
 } from "@/components/ui/sidebar";
 import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getOrganizations } from "@/lib/organizations/fetch";
+import {
+  getOrganizations,
+  getOrganizationsUserBelongs,
+} from "@/lib/organizations/fetch";
 import { OrganizationsList } from "./organizations-list";
 import { OrganizationsAdminActions } from "./organizations-admin-actions";
 import { InputSearch } from "@/components/input-search";
+import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationsPage() {
-  const user = await getCurrentUser();
+  const userResult = await getCurrentUser();
+  if (!userResult.ok) {
+    return (
+      <ErrorPage
+        result={userResult}
+        message="Something went wrong while fetching current user."
+      />
+    );
+  }
+  const user = userResult.data;
   const isAdmin = user!.systemRole === SystemRole.ADMIN;
   const result = isAdmin
     ? await getOrganizations()
-    : await getOrganizations(user!.username);
-  const organizations = result?.organizations ?? [];
+    : await getOrganizationsUserBelongs(user!.username);
+
+  if (!result.ok) {
+    return (
+      <ErrorPage
+        result={result}
+        message="Something went wrong while fetching organizations."
+      />
+    );
+  }
+
+  const organizations = result.data;
 
   return (
     <SidebarProvider
@@ -48,10 +69,6 @@ export default async function OrganizationsPage() {
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>Organizations</BreadcrumbPage>
                 </BreadcrumbItem>

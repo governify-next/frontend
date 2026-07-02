@@ -14,6 +14,8 @@ export interface IMembership {
   userId: {
     _id: string;
     username: string;
+    name: string;
+    surname: string;
   };
   roles: IRole[];
 }

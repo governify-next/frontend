@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { getCurrentUser } from "@/lib/auth/session";
+import { ErrorPage } from "./errors";
 
 const data = {
   navItems: [
@@ -63,25 +64,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 }
 
 async function SidebarUserSection() {
-  const IUserInfo = (await getCurrentUser()) ?? {
-    username: "user123",
-    systemRole: SystemRole.USER,
-    name: "Usuario",
-    email: "No disponible",
-    avatar: null,
-  };
+  const result = await getCurrentUser();
+  if (!result.ok) {
+    return (
+      <ErrorPage
+        result={result}
+        message="Something went wrong while fetching current user."
+      />
+    );
+  }
+
+  const user = result.data;
 
   return (
     <>
       <SidebarContent>
         <NavItems
           items={data.navItems.filter((item) =>
-            item.roles.includes(IUserInfo.systemRole),
+            item.roles.includes(user.systemRole),
           )}
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={IUserInfo} />
+        <NavUser user={user} />
       </SidebarFooter>
     </>
   );

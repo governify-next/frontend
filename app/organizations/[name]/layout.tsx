@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getOrganization } from "@/lib/organizations/fetch";
 import { OrganizationTabsNav } from "./organization-tabs-nav";
+import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationLayout({
   children,
@@ -27,9 +28,17 @@ export default async function OrganizationLayout({
   const { name } = await params;
 
   const result = await getOrganization(decodeURIComponent(name));
-  if (!result) notFound();
+  if (!result.ok) {
+    return (
+      <ErrorPage
+        result={result}
+        message="Something went wrong while fetching organization."
+      />
+    );
+  }
 
-  const title = result.organization.displayName || result.organization.name;
+  const organization = result.data;
+  const title = organization.displayName || organization.name;
 
   return (
     <SidebarProvider
@@ -51,10 +60,6 @@ export default async function OrganizationLayout({
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="/organizations">
                     Organizations

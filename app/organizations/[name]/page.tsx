@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getOrganization } from "@/lib/organizations/fetch";
+import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationHomePage({
   params,
@@ -9,9 +10,16 @@ export default async function OrganizationHomePage({
   const { name } = await params;
 
   const result = await getOrganization(decodeURIComponent(name));
-  if (!result) notFound();
+  if (!result.ok) {
+    return (
+      <ErrorPage
+        result={result}
+        message="Something went wrong while fetching organization."
+      />
+    );
+  }
 
-  const { organization } = result;
+  const organization = result.data;
 
   return (
     <div className="flex flex-col gap-1 pt-4">

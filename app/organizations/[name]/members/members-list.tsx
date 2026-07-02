@@ -8,6 +8,7 @@ import {
   Item,
   ItemActions,
   ItemContent,
+  ItemDescription,
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
@@ -50,10 +51,10 @@ export function MembersList({
   } | null>(null);
 
   const handleMemberRemove = async () => {
-    const removed = await removeOrganizationMember(orgName, memberToRemove!);
+    const result = await removeOrganizationMember(orgName, memberToRemove!);
 
-    if (!removed) {
-      toast.error("Failed to remove member. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return;
     }
 
@@ -94,7 +95,10 @@ export function MembersList({
                 </Avatar>
               </ItemMedia>
               <ItemContent>
-                <ItemTitle>{username}</ItemTitle>
+                <ItemTitle>
+                  {member.userId.name} {member.userId.surname}
+                </ItemTitle>
+                <ItemDescription>{username}</ItemDescription>
               </ItemContent>
               <ItemActions>
                 <span className="text-xs text-muted-foreground capitalize">

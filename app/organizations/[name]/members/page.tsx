@@ -1,9 +1,12 @@
 import { getCurrentUser } from "@/lib/auth/session";
-import { getOrganizationMembers } from "@/lib/organizations/fetch";
+import {
+  getOrganization,
+  getOrganizationMembers,
+} from "@/lib/organizations/fetch";
 import { MembersAdminActions } from "./members-admin-actions";
 import { MembersList } from "./members-list";
-import { getRoles } from "../../utils";
 import { InputSearch } from "@/components/input-search";
+import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationMembersPage({
   params,
@@ -13,16 +16,29 @@ export default async function OrganizationMembersPage({
   const { name } = await params;
   const orgName = decodeURIComponent(name);
 
-  const [user, result, roles] = await Promise.all([
+  const [userResult, membersResult, organizationResult] = await Promise.all([
     getCurrentUser(),
     getOrganizationMembers(orgName),
-    getRoles(orgName),
+    getOrganization(orgName),
   ]);
-  const members = result?.members ?? [];
+
+  const ERROR_MESSAGE =
+    "Something went wrong while fetching organization members.";
+
+  if (!userResult.ok)
+    return <ErrorPage result={userResult} message={ERROR_MESSAGE} />;
+  if (!membersResult.ok)
+    return <ErrorPage result={membersResult} message={ERROR_MESSAGE} />;
+  if (!organizationResult.ok)
+    return <ErrorPage result={organizationResult} message={ERROR_MESSAGE} />;
+
+  const members = membersResult.data;
+  const user = userResult.data;
+  const roles = organizationResult.data.roles;
 
   const isOrgAdmin = members.some(
     (m) =>
-      m.userId.username === user?.username &&
+      m.userId.username === user.username &&
       m.roles.some((r) => r.name === "admin"),
   );
 

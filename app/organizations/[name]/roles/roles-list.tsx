@@ -14,6 +14,7 @@ import {
   ItemActions,
   ItemContent,
   ItemDescription,
+  ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
 import {
@@ -39,10 +40,10 @@ export function RolesList({
   const [roleToEdit, setRoleToEdit] = useState<IRolePayload | null>(null);
 
   const handleDeleteRole = async (roleName: string) => {
-    const deleted = await deleteOrganizationRole(orgName, roleName);
+    const result = await deleteOrganizationRole(orgName, roleName);
 
-    if (!deleted) {
-      toast.error("Failed to delete role. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return;
     }
 
@@ -52,13 +53,13 @@ export function RolesList({
   };
 
   const handleEditRole = async (payload: IRolePayload) => {
-    const updated = await updateOrganizationRole(
+    const result = await updateOrganizationRole(
       orgName,
       roleToEdit!.name,
       payload,
     );
-    if (!updated) {
-      toast.error("Failed to update role. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return false;
     }
 
@@ -69,50 +70,43 @@ export function RolesList({
 
   return (
     <>
-      <ItemList
-        data={roles}
-        renderItem={(role) => {
-          return (
-            <Item key={role._id} variant="outline">
-              <ItemContent>
-                <ItemTitle>{role.name}</ItemTitle>
-                <ItemDescription>{role.description}</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Role options"
-                    >
-                      <MoreVertical />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        setRoleToEdit({
-                          name: role.name,
-                          description: role.description,
-                        })
-                      }
-                    >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onSelect={() => setRoleToDelete(role.name)}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </ItemActions>
-            </Item>
-          );
-        }}
-      ></ItemList>
+      <ItemGroup>
+        {roles.map((role) => (
+          <Item key={role._id} variant="outline">
+            <ItemContent>
+              <ItemTitle>{role.name}</ItemTitle>
+              <ItemDescription>{role.description}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Role options">
+                    <MoreVertical />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onSelect={() =>
+                      setRoleToEdit({
+                        name: role.name,
+                        description: role.description,
+                      })
+                    }
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onSelect={() => setRoleToDelete(role.name)}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </ItemActions>
+          </Item>
+        ))}
+      </ItemGroup>
       <AlertDialogDestructive
         open={roleToDelete !== null}
         onOpenChange={() => setRoleToDelete(null)}

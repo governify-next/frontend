@@ -5,10 +5,8 @@ import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { bootEnv } from "../config/bootConfig";
 import { LoginResponse, SessionTokens } from "@/types/auth";
-import { getLogger } from "../utils/logger";
-import { IBasicIUserInfo } from "@/types/user.types";
-
-const logger = getLogger().setTag("sessions.ts");
+import { IBasicUserInfo } from "@/types/user.types";
+import { apiFetcher } from "../utils/fetcher";
 
 const cookieOptions = {
   httpOnly: true,
@@ -67,70 +65,23 @@ export const deleteSessionResponseCookies = (response: NextResponse) => {
 };
 
 export const refreshSession = async (refreshToken: string) => {
-  try {
-    const response = await fetch(
-      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/refresh`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-        cache: "no-store",
-      },
-    );
+  const result = await apiFetcher<LoginResponse["data"]>(
+    `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/refresh`,
+    {
+      method: "POST",
+      body: { refreshToken },
+      skipAuth: true,
+    },
+  );
 
-    if (!response.ok) {
-      if (response.status >= 500) {
-        const body = await response.json().catch(() => null);
-        logger.error("Failed to refresh session with authenticator", {
-          error: body?.message,
-        });
-      }
-      return null;
-    }
-
-    const body = (await response.json()) as LoginResponse;
-    return body.data;
-  } catch (error) {
-    logger.error("Unexpected error while refreshing user session", error);
-    return null;
-  }
+  return result.ok ? result.data : null;
 };
 
 export const getCurrentUser = cache(async () => {
-  const token = await getAccessToken();
-  let response;
-
-  try {
-    response = await fetch(
-      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/me`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      },
-    );
-  } catch (error) {
-    logger.error("Unexpected error while getting user info", error);
-    return null;
-  }
-
-  if (!response.ok) {
-    if (response.status >= 500) {
-      const body = await response.json().catch(() => null);
-      logger.error("Failed to get user info", {
-        error: body?.message,
-      });
-    }
-    return null;
-  }
-
-  const body = await response.json();
-
-  return body.data as IBasicIUserInfo;
+  return await apiFetcher<IBasicUserInfo>(
+    `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/me`,
+    {
+      method: "GET",
+    },
+  );
 });

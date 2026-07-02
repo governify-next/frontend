@@ -27,10 +27,10 @@ export function DangerZone({ orgName }: { orgName: string }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleDelete = async () => {
-    const deleted = await deleteOrganization(orgName);
+    const result = await deleteOrganization(orgName);
 
-    if (!deleted) {
-      toast.error("Failed to delete organization. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       setConfirmOpen(false);
       return;
     }

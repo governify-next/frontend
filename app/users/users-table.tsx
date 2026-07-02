@@ -245,10 +245,10 @@ export function UsersTable({
   };
 
   const handleUserChange = async (userId: string, payload: IUserPayload) => {
-    const updatedUser = await updateUser(userId, payload);
+    const result = await updateUser(userId, payload);
 
-    if (!updatedUser) {
-      toast.error("Something went wrong. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return false;
     }
 
@@ -259,42 +259,40 @@ export function UsersTable({
   };
 
   const handleUserCreate = async (payload: ICreateIUserPayload) => {
-    const createdUser = await createUser(payload);
+    const result = await createUser(payload);
 
-    if (!createdUser) {
-      toast.error("Failed to create user. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return false;
     }
 
     router.refresh();
-    toast.success("User created.");
+    toast.success(`User created.`);
 
     return true;
   };
 
   const handleUserDeleteSessions = async (userId: string) => {
-    const deletedSessions = await deleteUserSessions(userId);
+    const result = await deleteUserSessions(userId);
 
-    if (deletedSessions === null) {
-      toast.error("Failed to remove sessions. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return;
     }
 
-    if (deletedSessions === 0) {
-      toast.info("No active sessions to remove.");
-      return;
-    }
-
-    toast.success(
-      `${deletedSessions} session${deletedSessions === 1 ? "" : "s"} removed.`,
-    );
+    const deletedSessions = result.data.deletedSessions;
+    deletedSessions === 0
+      ? toast.info("No active sessions to remove.")
+      : toast.success(
+          `${deletedSessions} session${deletedSessions === 1 ? "" : "s"} removed.`,
+        );
   };
 
   const handleUserDelete = async () => {
-    const deleted = await deleteUser(userToDelete!);
+    const result = await deleteUser(userToDelete!);
 
-    if (!deleted) {
-      toast.error("Failed to delete user. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return;
     }
 

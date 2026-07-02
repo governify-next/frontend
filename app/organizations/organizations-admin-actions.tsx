@@ -6,18 +6,18 @@ import { IconPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createOrganization } from "@/lib/organizations/actions";
-import { IOrganization } from "@/types/organization.types";
+import { IOrganizationPayload } from "@/types/organization.types";
 import { CreateOrganizationDialog } from "./create-form";
 
 export function OrganizationsAdminActions() {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const handleOrganizationCreate = async (payload: IOrganization) => {
-    const created = await createOrganization(payload);
+  const handleOrganizationCreate = async (payload: IOrganizationPayload) => {
+    const result = await createOrganization(payload);
 
-    if (!created) {
-      toast.error("Failed to create organization. Please try again.");
+    if (!result.ok) {
+      toast.error(result.error);
       return false;
     }
 

@@ -1,60 +1,12 @@
-import {
-  Pagination,
-  SystemRole,
-  IUserInfo,
-  UserStatus,
-} from "@/types/user.types";
-import { getAccessToken } from "../auth/session";
+import { IUserInfo, UserSearchFilters } from "@/types/user.types";
 import { bootEnv } from "../config/bootConfig";
-import { getLogger } from "../utils/logger";
-
-const logger = getLogger().setTag("users.fetch.ts");
+import { apiFetcher } from "../utils/fetcher";
 
 export const getUsers = async (page = 1, limit = 20) => {
-  const token = await getAccessToken();
-  let response;
-
-  try {
-    response = await fetch(
-      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users?page=${page}&limit=${limit}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      },
-    );
-  } catch (error) {
-    logger.error("Unexpected error while getting users", error);
-    return null;
-  }
-
-  if (!response.ok) {
-    if (response.status >= 500) {
-      const body = await response.json().catch(() => null);
-      logger.error("Failed to get users", {
-        error: body?.message,
-      });
-    }
-    return null;
-  }
-
-  const body = await response.json();
-
-  return {
-    users: body.data as IUserInfo[],
-    pagination: body.pagination as Pagination,
-  };
-};
-
-export type UserSearchFilters = {
-  usernameOrEmail?: string;
-  username?: string;
-  email?: string;
-  status?: UserStatus;
-  systemRole?: SystemRole;
+  return await apiFetcher<IUserInfo[]>(
+    `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users?page=${page}&limit=${limit}`,
+    { method: "GET" },
+  );
 };
 
 export const searchUsers = async (
@@ -62,40 +14,8 @@ export const searchUsers = async (
   page = 1,
   limit = 20,
 ) => {
-  const token = await getAccessToken();
-  let response;
-
-  try {
-    response = await fetch(
-      `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/search?page=${page}&limit=${limit}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(filters),
-        cache: "no-store",
-      },
-    );
-  } catch (error) {
-    logger.error("Unexpected error while searching users", error);
-    return null;
-  }
-
-  if (!response.ok) {
-    if (response.status >= 500) {
-      const body = await response.json().catch(() => null);
-      logger.error("Failed to search users", { error: body?.message });
-    }
-    return null;
-  }
-
-  const body = await response.json();
-
-  return {
-    users: body.data as IUserInfo[],
-    pagination: body.pagination as Pagination,
-  };
+  return await apiFetcher<IUserInfo[]>(
+    `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/search?page=${page}&limit=${limit}`,
+    { method: "POST", body: filters },
+  );
 };

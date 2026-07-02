@@ -17,7 +17,7 @@ export interface Pagination {
   hasPreviousPage: boolean;
 }
 
-export interface IBasicIUserInfo {
+export interface IBasicUserInfo {
   username: string;
   email: string;
   name: string;
@@ -25,7 +25,7 @@ export interface IBasicIUserInfo {
   avatar: null; // TODO: define avatar at authenticator
 }
 
-export interface IUserInfo extends IBasicIUserInfo {
+export interface IUserInfo extends IBasicUserInfo {
   _id: string;
   surname: string;
   status: UserStatus;
@@ -44,3 +44,11 @@ export type ICreateIUserPayload = Pick<
   IUserInfo,
   "username" | "name" | "surname" | "email" | "systemRole" | "status"
 > & { password: string };
+
+export type UserSearchFilters = {
+  usernameOrEmail?: string;
+  username?: string;
+  email?: string;
+  status?: UserStatus;
+  systemRole?: SystemRole;
+};

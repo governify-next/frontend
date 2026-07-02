@@ -6,27 +6,28 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export function OrganizationTabsNav({ orgName }: { orgName: string }) {
   const pathname = usePathname();
   const base = `/organizations/${orgName}`;
-  const tabs = [
+  const baseTabs = [
     { value: "home", label: "Home", href: base },
     { value: "members", label: "Members", href: `${base}/members` },
     { value: "roles", label: "Roles", href: `${base}/roles` },
     { value: "settings", label: "Settings", href: `${base}/settings` },
   ];
+
   const active =
-    tabs.find((t) => t.href !== base && pathname.startsWith(t.href))?.value ??
-    "home";
+    baseTabs.find((tab) => tab.href !== base && pathname.startsWith(tab.href))
+      ?.value ?? "home";
 
   return (
     <Tabs value={active} className="w-full">
       <TabsList variant="line" className="gap-6">
-        {tabs.map((t) => (
+        {baseTabs.map((tab) => (
           <TabsTrigger
-            key={t.value}
-            value={t.value}
+            key={tab.value}
+            value={tab.value}
             className="text-base"
             asChild
           >
-            <Link href={t.href}>{t.label}</Link>
+            <Link href={tab.href}>{tab.label}</Link>
           </TabsTrigger>
         ))}
       </TabsList>

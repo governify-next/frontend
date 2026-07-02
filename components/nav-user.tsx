@@ -19,10 +19,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { IBasicIUserInfo } from "@/types/user.types";
+import { IBasicUserInfo } from "@/types/user.types";
 import { avatarFallback } from "@/lib/utils/trimName";
 
-export function NavUser({ user }: { user: IBasicIUserInfo }) {
+export function NavUser({ user }: { user: IBasicUserInfo }) {
   const { isMobile } = useSidebar();
 
   return (

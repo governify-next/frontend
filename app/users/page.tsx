@@ -16,6 +16,8 @@ import {
 import { getUsers, searchUsers, UserSearchFilters } from "@/lib/users/fetch";
 import { SystemRole, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
+import { toast } from "sonner";
+import { ErrorPage } from "@/components/errors";
 
 export default async function UsersPage({
   searchParams,
@@ -48,8 +50,17 @@ export default async function UsersPage({
     ? await searchUsers(filters, currentPage, currentLimit)
     : await getUsers(currentPage, currentLimit);
 
-  const users = result?.users ?? [];
-  const pagination = result?.pagination;
+  if (!result.ok) {
+    return (
+      <ErrorPage
+        result={result}
+        message="Something went wrong while fetching users."
+      />
+    );
+  }
+
+  const users = result.data;
+  const pagination = result.pagination;
 
   return (
     <SidebarProvider
@@ -71,10 +82,6 @@ export default async function UsersPage({
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>Users</BreadcrumbPage>
                 </BreadcrumbItem>
