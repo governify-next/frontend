@@ -1,6 +1,7 @@
 import { RolesList } from "./roles-list";
 import { ErrorPage } from "@/components/errors";
 import { getOrganization } from "@/lib/organizations/fetch";
+import { AddRole } from "./role-nav";
 
 export default async function OrganizationRolesPage({
   params,
@@ -25,6 +26,7 @@ export default async function OrganizationRolesPage({
 
   return (
     <div className="mx-auto max-w-7xl pt-4 flex flex-col gap-4">
+      <AddRole orgName={orgName} />
       <RolesList orgName={orgName} roles={roles} />
     </div>
   );

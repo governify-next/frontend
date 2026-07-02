@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import { IUserInfo, IUserPayload } from "@/types/user.types";
 import {
   Dialog,
@@ -10,15 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   email: z.email("Invalid email address"),
@@ -43,7 +36,7 @@ export function EditUserDialog({
   onOpenChange: (open: boolean) => void;
   onUserChange: (userId: string, payload: IUserPayload) => Promise<boolean>;
 }) {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       email: user.email,
       name: user.name,
@@ -54,9 +47,13 @@ export function EditUserDialog({
     },
     onSubmit: async ({ value }) => {
       const success = await onUserChange(user._id, value);
-      if (success) {
-        onOpenChange(false);
+
+      if (!success) {
+        form.reset();
+        return;
       }
+
+      onOpenChange(false);
     },
   });
 
@@ -78,82 +75,17 @@ export function EditUserDialog({
           }}
         >
           <FieldGroup>
-            <form.Field
-              name="name"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                      autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="name">
+              {(field) => <field.TextField label="Name" autoFocus />}
+            </form.AppField>
 
-            <form.Field
-              name="surname"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Surname</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="surname">
+              {(field) => <field.TextField label="Surname" />}
+            </form.AppField>
 
-            <form.Field
-              name="email"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="email"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="email">
+              {(field) => <field.TextField label="Email" type="email" />}
+            </form.AppField>
           </FieldGroup>
         </form>
 
@@ -161,18 +93,9 @@ export function EditUserDialog({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="edit-user-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Save changes
-              </Button>
-            )}
-          </form.Subscribe>
+          <form.AppForm>
+            <form.SubmitButton label="Save changes" formId="edit-user-form" />
+          </form.AppForm>
         </DialogFooter>
       </DialogContent>
     </Dialog>

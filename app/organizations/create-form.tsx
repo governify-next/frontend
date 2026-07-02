@@ -1,4 +1,4 @@
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import { IOrganizationPayload } from "@/types/organization.types";
 import { organizationFormSchema } from "@/schemas/organization";
 import {
@@ -10,16 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 
 export function CreateOrganizationDialog({
   open,
@@ -30,7 +22,7 @@ export function CreateOrganizationDialog({
   onOpenChange: (open: boolean) => void;
   onCreate: (payload: IOrganizationPayload) => Promise<boolean>;
 }) {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: "",
       displayName: "",
@@ -71,99 +63,32 @@ export function CreateOrganizationDialog({
           }}
         >
           <FieldGroup className="gap-3">
-            <form.Field
-              name="name"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                      autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="name">
+              {(field) => <field.TextField label="Name" autoFocus />}
+            </form.AppField>
 
-            <form.Field
-              name="displayName"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Display name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="displayName">
+              {(field) => <field.TextField label="Display name" />}
+            </form.AppField>
 
-            <form.Field
-              name="description"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                    <Textarea
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="description">
+              {(field) => <field.TextareaField label="Description" />}
+            </form.AppField>
           </FieldGroup>
         </form>
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" onClick={() => form.reset()}>
+              Cancel
+            </Button>
           </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="create-organization-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Create organization
-              </Button>
-            )}
-          </form.Subscribe>
+          <form.AppForm>
+            <form.SubmitButton
+              label="Create organization"
+              formId="create-organization-form"
+            />
+          </form.AppForm>
         </DialogFooter>
       </DialogContent>
     </Dialog>

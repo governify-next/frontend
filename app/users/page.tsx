@@ -13,8 +13,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getUsers, searchUsers, UserSearchFilters } from "@/lib/users/fetch";
-import { SystemRole, UserStatus } from "@/types/user.types";
+import { getUsers, searchUsers } from "@/lib/users/fetch";
+import { SystemRole, UserSearchFilters, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
 import { toast } from "sonner";
 import { ErrorPage } from "@/components/errors";

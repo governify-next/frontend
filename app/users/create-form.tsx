@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import {
   ICreateIUserPayload,
   SystemRole,
@@ -14,22 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   username: z
@@ -59,7 +45,7 @@ export function CreateUserDialog({
   onOpenChange: (open: boolean) => void;
   onCreate: (payload: ICreateIUserPayload) => Promise<boolean>;
 }) {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       username: "",
       name: "",
@@ -100,204 +86,55 @@ export function CreateUserDialog({
           }}
         >
           <FieldGroup className="gap-3">
-            <form.Field
-              name="username"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                      autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="username">
+              {(field) => <field.TextField label="Username" autoFocus />}
+            </form.AppField>
 
-            <form.Field
-              name="name"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="name">
+              {(field) => <field.TextField label="Name" />}
+            </form.AppField>
 
-            <form.Field
-              name="surname"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Surname</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="surname">
+              {(field) => <field.TextField label="Surname" />}
+            </form.AppField>
 
-            <form.Field
-              name="email"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="email"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="email">
+              {(field) => <field.TextField label="Email" type="email" />}
+            </form.AppField>
 
-            <form.Field
-              name="password"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="off"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="password">
+              {(field) => <field.TextField label="Password" type="off" />}
+            </form.AppField>
 
-            <form.Field
-              name="systemRole"
-              children={(field) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>System Role</FieldLabel>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={(value) =>
-                      field.handleChange(value as SystemRole)
-                    }
-                  >
-                    <SelectTrigger id={field.name} className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(SystemRole).map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {role}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+            <form.AppField name="systemRole">
+              {(field) => (
+                <field.SelectField
+                  label="System Role"
+                  options={Object.values(SystemRole)}
+                />
               )}
-            />
+            </form.AppField>
 
-            <form.Field
-              name="status"
-              children={(field) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Status</FieldLabel>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={(value) =>
-                      field.handleChange(value as UserStatus)
-                    }
-                  >
-                    <SelectTrigger id={field.name} className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(UserStatus).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+            <form.AppField name="status">
+              {(field) => (
+                <field.SelectField
+                  label="Status"
+                  options={Object.values(UserStatus)}
+                />
               )}
-            />
+            </form.AppField>
           </FieldGroup>
         </form>
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" onClick={() => form.reset()}>
+              Cancel
+            </Button>
           </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="create-user-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Create user
-              </Button>
-            )}
-          </form.Subscribe>
+          <form.AppForm>
+            <form.SubmitButton label="Create user" formId="create-user-form" />
+          </form.AppForm>
         </DialogFooter>
       </DialogContent>
     </Dialog>

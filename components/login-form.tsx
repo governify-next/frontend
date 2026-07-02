@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
@@ -8,8 +7,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Loader2Icon } from "lucide-react";
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import { loginFormSchema } from "@/schemas/auth";
 import { useRouter } from "next/navigation";
 import { loginAction } from "@/lib/auth/actions";
@@ -17,7 +15,7 @@ import { toast } from "sonner";
 
 export function LoginUserForm() {
   const router = useRouter();
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       login: "",
       password: "",
@@ -54,35 +52,20 @@ export function LoginUserForm() {
           </p>
         </div>
 
-        <form.Field
-          name="login"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Login</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="text"
-                  autoComplete="username"
-                  aria-invalid={isInvalid}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  autoFocus={true}
-                  required
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
+        <form.AppField name="login">
+          {(field) => (
+            <field.TextField
+              label="Login"
+              type="text"
+              autoComplete="username"
+              autoFocus
+              required
+            />
+          )}
+        </form.AppField>
 
-        <form.Field
-          name="password"
-          children={(field) => {
+        <form.AppField name="password">
+          {(field) => {
             const isInvalid =
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
@@ -111,20 +94,11 @@ export function LoginUserForm() {
               </Field>
             );
           }}
-        />
+        </form.AppField>
 
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <Button
-              type="submit"
-              form="login-user-form"
-              disabled={isSubmitting}
-            >
-              {isSubmitting && <Loader2Icon className="animate-spin" />}
-              Login
-            </Button>
-          )}
-        </form.Subscribe>
+        <form.AppForm>
+          <form.SubmitButton label="Login" formId="login-user-form" />
+        </form.AppForm>
       </FieldGroup>
     </form>
   );

@@ -1,4 +1,4 @@
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import {
   Dialog,
   DialogClose,
@@ -8,18 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 import { IRolePayload } from "@/types/organization.types";
 import { roleFormSchema } from "@/schemas/organization";
-import { Textarea } from "@/components/ui/textarea";
 
 export function EditRoleDialog({
   role,
@@ -32,7 +24,7 @@ export function EditRoleDialog({
   onOpenChange: (open: boolean) => void;
   onRoleChange: (payload: IRolePayload) => Promise<boolean>;
 }) {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: role.name,
       description: role.description,
@@ -66,55 +58,13 @@ export function EditRoleDialog({
           }}
         >
           <FieldGroup>
-            <form.Field
-              name="name"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                      autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="name">
+              {(field) => <field.TextField label="Name" autoFocus />}
+            </form.AppField>
 
-            <form.Field
-              name="description"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                    <Textarea
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="description">
+              {(field) => <field.TextareaField label="Description" />}
+            </form.AppField>
           </FieldGroup>
         </form>
 
@@ -122,18 +72,9 @@ export function EditRoleDialog({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="edit-role-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Save changes
-              </Button>
-            )}
-          </form.Subscribe>
+          <form.AppForm>
+            <form.SubmitButton label="Save changes" formId="edit-role-form" />
+          </form.AppForm>
         </DialogFooter>
       </DialogContent>
     </Dialog>

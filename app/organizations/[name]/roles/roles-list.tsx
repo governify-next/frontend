@@ -84,7 +84,7 @@ export function RolesList({
                     <MoreVertical />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onSelect={() =>
                       setRoleToEdit({

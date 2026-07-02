@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useForm } from "@tanstack/react-form";
+import { useAppForm } from "@/components/form";
 import {
   Dialog,
   DialogClose,
@@ -9,15 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   username: z
@@ -35,7 +28,7 @@ export function AddMemberDialog({
   onOpenChange: (open: boolean) => void;
   onCreate: (payload: { username: string }) => Promise<boolean>;
 }) {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       username: "",
     },
@@ -69,31 +62,9 @@ export function AddMemberDialog({
           }}
         >
           <FieldGroup className="gap-3">
-            <form.Field
-              name="username"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      autoComplete="off"
-                      autoFocus={true}
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
+            <form.AppField name="username">
+              {(field) => <field.TextField label="Username" autoFocus />}
+            </form.AppField>
           </FieldGroup>
         </form>
 
@@ -101,18 +72,9 @@ export function AddMemberDialog({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
-              <Button
-                type="submit"
-                form="add-member-form"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Loader2Icon className="animate-spin" />}
-                Add member
-              </Button>
-            )}
-          </form.Subscribe>
+          <form.AppForm>
+            <form.SubmitButton label="Add member" formId="add-member-form" />
+          </form.AppForm>
         </DialogFooter>
       </DialogContent>
     </Dialog>
