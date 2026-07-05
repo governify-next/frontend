@@ -1,4 +1,4 @@
-import { Pagination } from "@/types/user.types";
+import { Pagination } from "@/types/pagination";
 import { getAccessToken } from "../auth/session";
 import { getLogger } from "./logger";
 

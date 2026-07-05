@@ -19,27 +19,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  pageCount?: number;
-  pagination?: { pageIndex: number; pageSize: number };
-  onPaginationChange?: (p: { pageIndex: number; pageSize: number }) => void;
-}
+import { Pagination } from "@/types/pagination";
+import { usePaginationParams } from "@/hooks/use-pagination-params";
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  pageCount: externalPageCount,
-  pagination: externalPagination,
-  onPaginationChange,
-}: DataTableProps<TData, TValue>) {
-  const isManualPagination = externalPagination !== undefined;
+  pagination,
+}: {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  pagination?: Pagination;
+}) {
+  const isManualPagination = pagination !== undefined;
+  const {
+    pagination: state,
+    pageCount,
+    onPaginationChange,
+  } = usePaginationParams(pagination);
 
   const handlePaginationChange: OnChangeFn<PaginationState> = (updater) => {
-    if (!onPaginationChange || !externalPagination) return;
-    const next = typeof updater === "function" ? updater(externalPagination) : updater;
+    if (!onPaginationChange || !state) return;
+    const next = typeof updater === "function" ? updater(state) : updater;
     onPaginationChange(next);
   };
 
@@ -50,8 +51,8 @@ export function DataTable<TData, TValue>({
     ...(isManualPagination
       ? {
           manualPagination: true,
-          pageCount: externalPageCount,
-          state: { pagination: externalPagination },
+          pageCount,
+          state: { pagination: state },
           onPaginationChange: handlePaginationChange,
         }
       : {

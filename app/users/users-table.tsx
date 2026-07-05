@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Pagination,
   SystemRole,
   IUserInfo,
   IUserPayload,
@@ -38,8 +37,8 @@ import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
 import { CreateUserDialog } from "./create-form";
 import { useRouter } from "next/navigation";
-import { useQueryParams } from "@/hooks/use-query-params";
 import { toast } from "sonner";
+import { Pagination } from "@/types/pagination";
 
 const updateMessage = (payload: IUserPayload) => {
   if ("password" in payload) return "Password updated.";
@@ -220,29 +219,12 @@ export function UsersTable({
   pagination?: Pagination;
 }) {
   const router = useRouter();
-  const { setParams } = useQueryParams();
 
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<IUserInfo | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-
-  const tablePagination = {
-    pageIndex: (pagination?.page ?? 1) - 1, // tan stack 1 based
-    pageSize: pagination?.limit ?? 20,
-  };
-
-  const handlePaginationChange = (next: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    const pageSizeChanged = next.pageSize !== tablePagination.pageSize;
-    setParams({
-      limit: String(next.pageSize),
-      page: String(pageSizeChanged ? 1 : next.pageIndex + 1),
-    });
-  };
 
   const handleUserChange = async (userId: string, payload: IUserPayload) => {
     const result = await updateUser(userId, payload);
@@ -311,20 +293,14 @@ export function UsersTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
         <UsersFilters totalItems={pagination?.totalItems} />
         <Button onClick={() => setCreateOpen(true)}>
           <IconPlus />
           Add user
         </Button>
       </div>
-      <DataTable
-        columns={tableColumns}
-        data={users}
-        pageCount={pagination?.totalPages ?? 0}
-        pagination={tablePagination}
-        onPaginationChange={handlePaginationChange}
-      />
+      <DataTable columns={tableColumns} data={users} pagination={pagination} />
       <AlertDialogDestructive
         open={userToDelete !== null}
         onOpenChange={() => {

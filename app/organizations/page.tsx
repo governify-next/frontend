@@ -13,16 +13,20 @@ import {
 } from "@/components/ui/sidebar";
 import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
-import {
-  getOrganizations,
-  getOrganizationsUserBelongs,
-} from "@/lib/organizations/fetch";
+import { searchOrganizations } from "@/lib/organizations/fetch";
 import { OrganizationsList } from "./organizations-list";
 import { OrganizationsAdminActions } from "./organizations-admin-actions";
-import { InputSearch } from "@/components/input-search";
 import { ErrorPage } from "@/components/errors";
+import { OrganizationFilters } from "./organization-filters";
+import { IOrganizationSearchFilters } from "@/types/organization.types";
+import { SearchParams } from "nuqs/server";
+import { loadOrganizationSearchParamas } from "./organization-search-params";
 
-export default async function OrganizationsPage() {
+export default async function OrganizationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const userResult = await getCurrentUser();
   if (!userResult.ok) {
     return (
@@ -32,12 +36,24 @@ export default async function OrganizationsPage() {
       />
     );
   }
+  const { page, limit, q, field } =
+    await loadOrganizationSearchParamas(searchParams);
+  const filters: IOrganizationSearchFilters = {};
+
+  if (q) {
+    if (field === "name") filters.name = q;
+    else if (field === "displayName") filters.displayName = q;
+    else if (field === "and") {
+      filters.name = q;
+      filters.displayName = q;
+    } else {
+      filters.nameOrDisplayName = q;
+    }
+  }
+
   const user = userResult.data;
   const isAdmin = user!.systemRole === SystemRole.ADMIN;
-  const result = isAdmin
-    ? await getOrganizations()
-    : await getOrganizationsUserBelongs(user!.username);
-
+  const result = await searchOrganizations(page, limit, filters);
   if (!result.ok) {
     return (
       <ErrorPage
@@ -46,8 +62,8 @@ export default async function OrganizationsPage() {
       />
     );
   }
-
   const organizations = result.data;
+  const pagination = result.pagination!;
 
   return (
     <SidebarProvider
@@ -81,11 +97,14 @@ export default async function OrganizationsPage() {
             <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
               <div className="px-4 lg:px-6">
                 <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <InputSearch placeholder="Search organizations..." />
+                  <div className="flex items-start justify-between gap-2">
+                    <OrganizationFilters totalItems={pagination.totalItems} />
                     {isAdmin && <OrganizationsAdminActions />}
                   </div>
-                  <OrganizationsList organizations={organizations} />
+                  <OrganizationsList
+                    organizations={organizations}
+                    pagination={pagination}
+                  />
                 </div>
               </div>
             </div>

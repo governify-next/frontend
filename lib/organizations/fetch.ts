@@ -1,22 +1,22 @@
 import { bootEnv } from "../config/bootConfig";
 import { cache } from "react";
-import { IMembership, IOrganization } from "@/types/organization.types";
+import {
+  IMembership,
+  IOrganization,
+  IOrganizationSearchFilters,
+} from "@/types/organization.types";
 import { apiFetcher } from "../utils/fetcher";
 
-export const getOrganizations = async () => {
+export const searchOrganizations = async (
+  page: number,
+  limit: number,
+  filters: IOrganizationSearchFilters,
+) => {
   return await apiFetcher<IOrganization[]>(
-    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations`,
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/search?page=${page}&limit=${limit}`,
     {
-      method: "GET",
-    },
-  );
-};
-
-export const getOrganizationsUserBelongs = async (username: string) => {
-  return await apiFetcher<IOrganization[]>(
-    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/users/${username}/organizations`,
-    {
-      method: "GET",
+      method: "POST",
+      body: filters,
     },
   );
 };

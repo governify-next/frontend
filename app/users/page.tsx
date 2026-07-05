@@ -2,10 +2,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -16,24 +14,17 @@ import {
 import { getUsers, searchUsers } from "@/lib/users/fetch";
 import { SystemRole, UserSearchFilters, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
-import { toast } from "sonner";
 import { ErrorPage } from "@/components/errors";
+import { SearchParams } from "nuqs";
+import { loadUserSearchParams } from "./users-search-params";
 
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: string;
-    limit?: string;
-    q?: string;
-    field?: string;
-    status?: string;
-    systemRole?: string;
-  }>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { page, limit, q, field, status, systemRole } = await searchParams;
-  const currentPage = Number(page) || 1;
-  const currentLimit = Number(limit) || 20;
+  const { q, field, status, systemRole, page, limit } =
+    await loadUserSearchParams(searchParams);
 
   const filters: UserSearchFilters = {};
   if (q) {
@@ -44,11 +35,7 @@ export default async function UsersPage({
   if (status) filters.status = status as UserStatus;
   if (systemRole) filters.systemRole = systemRole as SystemRole;
 
-  const hasFilters = Object.keys(filters).length > 0;
-
-  const result = hasFilters
-    ? await searchUsers(filters, currentPage, currentLimit)
-    : await getUsers(currentPage, currentLimit);
+  const result = await searchUsers(filters, page, limit);
 
   if (!result.ok) {
     return (

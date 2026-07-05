@@ -8,15 +8,6 @@ export enum UserStatus {
   DISABLED = "DISABLED",
 }
 
-export interface Pagination {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
 export interface IBasicUserInfo {
   username: string;
   email: string;

@@ -2,92 +2,61 @@
 
 import { useState } from "react";
 import { useQueryParams } from "@/hooks/use-query-params";
-import {
-  IconCheck,
-  IconChevronDown,
-  IconSearch,
-  IconX,
-} from "@tabler/icons-react";
+import { IconSearch, IconX } from "@tabler/icons-react";
 import { SystemRole, UserStatus } from "@/types/user.types";
-import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { FilterDropdown } from "@/components/filter-dropdown";
+import { useQueryStates } from "nuqs";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-type QueryField = "both" | "username" | "email" | null;
+  USER_FIELDS,
+  UserField,
+  userSearchParams,
+} from "./users-search-params";
+import { FilterSummary } from "@/components/filter-summary";
 
 export function UsersFilters({ totalItems }: { totalItems?: number }) {
-  const { searchParams, setParams } = useQueryParams();
-
-  const [query, setQuery] = useState(searchParams.get("q") ?? "");
-  const [field, setField] = useState<QueryField>(
-    (searchParams.get("field") as QueryField) ?? "both",
+  const [{ q, field, systemRole, status }, setParams] = useQueryStates(
+    userSearchParams,
+    { shallow: false },
   );
 
-  const submitSearch = () =>
-    setParams({ q: query || null, field: query ? field : null });
+  const [draft, setDraft] = useState(q);
 
-  const onFieldChange = (next: QueryField) => {
-    setField(next);
-    if (searchParams.get("q")) setParams({ field: next });
-  };
+  const submitSearch = () => setParams({ q: draft || null, page: 1 });
 
   const clearFilters = () => {
-    setQuery("");
-    setField("both");
-    setParams({ q: null, field: null, status: null, systemRole: null });
+    setDraft("");
+    setParams({
+      q: null,
+      field: "both",
+      status: null,
+      systemRole: null,
+      page: 1,
+    });
   };
 
-  const appliedQuery = searchParams.get("q");
-  const appliedField = searchParams.get("field");
-  const appliedStatus = searchParams.get("status");
-  const appliedRole = searchParams.get("systemRole");
-
-  const bold = "font-semibold text-foreground";
-  const summaryParts = [
-    appliedQuery && (
-      <>
-        matching <span className={bold}>{appliedQuery}</span> at{" "}
-        <span className={bold}>{appliedField}</span>
-      </>
-    ),
-    appliedStatus && (
-      <>
-        status <span className={bold}>{appliedStatus}</span>
-      </>
-    ),
-    appliedRole && (
-      <>
-        role <span className={bold}>{appliedRole}</span>
-      </>
-    ),
-  ].filter(Boolean);
-
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-3">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submitSearch();
         }}
-        className="flex flex-wrap items-center gap-2"
+        className="flex items-center gap-2"
       >
-        <ButtonGroup>
+        <ButtonGroup className="w-100 min-w-0">
           <InputGroup>
             <InputGroupInput
               placeholder="Search users..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
             />
             <InputGroupAddon align="inline-end">
               <InputGroupButton
@@ -106,97 +75,50 @@ export function UsersFilters({ totalItems }: { totalItems?: number }) {
             label="Type"
             value={field}
             options={[
-              { value: "both", label: "Username & Email" },
-              { value: "username", label: "Username" },
-              { value: "email", label: "Email" },
+              { value: USER_FIELDS[0], label: "Username & Email" },
+              { value: USER_FIELDS[1], label: "Username" },
+              { value: USER_FIELDS[2], label: "Email" },
             ]}
-            onSelect={(value) => onFieldChange(value as QueryField)}
+            onSelect={(value) =>
+              setParams({ field: value as UserField, page: 1 })
+            }
           />
           <FilterDropdown
             label="System Role"
             clearable
-            value={searchParams.get("systemRole")}
+            value={systemRole}
             options={Object.values(SystemRole).map((value) => ({
               value,
               label: value,
             }))}
-            onSelect={(value) => setParams({ systemRole: value })}
+            onSelect={(value) =>
+              setParams({ systemRole: value as SystemRole, page: 1 })
+            }
           />
           <FilterDropdown
             label="Status"
             clearable
-            value={searchParams.get("status")}
+            value={status}
             options={Object.values(UserStatus).map((value) => ({
               value,
               label: value,
             }))}
-            onSelect={(value) => setParams({ status: value })}
+            onSelect={(value) =>
+              setParams({ status: value as UserStatus, page: 1 })
+            }
           />
         </div>
       </form>
 
-      {summaryParts.length > 0 && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>
-            {totalItems ?? 0} {totalItems === 1 ? "result" : "results"}{" "}
-            {summaryParts.map((part, i) => (
-              <span key={i}>
-                {i > 0 && " , "}
-                {part}
-              </span>
-            ))}
-          </span>
-          <Button variant="secondary" size="sm" onClick={clearFilters}>
-            <IconX />
-            Clear filters
-          </Button>
-        </div>
-      )}
+      <FilterSummary
+        totalItems={totalItems}
+        items={[
+          q && { label: "matching", value: q, at: field },
+          status && { label: "status", value: status },
+          systemRole && { label: "role", value: systemRole },
+        ]}
+        onClear={clearFilters}
+      />
     </div>
-  );
-}
-
-function FilterDropdown({
-  label,
-  value,
-  options,
-  onSelect,
-  clearable = false,
-}: {
-  label: string;
-  value: string | null;
-  options: { value: string; label: string }[];
-  onSelect: (value: string | null) => void;
-  clearable?: boolean;
-}) {
-  const items = clearable
-    ? [{ value: null, label: "All" }, ...options]
-    : options;
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {label}
-          <IconChevronDown />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        {items.map((item) => {
-          const selected = item.value === value;
-
-          return (
-            <DropdownMenuItem
-              key={item.value ?? "all"}
-              disabled={selected}
-              onClick={() => onSelect(item.value)}
-            >
-              {item.label}
-              {selected && <IconCheck className="ml-auto" />}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }

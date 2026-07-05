@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ItemList } from "@/components/item-list";
 import { IOrganization } from "@/types/organization.types";
+import { Pagination } from "@/types/pagination";
 
 const getInitials = (label: string) =>
   label
@@ -28,13 +29,16 @@ const MEMBERS_PLACEHOLDER = 0;
 
 export function OrganizationsList({
   organizations,
+  pagination,
 }: {
   organizations: IOrganization[];
+  pagination: Pagination;
 }) {
   return (
     <ItemList
       className="w-full"
       data={organizations}
+      pagination={pagination}
       renderItem={(org) => {
         const title = org.displayName || org.name;
         return (
