@@ -11,7 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getUsers, searchUsers } from "@/lib/users/fetch";
+import { searchUsers } from "@/lib/users/fetch";
 import { SystemRole, UserSearchFilters, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
 import { ErrorPage } from "@/components/errors";

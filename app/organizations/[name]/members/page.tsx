@@ -5,7 +5,6 @@ import {
 } from "@/lib/organizations/fetch";
 import { MembersAdminActions } from "./members-admin-actions";
 import { MembersList } from "./members-list";
-import { InputSearch } from "@/components/input-search";
 import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationMembersPage({
@@ -44,8 +43,7 @@ export default async function OrganizationMembersPage({
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
-      <div className="flex items-center gap-2">
-        <InputSearch placeholder="Search members..." />
+      <div className="text-end gap-2">
         {isOrgAdmin && <MembersAdminActions orgName={orgName} />}
       </div>
       <MembersList
