@@ -1,5 +1,5 @@
 import { IconX } from "@tabler/icons-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 type SummaryItem = { label: string; value: string; at?: string };
 

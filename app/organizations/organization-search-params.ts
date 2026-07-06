@@ -1,4 +1,4 @@
-import { paginationSearchParams } from "@/lib/search-params/pagination";
+import { paginationSearchParams } from "@/lib/search/pagination";
 import { createLoader, parseAsString, parseAsStringLiteral } from "nuqs/server";
 
 export const ORGANIZATION_FIELDS = [

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useAppForm } from "@/components/form";
 import { loginFormSchema } from "@/schemas/auth";
 import { useRouter } from "next/navigation";
-import { loginAction } from "@/lib/auth/actions";
+import { loginAction } from "@/data/auth/actions";
 import { toast } from "sonner";
 
 export function LoginUserForm() {

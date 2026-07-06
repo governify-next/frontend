@@ -3,7 +3,7 @@ import { Result } from "@/lib/utils/fetcher";
 import { Frown, House, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function ErrorPage<T>({
   result,
@@ -15,7 +15,7 @@ export function ErrorPage<T>({
   const router = useRouter();
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-background">
       <Frown className="size-15 text-primary" strokeWidth={1.5} />
 
       <div className="flex flex-col gap-2 items-center">

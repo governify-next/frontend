@@ -2,9 +2,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { DropdownMenu } from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { DropdownMenu } from "../ui/dropdown-menu";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
 
 export function FilterDropdown({

@@ -19,8 +19,8 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
-import { AlertDialogDestructive } from "@/components/alert-dialog";
-import { deleteOrganization } from "@/lib/organizations/actions";
+import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { deleteOrganization } from "@/data/organizations/actions";
 
 export function DangerZone({ orgName }: { orgName: string }) {
   const router = useRouter();

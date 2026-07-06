@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { AddRoleDialog } from "./add-role-form";
-import { IRolePayload } from "@/types/organization.types";
+import { IRolePayload } from "@/types/organization";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { addOrganizationRole } from "@/lib/organizations/actions";
+import { addOrganizationRole } from "@/data/organizations/actions";
 
 export function AddRole({ orgName }: { orgName: string }) {
   const router = useRouter();

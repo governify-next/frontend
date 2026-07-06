@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/sidebar";
 import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
-import { searchOrganizations } from "@/lib/organizations/fetch";
+import { searchOrganizations } from "@/data/organizations/fetch";
 import { OrganizationsList } from "./organizations-list";
 import { OrganizationsAdminActions } from "./organizations-admin-actions";
 import { ErrorPage } from "@/components/errors";
 import { OrganizationFilters } from "./organization-filters";
-import { IOrganizationSearchFilters } from "@/types/organization.types";
+import { IOrganizationSearchFilters } from "@/types/organization";
 import { SearchParams } from "nuqs/server";
 import { loadOrganizationSearchParamas } from "./organization-search-params";
 

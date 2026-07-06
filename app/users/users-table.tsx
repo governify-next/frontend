@@ -8,14 +8,14 @@ import {
   ICreateIUserPayload,
   IBasicUserInfo,
 } from "@/types/user.types";
-import { DataTable } from "../../components/data-table";
+import { DataTable } from "@/components/data-table/data-table";
 import { useState } from "react";
 import {
   createUser,
   deleteUser,
   deleteUserSessions,
   updateUser,
-} from "@/lib/users/actions";
+} from "@/data/users/actions";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -32,7 +32,7 @@ import {
   IconDotsVertical,
   IconPlus,
 } from "@tabler/icons-react";
-import { AlertDialogDestructive } from "@/components/alert-dialog";
+import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
@@ -323,16 +323,16 @@ export function UsersTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-2">
-        <UsersFilters
-          totalItems={pagination?.totalItems}
-          applied={appliedFilters}
-        />
-        <Button onClick={() => setCreateOpen(true)}>
-          <IconPlus />
-          Add user
-        </Button>
-      </div>
+      <UsersFilters
+        totalItems={pagination?.totalItems}
+        applied={appliedFilters}
+        action={
+          <Button type="button" onClick={() => setCreateOpen(true)}>
+            <IconPlus />
+            Add user
+          </Button>
+        }
+      />
       <DataTable columns={tableColumns} data={users} pagination={pagination} />
       <AlertDialogDestructive
         open={userToDelete !== null}

@@ -20,25 +20,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertDialogDestructive } from "@/components/alert-dialog";
+import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item-list";
-import { IMembership, IOrganization, IRole } from "@/types/organization.types";
+import { IMembership, IOrganization, IRole } from "@/types/organization";
 import { avatarFallback } from "@/lib/utils/trimName";
 import {
   removeOrganizationMember,
   updateOrganizationMemberRoles,
-} from "@/lib/organizations/actions";
+} from "@/data/organizations/actions";
 import { ChangeRoleDialog } from "./change-role-dialog";
 
 export function MembersList({
   members,
   organization,
-  currentUserId,
   roles,
 }: {
   members: IMembership[];
   organization: IOrganization;
-  currentUserId: string;
   roles: IRole[];
 }) {
   const router = useRouter();

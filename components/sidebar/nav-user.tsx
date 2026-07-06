@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronsUpDown, LogOut, UserPen } from "lucide-react";
-import { logoutAction } from "@/lib/auth/actions";
+import { logoutAction } from "@/data/auth/actions";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {

@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { searchUsers } from "@/lib/users/fetch";
+import { searchUsers } from "@/data/users/fetch";
 import { SystemRole, UserSearchFilters, UserStatus } from "@/types/user.types";
 import { UsersTable } from "@/app/users/users-table";
 import { ErrorPage } from "@/components/errors";

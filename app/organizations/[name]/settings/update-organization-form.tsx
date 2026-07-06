@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAppForm } from "@/components/form";
-import { IOrganization } from "@/types/organization.types";
+import { IOrganization } from "@/types/organization";
 import { organizationFormSchema } from "@/schemas/organization";
-import { updateOrganization } from "@/lib/organizations/actions";
+import { updateOrganization } from "@/data/organizations/actions";
 import {
   Card,
   CardContent,

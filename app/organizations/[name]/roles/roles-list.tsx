@@ -1,7 +1,6 @@
 "use client";
 
-import { AlertDialogDestructive } from "@/components/alert-dialog";
-import { ItemList } from "@/components/item-list";
+import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,8 +19,8 @@ import {
 import {
   deleteOrganizationRole,
   updateOrganizationRole,
-} from "@/lib/organizations/actions";
-import { IRole, IRolePayload } from "@/types/organization.types";
+} from "@/data/organizations/actions";
+import { IRole, IRolePayload } from "@/types/organization";
 import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

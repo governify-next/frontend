@@ -4,8 +4,8 @@ import * as React from "react";
 import { Suspense } from "react";
 import { Building2, Command, Users } from "lucide-react";
 
-import { NavItems } from "@/components/nav-items";
-import { NavUser } from "@/components/nav-user";
+import { NavItems } from "@/components/sidebar/nav-items";
+import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { getCurrentUser } from "@/lib/auth/session";
-import { ErrorPage } from "./errors";
+import { ErrorPage } from "../errors";
 
 const data = {
   navItems: [

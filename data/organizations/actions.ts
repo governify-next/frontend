@@ -1,14 +1,14 @@
 "use server";
 
-import { bootEnv } from "../config/bootConfig";
+import { bootEnv } from "../../lib/bootConfig";
 import {
   IMembership,
   IOrganization,
   IOrganizationPayload,
   IRole,
   IRolePayload,
-} from "@/types/organization.types";
-import { apiFetcher } from "../utils/fetcher";
+} from "@/types/organization";
+import { apiFetcher } from "../../lib/utils/fetcher";
 import { cache } from "react";
 
 export const createOrganization = async (payload: IOrganizationPayload) => {

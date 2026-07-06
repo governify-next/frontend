@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
-import { bootEnv } from "../config/bootConfig";
+import { bootEnv } from "../bootConfig";
 import { LoginResponse, SessionTokens } from "@/types/auth";
 import { IBasicUserInfo } from "@/types/user.types";
 import { apiFetcher } from "../utils/fetcher";

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { IRolePayload } from "@/types/organization.types";
+import { IRolePayload } from "@/types/organization";
 import { roleFormSchema } from "@/schemas/organization";
 
 export function EditRoleDialog({

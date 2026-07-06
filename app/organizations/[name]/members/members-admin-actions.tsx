@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { IconPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { addOrganizationMember } from "@/lib/organizations/actions";
+import { addOrganizationMember } from "@/data/organizations/actions";
 import { AddMemberDialog } from "./add-member-form";
 
 export function MembersAdminActions({ orgName }: { orgName: string }) {

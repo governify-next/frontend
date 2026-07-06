@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 import * as session from "@/lib/auth/session";
-import { bootEnv } from "@/lib/config/bootConfig";
+import { bootEnv } from "@/lib/bootConfig";
 import type { LoginResponse } from "@/types/auth";
-import { getLogger } from "../utils/logger";
-import { apiFetcher } from "../utils/fetcher";
+import { getLogger } from "../../lib/utils/logger";
+import { apiFetcher } from "../../lib/utils/fetcher";
 const logger = getLogger().setTag("actions.ts");
 
 async function getLoginSession(credentials: {

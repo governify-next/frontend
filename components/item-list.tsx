@@ -8,8 +8,8 @@ import {
   OnChangeFn,
 } from "@tanstack/react-table";
 import { ItemGroup } from "@/components/ui/item";
-import { cn } from "@/lib/utils";
-import { DataTablePagination } from "./data-table-pagination";
+import { cn } from "@/lib/utils/cn";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Pagination } from "@/types/pagination";
 import { usePaginationParams } from "@/hooks/use-pagination-params";
 

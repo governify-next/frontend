@@ -9,14 +9,14 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { IconSearch } from "@tabler/icons-react";
-import { FilterDropdown } from "@/components/filter-dropdown";
+import { FilterDropdown } from "@/components/filter/filter-dropdown";
 import { useQueryStates } from "nuqs";
 import {
   ORGANIZATION_FIELDS,
   OrganizationField,
   organizationSearchParams,
 } from "./organization-search-params";
-import { FilterSummary } from "@/components/filter-summary";
+import { FilterSummary } from "@/components/filter/filter-summary";
 
 export function OrganizationFilters({
   totalItems,

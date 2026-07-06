@@ -1,6 +1,6 @@
 import { IUserInfo, UserSearchFilters } from "@/types/user.types";
-import { bootEnv } from "../config/bootConfig";
-import { apiFetcher } from "../utils/fetcher";
+import { bootEnv } from "../../lib/bootConfig";
+import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const searchUsers = async (
   filters: UserSearchFilters,

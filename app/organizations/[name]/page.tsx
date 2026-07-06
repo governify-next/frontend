@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { getOrganization } from "@/lib/organizations/fetch";
+import { getOrganization } from "@/data/organizations/fetch";
 import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationHomePage({

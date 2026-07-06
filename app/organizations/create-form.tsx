@@ -1,5 +1,5 @@
 import { useAppForm } from "@/components/form";
-import { IOrganizationPayload } from "@/types/organization.types";
+import { IOrganizationPayload } from "@/types/organization";
 import { organizationFormSchema } from "@/schemas/organization";
 import {
   Dialog,

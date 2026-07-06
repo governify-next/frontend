@@ -1,4 +1,4 @@
-import { paginationSearchParams } from "@/lib/search-params/pagination";
+import { paginationSearchParams } from "@/lib/search/pagination";
 import { Pagination } from "@/types/pagination";
 import { useQueryStates } from "nuqs";
 

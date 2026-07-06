@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { IconPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { createOrganization } from "@/lib/organizations/actions";
-import { IOrganizationPayload } from "@/types/organization.types";
+import { createOrganization } from "@/data/organizations/actions";
+import { IOrganizationPayload } from "@/types/organization";
 import { CreateOrganizationDialog } from "./create-form";
 
 export function OrganizationsAdminActions() {

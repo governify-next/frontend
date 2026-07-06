@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-sans" });

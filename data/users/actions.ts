@@ -5,8 +5,8 @@ import {
   IUserInfo,
   IUserPayload,
 } from "@/types/user.types";
-import { bootEnv } from "../config/bootConfig";
-import { apiFetcher } from "../utils/fetcher";
+import { bootEnv } from "../../lib/bootConfig";
+import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const updateUser = async (userId: string, payload: IUserPayload) => {
   return apiFetcher<IUserInfo>(

@@ -1,4 +1,4 @@
-import { paginationSearchParams } from "@/lib/search-params/pagination";
+import { paginationSearchParams } from "@/lib/search/pagination";
 import { SystemRole, UserStatus } from "@/types/user.types";
 import {
   createLoader,

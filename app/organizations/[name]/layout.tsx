@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,10 +13,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getOrganization } from "@/lib/organizations/fetch";
+import { getOrganization } from "@/data/organizations/fetch";
 import { OrganizationTabsNav } from "./organization-tabs-nav";
 import { ErrorPage } from "@/components/errors";
-import { isUserAdminOfOrganization } from "@/lib/organizations/actions";
+import { isUserAdminOfOrganization } from "@/data/organizations/actions";
 
 export default async function OrganizationLayout({
   children,

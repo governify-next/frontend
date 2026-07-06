@@ -17,7 +17,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { IRole } from "@/types/organization.types";
+import { IRole } from "@/types/organization";
 import { useState } from "react";
 
 export function ChangeRoleDialog({

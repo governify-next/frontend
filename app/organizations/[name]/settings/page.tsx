@@ -1,8 +1,8 @@
-import { getOrganization } from "@/lib/organizations/fetch";
+import { getOrganization } from "@/data/organizations/fetch";
 import { UpdateOrganizationForm } from "./update-organization-form";
 import { DangerZone } from "./danger-zone";
 import { ErrorPage } from "@/components/errors";
-import { isUserAdminOfOrganization } from "@/lib/organizations/actions";
+import { isUserAdminOfOrganization } from "@/data/organizations/actions";
 
 export default async function OrganizationSettingsPage({
   params,

@@ -1,4 +1,4 @@
-import { bootEnv } from "@/lib/config/bootConfig";
+import { bootEnv } from "@/lib/bootConfig";
 
 type LoggerLevel = "info" | "warn" | "error" | "debug";
 

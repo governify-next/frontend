@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ItemList } from "@/components/item-list";
-import { IOrganization } from "@/types/organization.types";
+import { IOrganization } from "@/types/organization";
 import { Pagination } from "@/types/pagination";
 
 const getInitials = (label: string) =>
