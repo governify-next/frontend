@@ -98,6 +98,7 @@ export default async function UsersPage({
                   users={users}
                   pagination={pagination}
                   currentUser={currentUser}
+                  appliedFilters={{ q, field, status, systemRole }}
                 />
               </div>
             </div>

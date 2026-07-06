@@ -1,6 +1,11 @@
 import { paginationSearchParams } from "@/lib/search-params/pagination";
 import { SystemRole, UserStatus } from "@/types/user.types";
-import { createLoader, parseAsString, parseAsStringLiteral } from "nuqs/server";
+import {
+  createLoader,
+  inferParserType,
+  parseAsString,
+  parseAsStringLiteral,
+} from "nuqs/server";
 
 export const USER_FIELDS = ["both", "username", "email"] as const;
 export type UserField = (typeof USER_FIELDS)[number];
@@ -14,3 +19,8 @@ export const userSearchParams = {
 };
 
 export const loadUserSearchParams = createLoader(userSearchParams);
+
+export type AppliedUserFilters = Pick<
+  inferParserType<typeof userSearchParams>,
+  "q" | "field" | "status" | "systemRole"
+>;

@@ -100,7 +100,10 @@ export default async function OrganizationsPage({
               <div className="px-4 lg:px-6">
                 <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
                   <div className="flex items-start justify-between gap-2">
-                    <OrganizationFilters totalItems={pagination.totalItems} />
+                    <OrganizationFilters
+                      totalItems={pagination.totalItems}
+                      applied={{ q, field }}
+                    />
                     {isAdmin && <OrganizationsAdminActions />}
                   </div>
                   <OrganizationsList

@@ -36,6 +36,7 @@ import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./users-filters";
+import { AppliedUserFilters } from "./users-search-params";
 import { CreateUserDialog } from "./create-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -239,10 +240,12 @@ export function UsersTable({
   users,
   pagination,
   currentUser,
+  appliedFilters,
 }: {
   users: IUserInfo[];
   pagination?: Pagination;
   currentUser: IBasicUserInfo;
+  appliedFilters: AppliedUserFilters;
 }) {
   const router = useRouter();
 
@@ -321,7 +324,10 @@ export function UsersTable({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-2">
-        <UsersFilters totalItems={pagination?.totalItems} />
+        <UsersFilters
+          totalItems={pagination?.totalItems}
+          applied={appliedFilters}
+        />
         <Button onClick={() => setCreateOpen(true)}>
           <IconPlus />
           Add user

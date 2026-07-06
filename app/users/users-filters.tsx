@@ -13,13 +13,20 @@ import {
 import { FilterDropdown } from "@/components/filter-dropdown";
 import { useQueryStates } from "nuqs";
 import {
+  AppliedUserFilters,
   USER_FIELDS,
   UserField,
   userSearchParams,
 } from "./users-search-params";
 import { FilterSummary } from "@/components/filter-summary";
 
-export function UsersFilters({ totalItems }: { totalItems?: number }) {
+export function UsersFilters({
+  totalItems,
+  applied,
+}: {
+  totalItems?: number;
+  applied: AppliedUserFilters;
+}) {
   const [{ q, field, systemRole, status }, setParams] = useQueryStates(
     userSearchParams,
     { shallow: false },
@@ -111,9 +118,13 @@ export function UsersFilters({ totalItems }: { totalItems?: number }) {
       <FilterSummary
         totalItems={totalItems}
         items={[
-          q && { label: "matching", value: q, at: field },
-          status && { label: "status", value: status },
-          systemRole && { label: "role", value: systemRole },
+          applied.q && {
+            label: "matching",
+            value: applied.q,
+            at: applied.field,
+          },
+          applied.status && { label: "status", value: applied.status },
+          applied.systemRole && { label: "role", value: applied.systemRole },
         ]}
         onClear={clearFilters}
       />

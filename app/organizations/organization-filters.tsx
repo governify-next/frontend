@@ -18,7 +18,13 @@ import {
 } from "./organization-search-params";
 import { FilterSummary } from "@/components/filter-summary";
 
-export function OrganizationFilters({ totalItems }: { totalItems?: number }) {
+export function OrganizationFilters({
+  totalItems,
+  applied,
+}: {
+  totalItems?: number;
+  applied: { q: string; field: OrganizationField };
+}) {
   const [{ q, field }, setParams] = useQueryStates(organizationSearchParams, {
     shallow: false,
   });
@@ -77,7 +83,13 @@ export function OrganizationFilters({ totalItems }: { totalItems?: number }) {
       </form>
       <FilterSummary
         totalItems={totalItems}
-        items={[q && { label: "matching", value: q, at: field }]}
+        items={[
+          applied.q && {
+            label: "matching",
+            value: applied.q,
+            at: applied.field,
+          },
+        ]}
         onClear={clearFilters}
       />
     </div>
