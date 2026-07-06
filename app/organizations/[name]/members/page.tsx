@@ -35,22 +35,15 @@ export default async function OrganizationMembersPage({
   const user = userResult.data;
   const roles = organizationResult.data.roles;
 
-  const isOrgAdmin = members.some(
-    (m) =>
-      m.userId.username === user.username &&
-      m.roles.some((r) => r.name === "admin"),
-  );
-
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
       <div className="text-end gap-2">
-        {isOrgAdmin && <MembersAdminActions orgName={orgName} />}
+        <MembersAdminActions orgName={orgName} />
       </div>
       <MembersList
         members={members}
-        isOrgAdmin={isOrgAdmin}
-        orgName={orgName}
-        currentUsername={user?.username}
+        organization={organizationResult.data}
+        currentUserId={user._id}
         roles={roles}
       />
     </div>

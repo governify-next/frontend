@@ -24,13 +24,13 @@ const data = {
       title: "Organizations",
       url: "/organizations",
       icon: Building2,
-      roles: [SystemRole.USER, SystemRole.ADMIN],
+      roles: [SystemRole.USER, SystemRole.ADMIN, SystemRole.SUPERADMIN],
     },
     {
       title: "Users",
       url: "/users",
       icon: Users,
-      roles: [SystemRole.ADMIN],
+      roles: [SystemRole.ADMIN, SystemRole.SUPERADMIN],
     },
   ],
 };

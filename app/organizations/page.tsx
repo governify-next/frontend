@@ -52,7 +52,9 @@ export default async function OrganizationsPage({
   }
 
   const user = userResult.data;
-  const isAdmin = user!.systemRole === SystemRole.ADMIN;
+  const isAdmin =
+    user!.systemRole === SystemRole.ADMIN ||
+    user!.systemRole === SystemRole.SUPERADMIN;
   const result = await searchOrganizations(page, limit, filters);
   if (!result.ok) {
     return (

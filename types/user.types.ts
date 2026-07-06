@@ -1,4 +1,5 @@
 export enum SystemRole {
+  SUPERADMIN = "SUPERADMIN",
   ADMIN = "ADMIN",
   USER = "USER",
 }
@@ -9,6 +10,7 @@ export enum UserStatus {
 }
 
 export interface IBasicUserInfo {
+  _id: string;
   username: string;
   email: string;
   name: string;
@@ -17,10 +19,10 @@ export interface IBasicUserInfo {
 }
 
 export interface IUserInfo extends IBasicUserInfo {
-  _id: string;
   surname: string;
   status: UserStatus;
   lastLoginAt?: Date;
+  createdBy?: string;
 }
 
 // User payload for user table

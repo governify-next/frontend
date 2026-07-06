@@ -23,27 +23,35 @@ import { useState } from "react";
 export function ChangeRoleDialog({
   open,
   onOpenChange,
-  username,
+  memberToChangeRole,
+  organizationCreatorId,
   currentRoles,
   roles,
   onSave,
 }: {
   open: boolean;
   onOpenChange: () => void;
-  username: string;
+  memberToChangeRole: {
+    userId: string;
+    username: string;
+    currentRoles: IRole[];
+  };
+  organizationCreatorId: string;
   currentRoles: IRole[];
   roles: IRole[];
-  onSave: (newRolesIds: string[]) => void;
+  onSave: (newRolesNames: string[]) => void;
 }) {
   const [selectedRoles, setSelectedRoles] = useState<string[]>(
-    currentRoles.map((role) => role._id),
+    currentRoles.map((role) => role.name),
   );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change role of {username}?</DialogTitle>
+          <DialogTitle>
+            Change role of {memberToChangeRole.username}?
+          </DialogTitle>
           <DialogDescription>Select new roles:</DialogDescription>
         </DialogHeader>
         <FieldGroup>
@@ -53,19 +61,23 @@ export function ChangeRoleDialog({
                 <Checkbox
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      setSelectedRoles([...selectedRoles, rol._id]);
+                      setSelectedRoles([...selectedRoles, rol.name]);
                     } else {
                       setSelectedRoles(
                         selectedRoles.filter(
-                          (selectedRoleId) => selectedRoleId !== rol._id,
+                          (selectedRoleName) => selectedRoleName !== rol.name,
                         ),
                       );
                     }
                   }}
                   id={rol._id}
                   checked={selectedRoles.some(
-                    (selectedRoleId) => selectedRoleId === rol._id,
+                    (selectedRoleName) => selectedRoleName === rol.name,
                   )}
+                  disabled={
+                    organizationCreatorId === memberToChangeRole.userId &&
+                    rol.name === "admin"
+                  }
                 />
                 <FieldContent>
                   <FieldLabel htmlFor={rol._id}>{rol.name}</FieldLabel>

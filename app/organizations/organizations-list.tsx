@@ -24,9 +24,6 @@ const getInitials = (label: string) =>
     .join("")
     .toUpperCase();
 
-// TODO: reemplazar por el conteo real de miembros cuando la API tenga el endpoint.
-const MEMBERS_PLACEHOLDER = 0;
-
 export function OrganizationsList({
   organizations,
   pagination,
@@ -59,7 +56,7 @@ export function OrganizationsList({
             <ItemActions>
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Users className="size-3.5" />
-                {MEMBERS_PLACEHOLDER} members
+                {org.members} members
               </span>
               <Button variant="ghost" size="icon" asChild>
                 <Link

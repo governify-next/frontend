@@ -3,6 +3,8 @@ export interface IOrganization {
   displayName?: string;
   description: string;
   roles: IRole[];
+  members: number;
+  createdBy: string;
 }
 
 export type IOrganizationPayload = Pick<

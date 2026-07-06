@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryParams } from "@/hooks/use-query-params";
-import { IconSearch, IconX } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { SystemRole, UserStatus } from "@/types/user.types";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,

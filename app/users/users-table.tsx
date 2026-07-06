@@ -6,6 +6,7 @@ import {
   IUserPayload,
   UserStatus,
   ICreateIUserPayload,
+  IBasicUserInfo,
 } from "@/types/user.types";
 import { DataTable } from "../../components/data-table";
 import { useState } from "react";
@@ -53,12 +54,14 @@ const columns = ({
   onDeleteUserRequest,
   onEditUser,
   onEditUserPassword,
+  currentUser,
 }: {
   onUserChange: (userId: string, payload: IUserPayload) => void;
   onDeleteUserSessions: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
   onEditUser: (user: IUserInfo) => void;
   onEditUserPassword: (user: IUserInfo) => void;
+  currentUser: IBasicUserInfo;
 }): ColumnDef<IUserInfo>[] => {
   return [
     {
@@ -137,6 +140,22 @@ const columns = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start">
+              {currentUser.systemRole === SystemRole.SUPERADMIN && (
+                <DropdownMenuItem
+                  disabled={user.systemRole === SystemRole.SUPERADMIN}
+                  onClick={() =>
+                    onUserChange(user._id, {
+                      systemRole: SystemRole.SUPERADMIN,
+                    })
+                  }
+                >
+                  Superadmin
+                  {user.systemRole === SystemRole.SUPERADMIN && (
+                    <IconCheck className="ml-auto" />
+                  )}
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuItem
                 disabled={user.systemRole === SystemRole.ADMIN}
                 onClick={() =>
@@ -169,6 +188,11 @@ const columns = ({
       accessorKey: "lastLoginAt",
       header: "Last Login",
       cell: ({ row }) => formatReadableDate(row.original.lastLoginAt),
+    },
+    {
+      accessorKey: "createdBy",
+      header: "Created By",
+      cell: ({ row }) => row.original.createdBy ?? "unknown",
     },
     {
       id: "actions",
@@ -214,9 +238,11 @@ const columns = ({
 export function UsersTable({
   users,
   pagination,
+  currentUser,
 }: {
   users: IUserInfo[];
   pagination?: Pagination;
+  currentUser: IBasicUserInfo;
 }) {
   const router = useRouter();
 
@@ -289,6 +315,7 @@ export function UsersTable({
     onDeleteUserRequest: setUserToDelete,
     onEditUser: setUserToEdit,
     onEditUserPassword: setUserToChangePassword,
+    currentUser,
   });
 
   return (

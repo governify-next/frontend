@@ -17,6 +17,7 @@ import { UsersTable } from "@/app/users/users-table";
 import { ErrorPage } from "@/components/errors";
 import { SearchParams } from "nuqs";
 import { loadUserSearchParams } from "./users-search-params";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function UsersPage({
   searchParams,
@@ -35,19 +36,32 @@ export default async function UsersPage({
   if (status) filters.status = status as UserStatus;
   if (systemRole) filters.systemRole = systemRole as SystemRole;
 
-  const result = await searchUsers(filters, page, limit);
+  const [currentUserResult, usersResult] = await Promise.all([
+    getCurrentUser(),
+    searchUsers(filters, page, limit),
+  ]);
 
-  if (!result.ok) {
+  if (!currentUserResult.ok) {
     return (
       <ErrorPage
-        result={result}
+        result={currentUserResult}
+        message="Something went wrong while fetching current user."
+      />
+    );
+  }
+
+  if (!usersResult.ok) {
+    return (
+      <ErrorPage
+        result={usersResult}
         message="Something went wrong while fetching users."
       />
     );
   }
 
-  const users = result.data;
-  const pagination = result.pagination;
+  const currentUser = currentUserResult.data;
+  const users = usersResult.data;
+  const pagination = usersResult.pagination;
 
   return (
     <SidebarProvider
@@ -80,7 +94,11 @@ export default async function UsersPage({
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
               <div className="px-4 lg:px-6">
-                <UsersTable users={users} pagination={pagination} />
+                <UsersTable
+                  users={users}
+                  pagination={pagination}
+                  currentUser={currentUser}
+                />
               </div>
             </div>
           </div>

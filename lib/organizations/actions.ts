@@ -9,6 +9,7 @@ import {
   IRolePayload,
 } from "@/types/organization.types";
 import { apiFetcher } from "../utils/fetcher";
+import { cache } from "react";
 
 export const createOrganization = async (payload: IOrganizationPayload) => {
   return apiFetcher<IOrganization>(
@@ -59,8 +60,10 @@ export const updateOrganizationMemberRoles = async (
   username: string,
   rolesIds: string[],
 ) => {
-  // TODO: Connect to upsert endpoint when ready
-  return true;
+  return await apiFetcher<IMembership>(
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/members/${username}/roles`,
+    { method: "POST", body: rolesIds },
+  );
 };
 
 export const deleteOrganizationRole = async (
@@ -93,3 +96,10 @@ export const updateOrganizationRole = async (
     { method: "PUT", body: payload },
   );
 };
+
+export const isUserAdminOfOrganization = cache(async (orgName: string) => {
+  return await apiFetcher<{ isAdmin: boolean }>(
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/members/me/admin`,
+    { method: "GET" },
+  );
+});

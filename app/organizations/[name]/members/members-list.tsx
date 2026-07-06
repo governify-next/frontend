@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertDialogDestructive } from "@/components/alert-dialog";
 import { ItemList } from "@/components/item-list";
-import { IMembership, IRole } from "@/types/organization.types";
+import { IMembership, IOrganization, IRole } from "@/types/organization.types";
 import { avatarFallback } from "@/lib/utils/trimName";
 import {
   removeOrganizationMember,
@@ -32,26 +32,28 @@ import { ChangeRoleDialog } from "./change-role-dialog";
 
 export function MembersList({
   members,
-  isOrgAdmin,
-  orgName,
-  currentUsername,
+  organization,
+  currentUserId,
   roles,
 }: {
   members: IMembership[];
-  isOrgAdmin: boolean;
-  orgName: string;
-  currentUsername?: string;
+  organization: IOrganization;
+  currentUserId: string;
   roles: IRole[];
 }) {
   const router = useRouter();
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
   const [memberToChangeRole, setMemberToChangeRole] = useState<{
+    userId: string;
     username: string;
     currentRoles: IRole[];
   } | null>(null);
 
   const handleMemberRemove = async () => {
-    const result = await removeOrganizationMember(orgName, memberToRemove!);
+    const result = await removeOrganizationMember(
+      organization.name,
+      memberToRemove!,
+    );
 
     if (!result.ok) {
       toast.error(result.error);
@@ -63,14 +65,14 @@ export function MembersList({
     toast.success("Member removed.");
   };
 
-  const handleChangeRole = async (newRolesIds: string[]) => {
-    const changed = await updateOrganizationMemberRoles(
-      orgName,
+  const handleChangeRole = async (newRolesNames: string[]) => {
+    const result = await updateOrganizationMemberRoles(
+      organization.name,
       memberToChangeRole!.username!,
-      newRolesIds,
+      newRolesNames,
     );
 
-    if (!changed) {
+    if (!result.ok) {
       toast.error("Failed to change role. Please try again.");
       return;
     }
@@ -107,41 +109,40 @@ export function MembersList({
                 <span className="text-xs text-muted-foreground">
                   {member.roles.length} roles
                 </span>
-                {isOrgAdmin && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Member options"
-                      >
-                        <MoreVertical />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem
-                        onSelect={() =>
-                          setMemberToChangeRole({
-                            username: member.userId.username,
-                            currentRoles: member.roles,
-                          })
-                        }
-                      >
-                        Change role
-                      </DropdownMenuItem>
-                      {username !== currentUsername && (
-                        <>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => setMemberToRemove(username)}
-                          >
-                            Remove user
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Member options"
+                    >
+                      <MoreVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                      onSelect={() =>
+                        setMemberToChangeRole({
+                          userId: member.userId._id,
+                          username: member.userId.username,
+                          currentRoles: member.roles,
+                        })
+                      }
+                    >
+                      Change role
+                    </DropdownMenuItem>
+                    {organization.createdBy !== member.userId._id && (
+                      <>
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onSelect={() => setMemberToRemove(username)}
+                        >
+                          Remove user
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </ItemActions>
             </Item>
           );
@@ -158,7 +159,8 @@ export function MembersList({
         <ChangeRoleDialog
           open={true}
           onOpenChange={() => setMemberToChangeRole(null)}
-          username={memberToChangeRole.username}
+          memberToChangeRole={memberToChangeRole}
+          organizationCreatorId={organization.createdBy}
           currentRoles={memberToChangeRole.currentRoles}
           roles={roles}
           onSave={handleChangeRole}
