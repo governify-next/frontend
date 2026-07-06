@@ -75,6 +75,7 @@ export function OrganizationFilters({
         <div className="flex flex-wrap items-center gap-2">
           <FilterDropdown
             label="Type"
+            contentClassName="w-56"
             value={field}
             options={[
               { value: ORGANIZATION_FIELDS[2], label: "Name or Display Name" },

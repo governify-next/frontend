@@ -88,6 +88,7 @@ export function UsersFilters({
           <div className="flex flex-wrap items-center gap-2">
             <FilterDropdown
               label="Type"
+              contentClassName="w-45"
               value={field}
               options={[
                 { value: USER_FIELDS[0], label: "Username & Email" },
@@ -107,6 +108,7 @@ export function UsersFilters({
             <FilterDropdown
               label="System Role"
               clearable
+              contentClassName="w-40"
               value={systemRole}
               options={Object.values(SystemRole).map((value) => ({
                 value,

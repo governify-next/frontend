@@ -13,12 +13,14 @@ export function FilterDropdown({
   options,
   onSelect,
   clearable = false,
+  contentClassName,
 }: {
   label: string;
   value: string | null;
   options: { value: string; label: string }[];
   onSelect: (value: string | null) => void;
   clearable?: boolean;
+  contentClassName?: string;
 }) {
   const items = clearable
     ? [{ value: null, label: "All" }, ...options]
@@ -32,7 +34,7 @@ export function FilterDropdown({
           <IconChevronDown />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="start" className={contentClassName}>
         {items.map((item) => {
           const selected = item.value === value;
 
