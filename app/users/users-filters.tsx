@@ -49,6 +49,11 @@ export function UsersFilters({
     });
   };
 
+  const getMaxLength = (field: UserField) => {
+    if (field === USER_FIELDS[1]) return 50;
+    return 100;
+  };
+
   return (
     <div className="flex w-full min-w-0 flex-col gap-3">
       <form
@@ -63,7 +68,9 @@ export function UsersFilters({
             <InputGroupInput
               placeholder="Search users..."
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) =>
+                setDraft(e.target.value.slice(0, getMaxLength(field)))
+              }
             />
             <InputGroupAddon align="inline-end">
               <InputGroupButton
@@ -87,9 +94,15 @@ export function UsersFilters({
                 { value: USER_FIELDS[1], label: "Username" },
                 { value: USER_FIELDS[2], label: "Email" },
               ]}
-              onSelect={(value) =>
-                setParams({ field: value as UserField, page: 1 })
-              }
+              onSelect={(value) => {
+                const nextField = value as UserField;
+                setDraft(draft.slice(0, getMaxLength(nextField)));
+                setParams({
+                  q: q ? q.slice(0, getMaxLength(nextField)) : null,
+                  field: nextField,
+                  page: 1,
+                });
+              }}
             />
             <FilterDropdown
               label="System Role"

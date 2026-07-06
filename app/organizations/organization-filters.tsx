@@ -37,6 +37,11 @@ export function OrganizationFilters({
     setParams({ q: null, field: "both", page: 1 });
   };
 
+  const getMaxLength = (field: OrganizationField) => {
+    if (field === ORGANIZATION_FIELDS[0]) return 100;
+    return 200;
+  };
+
   return (
     <div className="flex min-w-0 flex-col gap-3">
       <form
@@ -51,7 +56,9 @@ export function OrganizationFilters({
             <InputGroupInput
               placeholder="Search organizations..."
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) =>
+                setDraft(e.target.value.slice(0, getMaxLength(field)))
+              }
             />
             <InputGroupAddon align="inline-end">
               <InputGroupButton
@@ -76,7 +83,13 @@ export function OrganizationFilters({
               { value: ORGANIZATION_FIELDS[1], label: "Display Name" },
             ]}
             onSelect={(value) => {
-              setParams({ field: value as OrganizationField, page: 1 });
+              const nextField = value as OrganizationField;
+              setDraft(draft.slice(0, getMaxLength(nextField)));
+              setParams({
+                q: q ? q.slice(0, getMaxLength(nextField)) : null,
+                field: nextField,
+                page: 1,
+              });
             }}
           />
         </div>
