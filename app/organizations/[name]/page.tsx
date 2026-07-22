@@ -1,5 +1,6 @@
-import { getOrganization } from "@/data/organizations/fetch";
+import { getScopes } from "@/data/scopes/fetch";
 import { ErrorPage } from "@/components/errors";
+import { ScopesExplorer } from "./scopes-explorer";
 
 export default async function OrganizationHomePage({
   params,
@@ -7,29 +8,17 @@ export default async function OrganizationHomePage({
   params: Promise<{ name: string }>;
 }) {
   const { name } = await params;
+  const orgName = decodeURIComponent(name);
 
-  const result = await getOrganization(decodeURIComponent(name));
+  const result = await getScopes(orgName);
   if (!result.ok) {
     return (
       <ErrorPage
         result={result}
-        message="Something went wrong while fetching organization."
+        message="Something went wrong while fetching scopes."
       />
     );
   }
 
-  const organization = result.data;
-
-  return (
-    <div className="flex flex-col gap-1 pt-4">
-      <h2 className="text-lg font-medium">
-        {organization.displayName || organization.name}
-      </h2>
-      {organization.description && (
-        <p className="text-sm text-muted-foreground">
-          {organization.description}
-        </p>
-      )}
-    </div>
-  );
+  return <ScopesExplorer orgName={orgName} tree={result.data} />;
 }
