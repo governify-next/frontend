@@ -1,7 +1,7 @@
 "use client";
 
 import { useFieldContext } from "@/components/form/form-context";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
@@ -23,8 +23,6 @@ export function ConfigField() {
 
   return (
     <Field>
-      <FieldLabel>Config</FieldLabel>
-
       {field.state.value.map((row, i) => (
         <div key={i} className="flex items-start gap-2">
           <Input
@@ -49,7 +47,7 @@ export function ConfigField() {
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Remove config entry"
+            aria-label="Remove property entry"
             onClick={() => field.removeValue(i)}
           >
             <X />
@@ -65,7 +63,7 @@ export function ConfigField() {
         onClick={() => field.pushValue({ key: "", value: "" })}
       >
         <Plus />
-        Add config
+        Add property
       </Button>
     </Field>
   );

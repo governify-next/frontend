@@ -14,6 +14,7 @@ import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { scopeFormSchema } from "@/schemas/scope";
 import { ConfigField, rowsToConfig } from "./config-fields";
+import { DetailSection } from "./detail-section";
 import { TypeCombobox } from "./type-combobox";
 import { ConfigRow, IScopePayload } from "@/types/scope";
 
@@ -22,6 +23,7 @@ export function AddScopeDialog({
   onOpenChange,
   onCreate,
   existingTypes,
+  parentName,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,6 +31,7 @@ export function AddScopeDialog({
     payload: Pick<IScopePayload, "name" | "description" | "type" | "config">, // TODO: replace with IScopePayload when fields/permissions are added
   ) => Promise<boolean>;
   existingTypes: string[];
+  parentName?: string;
 }) {
   const form = useAppForm({
     defaultValues: {
@@ -57,40 +60,47 @@ export function AddScopeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add child scope</DialogTitle>
+          <DialogTitle>Create a new folder</DialogTitle>
           <DialogDescription>
-            Enter the details of the scope you want to add.
+            {parentName
+              ? `Fill in the details to create a new folder. It will be created inside ${parentName}.`
+              : "Fill in the details to create a new folder. It will be created at the top level of your organization."}
           </DialogDescription>
         </DialogHeader>
 
         <form
           id="add-scope-form"
+          className="flex flex-col gap-3"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
           }}
         >
-          <FieldGroup className="gap-3">
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" autoFocus />}
-            </form.AppField>
+          <DetailSection title="General">
+            <FieldGroup className="gap-3">
+              <form.AppField name="name">
+                {(field) => <field.TextField label="Name" autoFocus />}
+              </form.AppField>
 
-            <form.AppField name="description">
-              {(field) => <field.TextareaField label="Description" />}
-            </form.AppField>
+              <form.AppField name="description">
+                {(field) => <field.TextareaField label="Description" />}
+              </form.AppField>
 
-            <form.AppField name="type">
-              {() => (
-                <TypeCombobox label="Type" existingTypes={existingTypes} />
-              )}
-            </form.AppField>
+              <form.AppField name="type">
+                {() => (
+                  <TypeCombobox label="Type" existingTypes={existingTypes} />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </DetailSection>
 
+          <DetailSection title="Configuration">
             <form.AppField name="config" mode="array">
               {() => <ConfigField />}
             </form.AppField>
-          </FieldGroup>
+          </DetailSection>
         </form>
 
         <DialogFooter>
@@ -100,7 +110,7 @@ export function AddScopeDialog({
             </Button>
           </DialogClose>
           <form.AppForm>
-            <form.SubmitButton label="Add scope" formId="add-scope-form" />
+            <form.SubmitButton label="Create folder" formId="add-scope-form" />
           </form.AppForm>
         </DialogFooter>
       </DialogContent>

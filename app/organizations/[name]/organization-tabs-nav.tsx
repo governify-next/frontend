@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { House, Settings, ShieldCheck, Users } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function OrganizationTabsNav({
@@ -13,11 +14,18 @@ export function OrganizationTabsNav({
   const pathname = usePathname();
   const base = `/organizations/${orgName}`;
 
-  const baseTabs = [{ value: "home", label: "Home", href: base }];
+  const baseTabs = [
+    { value: "overview", label: "Home", href: base, icon: House },
+  ];
   const adminTabs = [
-    { value: "members", label: "Members", href: `${base}/members` },
-    { value: "roles", label: "Roles", href: `${base}/roles` },
-    { value: "settings", label: "Settings", href: `${base}/settings` },
+    { value: "members", label: "Members", href: `${base}/members`, icon: Users },
+    { value: "roles", label: "Roles", href: `${base}/roles`, icon: ShieldCheck },
+    {
+      value: "settings",
+      label: "Settings",
+      href: `${base}/settings`,
+      icon: Settings,
+    },
   ];
 
   if (isAdmin) {
@@ -26,7 +34,7 @@ export function OrganizationTabsNav({
 
   const active =
     baseTabs.find((tab) => tab.href !== base && pathname.startsWith(tab.href))
-      ?.value ?? "home";
+      ?.value ?? "overview";
 
   return (
     <Tabs value={active} className="w-full">
@@ -38,7 +46,10 @@ export function OrganizationTabsNav({
             className="text-base"
             asChild
           >
-            <Link href={tab.href}>{tab.label}</Link>
+            <Link href={tab.href}>
+              <tab.icon />
+              {tab.label}
+            </Link>
           </TabsTrigger>
         ))}
       </TabsList>

@@ -15,7 +15,7 @@ export default async function OrganizationHomePage({
     return (
       <ErrorPage
         result={result}
-        message="Something went wrong while fetching scopes."
+        message="Something went wrong while loading the organization structure."
       />
     );
   }

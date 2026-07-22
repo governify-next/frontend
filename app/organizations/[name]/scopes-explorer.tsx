@@ -4,12 +4,11 @@ import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryState, parseAsString } from "nuqs";
 import { toast } from "sonner";
-import { File, Folder, House, Plus, Trash2 } from "lucide-react";
+import { FolderTree, Info, Plus, Trash2 } from "lucide-react";
 
 import { IScopeNode, IScopePayload } from "@/types/scope";
 import { createScope, deleteScope, updateScope } from "@/data/scopes/actions";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -27,7 +26,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { AlertDialogDestructive } from "@/components/confirm-dialog";
-import { ScopeCard } from "./scope-card";
+import { FolderIcon } from "./folder-icon";
+import { ScopeDetailsDialog } from "./scope-details-dialog";
 import { AddScopeDialog } from "./add-scope-form";
 
 function groupByType(nodes: IScopeNode[]): [string, IScopeNode[]][] {
@@ -52,6 +52,7 @@ export function ScopesExplorer({
   const router = useRouter();
   const [scope, setScope] = useQueryState("scope", parseAsString); // scope = current node _id (null = home)
   const [addOpen, setAddOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Index the tree: node by _id and the distinct organization types.
@@ -107,7 +108,7 @@ export function ScopesExplorer({
       return false;
     }
 
-    toast.success("Scope created.");
+    toast.success("Folder created.");
     router.refresh();
     return true;
   };
@@ -129,7 +130,7 @@ export function ScopesExplorer({
       return false;
     }
 
-    toast.success("Scope updated.");
+    toast.success("Folder updated.");
     router.refresh();
     return true;
   };
@@ -144,15 +145,15 @@ export function ScopesExplorer({
       return;
     }
 
-    toast.success("Scope deleted.");
+    toast.success("Folder deleted.");
     setScope(current.parentId ?? null, { history: "push" }); // navigate to parent (or home)
     setConfirmDelete(false);
     router.refresh();
   };
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-4 pt-4">
-      <div className="flex items-center gap-2">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
+      <div className="flex flex-col gap-3 @4xl/main:flex-row @4xl/main:items-center">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -163,14 +164,14 @@ export function ScopesExplorer({
                     className="flex cursor-pointer items-center gap-1.5"
                     onClick={() => setScope(null, { history: "push" })}
                   >
-                    <House className="size-3.5" />
-                    Home
+                    <FolderTree className="size-3.5" />
+                    All folders
                   </button>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage className="flex items-center gap-1.5">
-                  <House className="size-3.5" />
-                  Home
+                  <FolderTree className="size-3.5" />
+                  All folders
                 </BreadcrumbPage>
               )}
             </BreadcrumbItem>
@@ -182,12 +183,18 @@ export function ScopesExplorer({
                   {node === null ? (
                     <BreadcrumbEllipsis />
                   ) : i === crumbs.length - 1 ? (
-                    <BreadcrumbPage>{node.name}</BreadcrumbPage>
+                    <BreadcrumbPage
+                      className="block max-w-40 truncate"
+                      title={node.name}
+                    >
+                      {node.name}
+                    </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
                       <button
                         type="button"
-                        className="cursor-pointer"
+                        className="max-w-40 cursor-pointer truncate"
+                        title={node.name}
                         onClick={() => setScope(node._id, { history: "push" })}
                       >
                         {node.name}
@@ -200,54 +207,67 @@ export function ScopesExplorer({
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="ml-auto flex gap-2">
+        <div className="flex flex-wrap gap-2 @4xl/main:ml-auto @4xl/main:justify-end">
+          {current && (
+            <Button variant="outline" onClick={() => setDetailsOpen(true)}>
+              <Info />
+              Details
+            </Button>
+          )}
           <Button onClick={() => setAddOpen(true)}>
             <Plus />
-            Add new file
+            New folder
           </Button>
           {current && (
-            <Button variant="outline" onClick={() => setConfirmDelete(true)}>
+            <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
               <Trash2 />
-              Delete scope
+              Delete folder
             </Button>
           )}
         </div>
       </div>
-
-      {current && (
-        <ScopeCard key={current._id} scope={current} onSave={handleSave} />
-      )}
 
       <Card>
         <CardHeader>
           <CardTitle>Organization structure</CardTitle>
           <CardDescription>
             {current
-              ? `Child scopes of ${current.name}.`
-              : "Here you can find the organization structure and navigate through it."}
+              ? `Browse the folders inside ${current.name}. Open one to see its contents.`
+              : "Browse your organization's folders. Open one to see its contents."}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {children.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No scopes here yet.</p>
+            <p className="text-sm text-muted-foreground">
+              {current
+                ? "This folder is empty. Use “New folder” to add one inside."
+                : "No folders yet. Create your first folder to start organizing your organization."}
+            </p>
           ) : (
-            groupByType(children).map(([type, nodes], groupIndex) => (
+            groupByType(children).map(([type, nodes]) => (
               <div key={type} className="flex flex-col gap-2">
-                {groupIndex > 0 && <Separator />}
                 <p className="text-xs font-medium uppercase text-muted-foreground">
                   {type}
                 </p>
-                <div className="flex flex-col gap-1">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-1">
                   {nodes.map((child) => (
-                    <Button
+                    <button
                       key={child._id}
-                      variant="ghost"
-                      className="justify-start"
+                      type="button"
+                      title={child.name}
+                      className="flex cursor-pointer flex-col items-center gap-1 rounded-lg p-3 hover:bg-accent"
                       onClick={() => setScope(child._id, { history: "push" })}
                     >
-                      {child.children.length > 0 ? <Folder /> : <File />}
-                      {child.name}
-                    </Button>
+                      <FolderIcon className="w-16 drop-shadow-sm" />
+                      <span className="line-clamp-2 w-full break-words text-center text-sm leading-tight">
+                        {child.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {child.children.length === 0
+                          ? "Empty"
+                          : `${child.children.length} ${child.children.length === 1 ? "folder" : "folders"}`}
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -256,18 +276,29 @@ export function ScopesExplorer({
         </CardContent>
       </Card>
 
+      {current && (
+        <ScopeDetailsDialog
+          key={current._id}
+          scope={current}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+          onSave={handleSave}
+        />
+      )}
+
       <AddScopeDialog
         open={addOpen}
         onOpenChange={setAddOpen}
         onCreate={handleCreate}
         existingTypes={existingTypes}
+        parentName={current?.name}
       />
 
       <AlertDialogDestructive
         open={confirmDelete}
         onOpenChange={() => setConfirmDelete(false)}
-        title="Delete scope?"
-        description="This deletes the scope and all of its descendants. This action cannot be undone."
+        title="Delete this folder?"
+        description={`This will permanently delete "${current?.name}" and everything inside it. This action cannot be undone.`}
         onConfirm={handleDelete}
       />
     </div>
