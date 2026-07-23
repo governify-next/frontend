@@ -41,7 +41,7 @@ export function ScopeDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {editing ? `Edit ${scope.name}` : `View details of ${scope.name}`}
@@ -78,7 +78,7 @@ function ScopeReadView({
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 overflow-y-auto">
         <DetailSection title="General">
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             <dt className="font-medium">Name</dt>
@@ -154,7 +154,7 @@ function ScopeEditForm({
     <>
       <form
         id="scope-details-form"
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 overflow-y-auto"
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();

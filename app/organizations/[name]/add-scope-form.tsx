@@ -60,7 +60,7 @@ export function AddScopeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create a new folder</DialogTitle>
           <DialogDescription>
@@ -72,7 +72,7 @@ export function AddScopeDialog({
 
         <form
           id="add-scope-form"
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-3 overflow-y-auto"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();

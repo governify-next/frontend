@@ -8,7 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 export function TextareaField({
   label,
   ...textareaProps
-}: { label: string } & ComponentProps<typeof Textarea>) {
+}: { label: string } & Omit<
+  ComponentProps<typeof Textarea>,
+  "maxLength" | "className"
+>) {
   const field = useFieldContext<string>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
@@ -23,6 +26,8 @@ export function TextareaField({
         onChange={(e) => field.handleChange(e.target.value)}
         aria-invalid={isInvalid}
         {...textareaProps}
+        maxLength={500} // avoid dialog overflow
+        className="max-h-32"
       />
       {isInvalid && <FieldError errors={field.state.meta.errors} />}
     </Field>
