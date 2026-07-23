@@ -18,19 +18,25 @@ import {
 } from "@/components/ui/dialog";
 import { ConfigField, configToRows, rowsToConfig } from "./config-fields";
 import { DetailSection } from "./detail-section";
+import { TypeCombobox } from "./type-combobox";
 
-type SavePayload = Pick<IScopePayload, "name" | "description" | "config">; // TODO: replace with IScopePayload when fields/permissions are added
+type SavePayload = Pick<
+  IScopePayload,
+  "name" | "description" | "type" | "config"
+>; // TODO: replace with IScopePayload when fields/permissions are added
 
 export function ScopeDetailsDialog({
   scope,
   open,
   onOpenChange,
   onSave,
+  existingTypes,
 }: {
   scope: IScopeNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (payload: SavePayload) => Promise<boolean>;
+  existingTypes: string[];
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -58,6 +64,7 @@ export function ScopeDetailsDialog({
             scope={scope}
             onSave={onSave}
             onDone={() => setEditing(false)}
+            existingTypes={existingTypes}
           />
         ) : (
           <ScopeReadView scope={scope} onEdit={() => setEditing(true)} />
@@ -87,6 +94,8 @@ function ScopeReadView({
             <dd className="text-muted-foreground">
               {scope.description || "No description."}
             </dd>
+            <dt className="font-medium">Type</dt>
+            <dd className="text-muted-foreground">{scope.type}</dd>
           </dl>
         </DetailSection>
 
@@ -122,10 +131,12 @@ function ScopeEditForm({
   scope,
   onSave,
   onDone,
+  existingTypes,
 }: {
   scope: IScopeNode;
   onSave: (payload: SavePayload) => Promise<boolean>;
   onDone: () => void;
+  existingTypes: string[];
 }) {
   const form = useAppForm({
     defaultValues: {
@@ -141,6 +152,7 @@ function ScopeEditForm({
       const ok = await onSave({
         name: value.name,
         description: value.description || undefined,
+        type: value.type,
         config: rowsToConfig(value.config),
       });
 
@@ -168,6 +180,12 @@ function ScopeEditForm({
 
             <form.AppField name="description">
               {(field) => <field.TextareaField label="Description" />}
+            </form.AppField>
+
+            <form.AppField name="type">
+              {() => (
+                <TypeCombobox label="Type" existingTypes={existingTypes} />
+              )}
             </form.AppField>
           </FieldGroup>
         </DetailSection>

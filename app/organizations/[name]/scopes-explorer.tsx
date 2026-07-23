@@ -114,13 +114,12 @@ export function ScopesExplorer({
   };
 
   const handleSave = async (
-    payload: Pick<IScopePayload, "name" | "description" | "config">, // TODO: replace with IScopePayload when fields/permissions are added
+    payload: Pick<IScopePayload, "name" | "description" | "type" | "config">, // TODO: replace with IScopePayload when fields/permissions are added
   ) => {
     if (!current) return false;
 
     const result = await updateScope(orgName, current.name, {
       ...payload,
-      type: current.type,
       fields: current.fields,
       permissions: current.permissions,
     });
@@ -283,6 +282,7 @@ export function ScopesExplorer({
           open={detailsOpen}
           onOpenChange={setDetailsOpen}
           onSave={handleSave}
+          existingTypes={existingTypes}
         />
       )}
 
