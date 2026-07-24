@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FileText, Pencil, Plus } from "lucide-react";
+import { FileText, Pencil, Plus, X } from "lucide-react";
 
 import { useAppForm } from "@/components/form";
+import { useFieldContext } from "@/components/form/form-context";
 import { scopeConfigSchema } from "@/schemas/scope";
+import { ConfigRow } from "@/types/scope";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -13,7 +17,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ConfigField, configToRows, rowsToConfig } from "./config-fields";
+
+// Record -> rows for the form defaultValues.
+const configToRows = (config: Record<string, unknown>): ConfigRow[] =>
+  Object.entries(config).map(([key, value]) => ({
+    key,
+    value: typeof value === "string" ? value : JSON.stringify(value),
+  }));
+
+// rows -> Record for the create/update payload.
+const rowsToConfig = (rows: ConfigRow[]) =>
+  Object.fromEntries(rows.map(({ key, value }) => [key, value]));
 
 type Mode = "read" | "edit" | "add";
 
@@ -149,5 +163,65 @@ function ConfigEditForm({
         </form.AppForm>
       </CardFooter>
     </>
+  );
+}
+
+// Key/value rows editor bound to the "config" array field.
+function ConfigField() {
+  const field = useFieldContext<ConfigRow[]>();
+
+  return (
+    <Field>
+      {field.state.value.map((row, i) => (
+        <div key={i} className="flex items-start gap-2">
+          <Input
+            placeholder="Key"
+            autoComplete="off"
+            value={row.key}
+            onBlur={field.handleBlur}
+            onChange={(e) =>
+              field.replaceValue(i, { ...row, key: e.target.value })
+            }
+            aria-invalid={field.state.meta.isTouched && row.key.trim() === ""}
+          />
+          <Input
+            placeholder="Value"
+            autoComplete="off"
+            value={row.value}
+            onChange={(e) =>
+              field.replaceValue(i, { ...row, value: e.target.value })
+            }
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+            aria-label="Remove property entry"
+            onClick={() => field.removeValue(i)}
+          >
+            <X />
+          </Button>
+        </div>
+      ))}
+
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="self-start"
+        onClick={(e) => {
+          field.pushValue({ key: "", value: "" });
+          // Keep the new row and this button in view when the list scrolls.
+          const button = e.currentTarget;
+          requestAnimationFrame(() =>
+            button.scrollIntoView({ block: "nearest" }),
+          );
+        }}
+      >
+        <Plus />
+        Add configuration
+      </Button>
+    </Field>
   );
 }

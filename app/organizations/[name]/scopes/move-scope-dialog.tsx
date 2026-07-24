@@ -1,20 +1,11 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
-import { ChevronRight, FolderTree } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 import { IScopeNode } from "@/types/scope";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/button";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FolderIcon } from "./folder-icon";
+import { indexScopeTree, ScopeBreadcrumb } from "./scope-breadcrumb";
 
 export function MoveScopeDialog({
   scope,
@@ -42,17 +34,7 @@ export function MoveScopeDialog({
   const [selectedId, setSelectedId] = useState<string | null>(null); // selected row within the browsed folder
   const [moving, setMoving] = useState(false);
 
-  const byId = useMemo(() => {
-    const byId = new Map<string, IScopeNode>();
-    const indexTreeLevel = (nodes: IScopeNode[]) => {
-      for (const node of nodes) {
-        byId.set(node._id, node);
-        indexTreeLevel(node.children);
-      }
-    };
-    indexTreeLevel(tree);
-    return byId;
-  }, [tree]);
+  const byId = useMemo(() => indexScopeTree(tree), [tree]);
 
   const browsing = browsingId ? (byId.get(browsingId) ?? null) : null;
   const rows = (browsing ? browsing.children : tree)
@@ -72,20 +54,6 @@ export function MoveScopeDialog({
     ? (byId.get(scope.parentId)?.name ?? "")
     : "All folders";
 
-  // Build breadcrumb path
-  const path: IScopeNode[] = [];
-  for (
-    let node = browsing;
-    node;
-    node = node.parentId ? (byId.get(node.parentId) ?? null) : null
-  ) {
-    path.unshift(node);
-  }
-  const crumbs: (IScopeNode | null)[] =
-    path.length > 3
-      ? [path[0], null, path[path.length - 2], path[path.length - 1]]
-      : path;
-
   const browseTo = (id: string | null) => {
     setBrowsingId(id);
     setSelectedId(null);
@@ -100,7 +68,7 @@ export function MoveScopeDialog({
     setMoving(true);
     const ok = await onMove(destinationId);
     setMoving(false);
-    if (ok) onOpenChange(false);
+    if (ok) handleOpenChange(false);
   };
 
   return (
@@ -117,58 +85,11 @@ export function MoveScopeDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              {browsing ? (
-                <BreadcrumbLink asChild>
-                  <button
-                    type="button"
-                    className="flex cursor-pointer items-center gap-1.5"
-                    onClick={() => browseTo(null)}
-                  >
-                    <FolderTree className="size-3.5" />
-                    All folders
-                  </button>
-                </BreadcrumbLink>
-              ) : (
-                <BreadcrumbPage className="flex items-center gap-1.5">
-                  <FolderTree className="size-3.5" />
-                  All folders
-                </BreadcrumbPage>
-              )}
-            </BreadcrumbItem>
-
-            {crumbs.map((node, i) => (
-              <Fragment key={node ? node._id : "ellipsis"}>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  {node === null ? (
-                    <BreadcrumbEllipsis />
-                  ) : i === crumbs.length - 1 ? (
-                    <BreadcrumbPage
-                      className="block max-w-40 truncate"
-                      title={node.name}
-                    >
-                      {node.name}
-                    </BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink asChild>
-                      <button
-                        type="button"
-                        className="max-w-40 cursor-pointer truncate"
-                        title={node.name}
-                        onClick={() => browseTo(node._id)}
-                      >
-                        {node.name}
-                      </button>
-                    </BreadcrumbLink>
-                  )}
-                </BreadcrumbItem>
-              </Fragment>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
+        <ScopeBreadcrumb
+          byId={byId}
+          currentId={browsingId}
+          onNavigate={browseTo}
+        />
 
         <div className="flex h-72 flex-col gap-1 overflow-y-auto">
           {rows.length === 0 ? (

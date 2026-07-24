@@ -1,10 +1,10 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryState, parseAsString } from "nuqs";
 import { toast } from "sonner";
-import { FolderInput, FolderTree, Pencil, Plus, Trash2 } from "lucide-react";
+import { FolderInput, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { IScopeNode, IScopePayload } from "@/types/scope";
 import { createScope, deleteScope, updateScope } from "@/data/scopes/actions";
@@ -17,19 +17,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { FolderIcon } from "./folder-icon";
-import { AddScopeDialog } from "./add-scope-form";
-import { EditScopeDialog } from "./edit-scope-dialog";
+import { indexScopeTree, ScopeBreadcrumb } from "./scope-breadcrumb";
+import { ScopeBasics, ScopeFormDialog } from "./scope-form-dialog";
 import { MoveScopeDialog } from "./move-scope-dialog";
 import { ScopeConfigCard } from "./scope-config-card";
 
@@ -73,18 +64,8 @@ export function ScopesExplorer({
 
   // Index the tree: node by _id and the distinct organization types.
   const { byId, existingTypes } = useMemo(() => {
-    const byId = new Map<string, IScopeNode>();
-    const types = new Set<string>();
-
-    const indexTreeLevel = (nodes: IScopeNode[]) => {
-      for (const node of nodes) {
-        byId.set(node._id, node);
-        types.add(node.type);
-        indexTreeLevel(node.children);
-      }
-    };
-    indexTreeLevel(tree);
-
+    const byId = indexScopeTree(tree);
+    const types = new Set([...byId.values()].map((node) => node.type));
     return {
       byId,
       existingTypes: [...types].sort((a, b) => a.localeCompare(b)),
@@ -94,29 +75,12 @@ export function ScopesExplorer({
   const current = scope ? (byId.get(scope) ?? null) : null; // scope not found is treated as home
   const children = current ? current.children : tree; // home treated with root scopes as children
 
-  // Build breadcrumb path from current to root adding parents at the beginning.
-  const path: IScopeNode[] = [];
-  for (
-    let node = current;
-    node;
-    node = node.parentId ? (byId.get(node.parentId) ?? null) : null
-  ) {
-    path.unshift(node);
-  }
-  // Collapse the middle of the path into a "…" when deeper than 3: Home / root / … / parent / current.
-  const crumbs: (IScopeNode | null)[] =
-    path.length > 3
-      ? [path[0], null, path[path.length - 2], path[path.length - 1]]
-      : path;
-
   const openAdd = (type: string) => {
     setAddType(type);
     setAddOpen(true);
   };
 
-  const handleCreate = async (
-    payload: Pick<IScopePayload, "name" | "description" | "type">,
-  ) => {
+  const handleCreate = async (payload: ScopeBasics) => {
     const result = await createScope(orgName, {
       ...payload,
       parentId: current?._id ?? null,
@@ -135,7 +99,10 @@ export function ScopesExplorer({
     return true;
   };
 
-  const handleSave = async (patch: Partial<IScopePayload>) => {
+  const handleUpdate = async (
+    patch: Partial<IScopePayload>,
+    successMessage: string,
+  ) => {
     if (!current) return false;
 
     const result = await updateScope(orgName, current._id, {
@@ -148,25 +115,7 @@ export function ScopesExplorer({
       return false;
     }
 
-    toast.success("Folder updated.");
-    router.refresh();
-    return true;
-  };
-
-  const handleMove = async (newParentId: string | null) => {
-    if (!current) return false;
-
-    const result = await updateScope(orgName, current._id, {
-      ...toPayload(current),
-      parentId: newParentId,
-    });
-
-    if (!result.ok) {
-      toast.error(result.error);
-      return false;
-    }
-
-    toast.success("Folder moved.");
+    toast.success(successMessage);
     router.refresh();
     return true;
   };
@@ -201,58 +150,11 @@ export function ScopesExplorer({
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
       <div className="flex flex-col gap-3 @4xl/main:flex-row @4xl/main:items-center">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              {current ? (
-                <BreadcrumbLink asChild>
-                  <button
-                    type="button"
-                    className="flex cursor-pointer items-center gap-1.5"
-                    onClick={() => setScope(null, { history: "push" })}
-                  >
-                    <FolderTree className="size-3.5" />
-                    All folders
-                  </button>
-                </BreadcrumbLink>
-              ) : (
-                <BreadcrumbPage className="flex items-center gap-1.5">
-                  <FolderTree className="size-3.5" />
-                  All folders
-                </BreadcrumbPage>
-              )}
-            </BreadcrumbItem>
-
-            {crumbs.map((node, i) => (
-              <Fragment key={node ? node._id : "ellipsis"}>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  {node === null ? (
-                    <BreadcrumbEllipsis />
-                  ) : i === crumbs.length - 1 ? (
-                    <BreadcrumbPage
-                      className="block max-w-40 truncate"
-                      title={node.name}
-                    >
-                      {node.name}
-                    </BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink asChild>
-                      <button
-                        type="button"
-                        className="max-w-40 cursor-pointer truncate"
-                        title={node.name}
-                        onClick={() => setScope(node._id, { history: "push" })}
-                      >
-                        {node.name}
-                      </button>
-                    </BreadcrumbLink>
-                  )}
-                </BreadcrumbItem>
-              </Fragment>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
+        <ScopeBreadcrumb
+          byId={byId}
+          currentId={scope}
+          onNavigate={(id) => setScope(id, { history: "push" })}
+        />
 
         <div className="flex flex-wrap gap-2 @4xl/main:ml-auto @4xl/main:justify-end">
           <Button onClick={() => openAdd("")}>
@@ -309,15 +211,16 @@ export function ScopesExplorer({
             <ScopeConfigCard
               key={current._id} // reset edit mode when navigating to another folder
               config={current.config}
-              onSave={(config) => handleSave({ config })}
+              onSave={(config) => handleUpdate({ config }, "Folder updated.")}
             />
           )}
 
           {children.length === 0
             ? !current && (
                 <p className="text-sm text-muted-foreground">
-                  No folders yet. Create your first folder using the button "New
-                  folder" above to start managing your organization.
+                  No folders yet. Create your first folder using the button
+                  &quot;New folder&quot; above to start managing your
+                  organization.
                 </p>
               )
             : groupByType(children).map(([type, nodes]) => (
@@ -353,13 +256,20 @@ export function ScopesExplorer({
       </Card>
 
       {current && (
-        <EditScopeDialog
+        <ScopeFormDialog
           key={`edit-${current._id}-${current.updatedAt}`}
-          scope={current}
           open={editOpen}
           onOpenChange={setEditOpen}
-          onSave={handleSave}
+          onSubmit={(patch) => handleUpdate(patch, "Folder updated.")}
           existingTypes={existingTypes}
+          title="Edit folder"
+          description={`Make changes to ${current.name} here. Click save when you're done.`}
+          submitLabel="Save changes"
+          defaultValues={{
+            name: current.name,
+            description: current.description ?? "",
+            type: current.type,
+          }}
         />
       )}
 
@@ -370,18 +280,26 @@ export function ScopesExplorer({
           tree={tree}
           open={moveOpen}
           onOpenChange={setMoveOpen}
-          onMove={handleMove}
+          onMove={(newParentId) =>
+            handleUpdate({ parentId: newParentId }, "Folder moved.")
+          }
         />
       )}
 
-      <AddScopeDialog
+      <ScopeFormDialog
         key={`add-${addType}`} // remount so the preset type lands in the form defaults
         open={addOpen}
         onOpenChange={setAddOpen}
-        onCreate={handleCreate}
+        onSubmit={handleCreate}
         existingTypes={existingTypes}
-        parentName={current?.name}
-        defaultType={addType}
+        title="Create a new folder"
+        description={
+          current
+            ? `Fill in the details to create a new folder. It will be created inside ${current.name}.`
+            : "Fill in the details to create a new folder. It will be created at the top level of your organization."
+        }
+        submitLabel="Create folder"
+        defaultValues={{ name: "", description: "", type: addType }}
       />
 
       <AlertDialogDestructive

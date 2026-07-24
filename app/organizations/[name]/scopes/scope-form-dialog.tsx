@@ -1,6 +1,10 @@
 "use client";
 
 import { useAppForm } from "@/components/form";
+import { IScopePayload } from "@/types/scope";
+import { scopeBasicsSchema } from "@/schemas/scope";
+import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
 import {
   Dialog,
   DialogClose,
@@ -10,40 +14,37 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FieldGroup } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
-import { scopeBasicsSchema } from "@/schemas/scope";
 import { TypeCombobox } from "./type-combobox";
-import { IScopePayload } from "@/types/scope";
 
-export function AddScopeDialog({
+export type ScopeBasics = Pick<IScopePayload, "name" | "description" | "type">;
+
+// Shared create/edit folder dialog: the parent decides texts, defaults and submit.
+export function ScopeFormDialog({
   open,
   onOpenChange,
-  onCreate,
+  onSubmit,
   existingTypes,
-  parentName,
-  defaultType,
+  title,
+  description,
+  submitLabel,
+  defaultValues,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (
-    payload: Pick<IScopePayload, "name" | "description" | "type">,
-  ) => Promise<boolean>;
+  onSubmit: (values: ScopeBasics) => Promise<boolean>;
   existingTypes: string[];
-  parentName?: string;
-  defaultType?: string;
+  title: string;
+  description: string;
+  submitLabel: string;
+  defaultValues: { name: string; description: string; type: string };
 }) {
   const form = useAppForm({
-    defaultValues: {
-      name: "",
-      description: "",
-      type: defaultType ?? "",
-    },
+    defaultValues,
     validators: {
       onSubmit: scopeBasicsSchema,
     },
     onSubmit: async ({ value }) => {
-      const ok = await onCreate({
+      const ok = await onSubmit({
         name: value.name,
         description: value.description || undefined,
         type: value.type,
@@ -60,16 +61,12 @@ export function AddScopeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create a new folder</DialogTitle>
-          <DialogDescription>
-            {parentName
-              ? `Fill in the details to create a new folder. It will be created inside ${parentName}.`
-              : "Fill in the details to create a new folder. It will be created at the top level of your organization."}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <form
-          id="add-scope-form"
+          id="scope-form"
           className="-m-1 flex flex-col gap-3 overflow-y-auto p-1"
           onSubmit={(e) => {
             e.preventDefault();
@@ -98,7 +95,7 @@ export function AddScopeDialog({
             </Button>
           </DialogClose>
           <form.AppForm>
-            <form.SubmitButton label="Create folder" formId="add-scope-form" />
+            <form.SubmitButton label={submitLabel} formId="scope-form" />
           </form.AppForm>
         </DialogFooter>
       </DialogContent>
