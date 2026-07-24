@@ -4,10 +4,11 @@ import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryState, parseAsString } from "nuqs";
 import { toast } from "sonner";
-import { FolderTree, Info, Plus, Trash2 } from "lucide-react";
+import { FolderInput, FolderTree, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { IScopeNode, IScopePayload } from "@/types/scope";
 import { createScope, deleteScope, updateScope } from "@/data/scopes/actions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,8 +28,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { FolderIcon } from "./folder-icon";
-import { ScopeDetailsDialog } from "./scope-details-dialog";
 import { AddScopeDialog } from "./add-scope-form";
+import { EditScopeDialog } from "./edit-scope-dialog";
+import { MoveScopeDialog } from "./move-scope-dialog";
+import { ScopeConfigCard } from "./scope-config-card";
 
 function groupByType(nodes: IScopeNode[]): [string, IScopeNode[]][] {
   const groups = new Map<string, IScopeNode[]>();
@@ -42,6 +45,17 @@ function groupByType(nodes: IScopeNode[]): [string, IScopeNode[]][] {
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)); // sort alphabetically
 }
 
+// Full update payload for a node, update handlers patch over this to change one thing at a time.
+const toPayload = (scope: IScopeNode): IScopePayload => ({
+  name: scope.name,
+  description: scope.description,
+  type: scope.type,
+  config: scope.config,
+  parentId: scope.parentId ?? null,
+  fields: scope.fields,
+  permissions: scope.permissions,
+});
+
 export function ScopesExplorer({
   orgName,
   tree,
@@ -52,7 +66,9 @@ export function ScopesExplorer({
   const router = useRouter();
   const [scope, setScope] = useQueryState("scope", parseAsString); // scope = current node _id (null = home)
   const [addOpen, setAddOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [addType, setAddType] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
+  const [moveOpen, setMoveOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Index the tree: node by _id and the distinct organization types.
@@ -93,12 +109,18 @@ export function ScopesExplorer({
       ? [path[0], null, path[path.length - 2], path[path.length - 1]]
       : path;
 
+  const openAdd = (type: string) => {
+    setAddType(type);
+    setAddOpen(true);
+  };
+
   const handleCreate = async (
-    payload: Pick<IScopePayload, "name" | "description" | "type" | "config">, // TODO: replace with IScopePayload when fields/permissions are added
+    payload: Pick<IScopePayload, "name" | "description" | "type">,
   ) => {
     const result = await createScope(orgName, {
       ...payload,
-      parentId: current?._id,
+      parentId: current?._id ?? null,
+      config: {}, // configured later from the Configuration card
       fields: [],
       permissions: { view: [], edit: [], delete: [], create: [] },
     });
@@ -113,15 +135,12 @@ export function ScopesExplorer({
     return true;
   };
 
-  const handleSave = async (
-    payload: Pick<IScopePayload, "name" | "description" | "type" | "config">, // TODO: replace with IScopePayload when fields/permissions are added
-  ) => {
+  const handleSave = async (patch: Partial<IScopePayload>) => {
     if (!current) return false;
 
-    const result = await updateScope(orgName, current.name, {
-      ...payload,
-      fields: current.fields,
-      permissions: current.permissions,
+    const result = await updateScope(orgName, current._id, {
+      ...toPayload(current),
+      ...patch,
     });
 
     if (!result.ok) {
@@ -134,10 +153,28 @@ export function ScopesExplorer({
     return true;
   };
 
+  const handleMove = async (newParentId: string | null) => {
+    if (!current) return false;
+
+    const result = await updateScope(orgName, current._id, {
+      ...toPayload(current),
+      parentId: newParentId,
+    });
+
+    if (!result.ok) {
+      toast.error(result.error);
+      return false;
+    }
+
+    toast.success("Folder moved.");
+    router.refresh();
+    return true;
+  };
+
   const handleDelete = async () => {
     if (!current) return;
 
-    const result = await deleteScope(orgName, current.name);
+    const result = await deleteScope(orgName, current._id);
 
     if (!result.ok) {
       toast.error(result.error);
@@ -149,6 +186,17 @@ export function ScopesExplorer({
     setConfirmDelete(false);
     router.refresh();
   };
+
+  const addFolderTile = (type: string) => (
+    <button
+      type="button"
+      className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed p-3 text-muted-foreground hover:border-sky-500/50 hover:bg-sky-500/10 hover:text-sky-600 dark:hover:text-sky-400"
+      onClick={() => openAdd(type)}
+    >
+      <Plus className="size-8" />
+      <span className="text-sm">Add folder</span>
+    </button>
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
@@ -207,98 +255,140 @@ export function ScopesExplorer({
         </Breadcrumb>
 
         <div className="flex flex-wrap gap-2 @4xl/main:ml-auto @4xl/main:justify-end">
-          {current && (
-            <Button variant="outline" onClick={() => setDetailsOpen(true)}>
-              <Info />
-              Details
-            </Button>
-          )}
-          <Button onClick={() => setAddOpen(true)}>
+          <Button onClick={() => openAdd("")}>
             <Plus />
             New folder
           </Button>
           {current && (
-            <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
-              <Trash2 />
-              Delete folder
-            </Button>
+            <>
+              <Button
+                variant="destructive"
+                onClick={() => setConfirmDelete(true)}
+              >
+                <Trash2 />
+                Delete folder
+              </Button>
+              <Button variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil />
+                Edit
+              </Button>
+              <Button variant="outline" onClick={() => setMoveOpen(true)}>
+                <FolderInput />
+                Move to…
+              </Button>
+            </>
           )}
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Organization structure</CardTitle>
-          <CardDescription>
-            {current
-              ? `Browse the folders inside ${current.name}. Open one to see its contents.`
-              : "Browse your organization's folders. Open one to see its contents."}
-          </CardDescription>
+          {current ? (
+            <>
+              <CardTitle className="flex items-center gap-2">
+                {current.name}
+                <Badge variant="secondary">{current.type}</Badge>
+              </CardTitle>
+              <CardDescription>
+                {current.description ||
+                  "This folder has no description yet. You can add one using the “Edit” button above."}
+              </CardDescription>
+            </>
+          ) : (
+            <>
+              <CardTitle>Organization structure</CardTitle>
+              <CardDescription>
+                Browse your organization&apos;s folders. Open one to see its
+                contents.
+              </CardDescription>
+            </>
+          )}
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {children.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {current
-                ? "This folder is empty. Use “New folder” to add one inside."
-                : "No folders yet. Create your first folder to start organizing your organization."}
-            </p>
-          ) : (
-            groupByType(children).map(([type, nodes]) => (
-              <div key={type} className="flex flex-col gap-2">
-                <p className="text-xs font-medium uppercase text-muted-foreground">
-                  {type}
-                </p>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-1">
-                  {nodes.map((child) => (
-                    <button
-                      key={child._id}
-                      type="button"
-                      title={child.name}
-                      className="flex cursor-pointer flex-col items-center gap-1 rounded-lg p-3 hover:bg-accent"
-                      onClick={() => setScope(child._id, { history: "push" })}
-                    >
-                      <FolderIcon className="w-16 drop-shadow-sm" />
-                      <span className="line-clamp-2 w-full break-words text-center text-sm leading-tight">
-                        {child.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {child.children.length === 0
-                          ? "Empty"
-                          : `${child.children.length} ${child.children.length === 1 ? "folder" : "folders"}`}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))
+          {current && (
+            <ScopeConfigCard
+              key={current._id} // reset edit mode when navigating to another folder
+              config={current.config}
+              onSave={(config) => handleSave({ config })}
+            />
           )}
+
+          {children.length === 0
+            ? !current && (
+                <p className="text-sm text-muted-foreground">
+                  No folders yet. Create your first folder using the button "New
+                  folder" above to start managing your organization.
+                </p>
+              )
+            : groupByType(children).map(([type, nodes]) => (
+                <div key={type} className="flex flex-col gap-2">
+                  <p className="text-xs font-medium uppercase text-muted-foreground">
+                    {type}
+                  </p>
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-1">
+                    {nodes.map((child) => (
+                      <button
+                        key={child._id}
+                        type="button"
+                        title={child.name}
+                        className="flex cursor-pointer flex-col items-center gap-1 rounded-lg p-3 hover:bg-accent"
+                        onClick={() => setScope(child._id, { history: "push" })}
+                      >
+                        <FolderIcon className="w-16 drop-shadow-sm" />
+                        <span className="line-clamp-2 w-full break-words text-center text-sm leading-tight">
+                          {child.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {child.children.length === 0
+                            ? "Empty"
+                            : `${child.children.length} ${child.children.length === 1 ? "folder" : "folders"}`}
+                        </span>
+                      </button>
+                    ))}
+                    {addFolderTile(type)}
+                  </div>
+                </div>
+              ))}
         </CardContent>
       </Card>
 
       {current && (
-        <ScopeDetailsDialog
-          key={current._id}
+        <EditScopeDialog
+          key={`edit-${current._id}-${current.updatedAt}`}
           scope={current}
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
+          open={editOpen}
+          onOpenChange={setEditOpen}
           onSave={handleSave}
           existingTypes={existingTypes}
         />
       )}
 
+      {current && (
+        <MoveScopeDialog
+          key={`move-${current._id}`}
+          scope={current}
+          tree={tree}
+          open={moveOpen}
+          onOpenChange={setMoveOpen}
+          onMove={handleMove}
+        />
+      )}
+
       <AddScopeDialog
+        key={`add-${addType}`} // remount so the preset type lands in the form defaults
         open={addOpen}
         onOpenChange={setAddOpen}
         onCreate={handleCreate}
         existingTypes={existingTypes}
         parentName={current?.name}
+        defaultType={addType}
       />
 
       <AlertDialogDestructive
         open={confirmDelete}
         onOpenChange={() => setConfirmDelete(false)}
         title="Delete this folder?"
-        description={`This will permanently delete "${current?.name}" and everything inside it. This action cannot be undone.`}
+        description={`This will permanently delete ${current?.name} and everything inside it. This action cannot be undone.`}
         onConfirm={handleDelete}
       />
     </div>

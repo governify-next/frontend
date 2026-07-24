@@ -13,18 +13,18 @@ export const createScope = async (orgName: string, payload: IScopePayload) => {
 
 export const updateScope = async (
   orgName: string,
-  scopeName: string,
+  scopeId: string,
   payload: IScopePayload,
 ) => {
   return await apiFetcher<IScope>(
-    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeName}`,
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}`,
     { method: "PUT", body: payload },
   );
 };
 
-export const deleteScope = async (orgName: string, scopeName: string) => {
+export const deleteScope = async (orgName: string, scopeId: string) => {
   return await apiFetcher<void>(
-    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeName}`,
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}`,
     { method: "DELETE" },
   );
 };

@@ -47,6 +47,7 @@ export function ConfigField() {
             type="button"
             variant="ghost"
             size="icon"
+            className="hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
             aria-label="Remove property entry"
             onClick={() => field.removeValue(i)}
           >
@@ -60,10 +61,17 @@ export function ConfigField() {
         variant="outline"
         size="sm"
         className="self-start"
-        onClick={() => field.pushValue({ key: "", value: "" })}
+        onClick={(e) => {
+          field.pushValue({ key: "", value: "" });
+          // Keep the new row and this button in view when the list scrolls.
+          const button = e.currentTarget;
+          requestAnimationFrame(() =>
+            button.scrollIntoView({ block: "nearest" }),
+          );
+        }}
       >
         <Plus />
-        Add property
+        Add configuration
       </Button>
     </Field>
   );

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const scopeFormSchema = z.object({
+export const scopeBasicsSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters.")
@@ -14,10 +14,17 @@ export const scopeFormSchema = z.object({
     .string()
     .min(2, "Type must be at least 2 characters.")
     .max(100, "Type must be at most 100 characters."),
-  config: z.array(
-    z.object({
-      key: z.string().min(1, "Key is required."),
-      value: z.string(),
+});
+
+export const scopeConfigSchema = z.object({
+  config: z
+    .array(
+      z.object({
+        key: z.string(),
+        value: z.string(),
+      }),
+    )
+    .refine((rows) => rows.every((row) => row.key.trim() !== ""), {
+      message: "Key is required.",
     }),
-  ),
 });

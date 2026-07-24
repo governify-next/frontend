@@ -1,6 +1,10 @@
 "use client";
 
 import { useAppForm } from "@/components/form";
+import { IScopeNode, IScopePayload } from "@/types/scope";
+import { scopeBasicsSchema } from "@/schemas/scope";
+import { Button } from "@/components/ui/button";
+import { FieldGroup } from "@/components/ui/field";
 import {
   Dialog,
   DialogClose,
@@ -10,47 +14,38 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FieldGroup } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
-import { scopeBasicsSchema } from "@/schemas/scope";
 import { TypeCombobox } from "./type-combobox";
-import { IScopePayload } from "@/types/scope";
 
-export function AddScopeDialog({
+export function EditScopeDialog({
+  scope,
   open,
   onOpenChange,
-  onCreate,
+  onSave,
   existingTypes,
-  parentName,
-  defaultType,
 }: {
+  scope: IScopeNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (
-    payload: Pick<IScopePayload, "name" | "description" | "type">,
-  ) => Promise<boolean>;
+  onSave: (patch: Partial<IScopePayload>) => Promise<boolean>;
   existingTypes: string[];
-  parentName?: string;
-  defaultType?: string;
 }) {
   const form = useAppForm({
     defaultValues: {
-      name: "",
-      description: "",
-      type: defaultType ?? "",
+      name: scope.name,
+      description: scope.description ?? "",
+      type: scope.type,
     },
     validators: {
       onSubmit: scopeBasicsSchema,
     },
     onSubmit: async ({ value }) => {
-      const ok = await onCreate({
+      const ok = await onSave({
         name: value.name,
         description: value.description || undefined,
         type: value.type,
       });
 
       if (ok) {
-        form.reset();
         onOpenChange(false);
       }
     },
@@ -60,16 +55,14 @@ export function AddScopeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create a new folder</DialogTitle>
+          <DialogTitle>Edit folder</DialogTitle>
           <DialogDescription>
-            {parentName
-              ? `Fill in the details to create a new folder. It will be created inside ${parentName}.`
-              : "Fill in the details to create a new folder. It will be created at the top level of your organization."}
+            Make changes to {scope.name} here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
 
         <form
-          id="add-scope-form"
+          id="edit-scope-form"
           className="-m-1 flex flex-col gap-3 overflow-y-auto p-1"
           onSubmit={(e) => {
             e.preventDefault();
@@ -86,7 +79,9 @@ export function AddScopeDialog({
             </form.AppField>
 
             <form.AppField name="type">
-              {() => <TypeCombobox label="Type" existingTypes={existingTypes} />}
+              {() => (
+                <TypeCombobox label="Type" existingTypes={existingTypes} />
+              )}
             </form.AppField>
           </FieldGroup>
         </form>
@@ -98,7 +93,7 @@ export function AddScopeDialog({
             </Button>
           </DialogClose>
           <form.AppForm>
-            <form.SubmitButton label="Create folder" formId="add-scope-form" />
+            <form.SubmitButton label="Save changes" formId="edit-scope-form" />
           </form.AppForm>
         </DialogFooter>
       </DialogContent>

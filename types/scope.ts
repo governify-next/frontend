@@ -25,7 +25,7 @@ export interface IScopePayload {
   name: string;
   description?: string;
   type: string;
-  parentId?: string;
+  parentId: string | null; // null = root
   fields: Record<string, unknown>[];
   permissions: {
     view: string[];
