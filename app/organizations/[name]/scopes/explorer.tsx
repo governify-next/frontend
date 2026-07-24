@@ -241,11 +241,6 @@ export function ScopesExplorer({
                         <span className="line-clamp-2 w-full break-words text-center text-sm leading-tight">
                           {child.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          {child.children.length === 0
-                            ? "Empty"
-                            : `${child.children.length} ${child.children.length === 1 ? "folder" : "folders"}`}
-                        </span>
                       </button>
                     ))}
                     {addFolderTile(type)}
