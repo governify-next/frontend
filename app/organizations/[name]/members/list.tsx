@@ -28,7 +28,7 @@ import {
   removeOrganizationMember,
   updateOrganizationMemberRoles,
 } from "@/data/organizations/actions";
-import { ChangeRoleDialog } from "./change-role-dialog";
+import { ChangeRoleDialog } from "./change-role";
 
 export function MembersList({
   members,

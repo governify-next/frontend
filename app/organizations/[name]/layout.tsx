@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getOrganization } from "@/data/organizations/fetch";
-import { OrganizationTabsNav } from "./organization-tabs-nav";
+import { OrganizationTabsNav } from "./tabs-nav";
 import { ErrorPage } from "@/components/errors";
 import { isUserAdminOfOrganization } from "@/data/organizations/actions";
 

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createOrganization } from "@/data/organizations/actions";
 import { IOrganizationPayload } from "@/types/organization";
-import { CreateOrganizationDialog } from "./add-organization-form";
+import { CreateOrganizationDialog } from "./add-form";
 
 export function OrganizationsAdminActions() {
   const router = useRouter();

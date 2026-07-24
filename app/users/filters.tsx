@@ -10,15 +10,15 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { FilterDropdown } from "@/components/filter/filter-dropdown";
+import { FilterDropdown } from "@/components/filter/dropdown";
 import { useQueryStates } from "nuqs";
 import {
   AppliedUserFilters,
   USER_FIELDS,
   UserField,
   userSearchParams,
-} from "./users-search-params";
-import { FilterSummary } from "@/components/filter/filter-summary";
+} from "./search-params";
+import { FilterSummary } from "@/components/filter/summary";
 
 export function UsersFilters({
   totalItems,

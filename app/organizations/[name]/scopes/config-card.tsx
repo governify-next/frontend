@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Pencil, Plus, X } from "lucide-react";
 
 import { useAppForm } from "@/components/form";
-import { useFieldContext } from "@/components/form/form-context";
+import { useFieldContext } from "@/components/form/context";
 import { scopeConfigSchema } from "@/schemas/scope";
 import { ConfigRow } from "@/types/scope";
 import { Button } from "@/components/ui/button";

@@ -1,7 +1,7 @@
-import { RolesList } from "./roles-list";
+import { RolesList } from "./list";
 import { ErrorPage } from "@/components/errors";
 import { getOrganization } from "@/data/organizations/fetch";
-import { AddRole } from "./role-nav";
+import { AddRole } from "./header-nav";
 
 export default async function OrganizationRolesPage({
   params,

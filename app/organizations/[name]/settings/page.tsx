@@ -1,5 +1,5 @@
 import { getOrganization } from "@/data/organizations/fetch";
-import { UpdateOrganizationForm } from "./update-organization-form";
+import { UpdateOrganizationForm } from "./update-form";
 import { DangerZone } from "./danger-zone";
 import { ErrorPage } from "@/components/errors";
 import { isUserAdminOfOrganization } from "@/data/organizations/actions";

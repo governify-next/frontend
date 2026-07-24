@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import { useFieldContext } from "@/components/form/form-context";
+import { useFieldContext } from "@/components/form/context";
 import { cn } from "@/lib/utils/cn";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -89,7 +89,9 @@ export function TypeCombobox({
                     onSelect={() => select(type)}
                   >
                     <Check
-                      className={cn(value === type ? "opacity-100" : "opacity-0")}
+                      className={cn(
+                        value === type ? "opacity-100" : "opacity-0",
+                      )}
                     />
                     {type}
                   </CommandItem>

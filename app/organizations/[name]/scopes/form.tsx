@@ -18,7 +18,7 @@ import { TypeCombobox } from "./type-combobox";
 
 export type ScopeBasics = Pick<IScopePayload, "name" | "description" | "type">;
 
-// Shared create/edit folder dialog: the parent decides texts, defaults and submit.
+// Shared create/edit folder dialog
 export function ScopeFormDialog({
   open,
   onOpenChange,
@@ -83,7 +83,9 @@ export function ScopeFormDialog({
             </form.AppField>
 
             <form.AppField name="type">
-              {() => <TypeCombobox label="Type" existingTypes={existingTypes} />}
+              {() => (
+                <TypeCombobox label="Type" existingTypes={existingTypes} />
+              )}
             </form.AppField>
           </FieldGroup>
         </form>

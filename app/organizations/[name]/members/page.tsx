@@ -2,8 +2,8 @@ import {
   getOrganization,
   getOrganizationMembers,
 } from "@/data/organizations/fetch";
-import { MembersAdminActions } from "./members-admin-actions";
-import { MembersList } from "./members-list";
+import { MembersAdminActions } from "./admin-actions";
+import { MembersList } from "./list";
 import { ErrorPage } from "@/components/errors";
 
 export default async function OrganizationMembersPage({

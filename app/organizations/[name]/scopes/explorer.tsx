@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/card";
 import { AlertDialogDestructive } from "@/components/confirm-dialog";
 import { FolderIcon } from "./folder-icon";
-import { indexScopeTree, ScopeBreadcrumb } from "./scope-breadcrumb";
-import { ScopeBasics, ScopeFormDialog } from "./scope-form-dialog";
-import { MoveScopeDialog } from "./move-scope-dialog";
-import { ScopeConfigCard } from "./scope-config-card";
+import { indexScopeTree, ScopeBreadcrumb } from "./breadcrumb";
+import { ScopeBasics, ScopeFormDialog } from "./form";
+import { MoveScopeDialog } from "./move-dialog";
+import { ScopeConfigCard } from "./config-card";
 
 function groupByType(nodes: IScopeNode[]): [string, IScopeNode[]][] {
   const groups = new Map<string, IScopeNode[]>();
@@ -84,7 +84,7 @@ export function ScopesExplorer({
     const result = await createScope(orgName, {
       ...payload,
       parentId: current?._id ?? null,
-      config: {}, // configured later from the Configuration card
+      config: {}, // configured later from the configuration card
       fields: [],
       permissions: { view: [], edit: [], delete: [], create: [] },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "./form-context";
+import { useFormContext } from "./context";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 

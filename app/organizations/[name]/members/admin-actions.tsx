@@ -5,7 +5,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { addOrganizationMember } from "@/data/organizations/actions";
-import { AddMemberDialog } from "./add-member-form";
+import { AddMemberDialog } from "./add-form";
 
 export function MembersAdminActions({ orgName }: { orgName: string }) {
   const router = useRouter();

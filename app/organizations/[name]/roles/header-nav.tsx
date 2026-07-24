@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { AddRoleDialog } from "./add-role-form";
+import { AddRoleDialog } from "./add-form";
 import { IRolePayload } from "@/types/organization";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

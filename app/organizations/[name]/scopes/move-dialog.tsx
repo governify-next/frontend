@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FolderIcon } from "./folder-icon";
-import { indexScopeTree, ScopeBreadcrumb } from "./scope-breadcrumb";
+import { indexScopeTree, ScopeBreadcrumb } from "./breadcrumb";
 
 export function MoveScopeDialog({
   scope,

@@ -25,7 +25,7 @@ import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { EditRoleDialog } from "./edit-role-form";
+import { EditRoleDialog } from "./edit-form";
 
 export function RolesList({
   orgName,
