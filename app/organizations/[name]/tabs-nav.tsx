@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Settings, ShieldCheck, Users } from "lucide-react";
+import { FolderTree, House, Settings, ShieldCheck, Users } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function OrganizationTabsNav({
@@ -16,6 +16,12 @@ export function OrganizationTabsNav({
 
   const baseTabs = [
     { value: "overview", label: "Home", href: base, icon: House },
+    {
+      value: "scopes",
+      label: "Scopes",
+      href: `${base}/scopes`,
+      icon: FolderTree,
+    },
   ];
   const adminTabs = [
     { value: "members", label: "Members", href: `${base}/members`, icon: Users },

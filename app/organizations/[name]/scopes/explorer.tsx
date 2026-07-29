@@ -163,13 +163,6 @@ export function ScopesExplorer({
           </Button>
           {current && (
             <>
-              <Button
-                variant="destructive"
-                onClick={() => setConfirmDelete(true)}
-              >
-                <Trash2 />
-                Delete folder
-              </Button>
               <Button variant="outline" onClick={() => setEditOpen(true)}>
                 <Pencil />
                 Edit
@@ -177,6 +170,13 @@ export function ScopesExplorer({
               <Button variant="outline" onClick={() => setMoveOpen(true)}>
                 <FolderInput />
                 Move to…
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setConfirmDelete(true)}
+              >
+                <Trash2 />
+                Delete folder
               </Button>
             </>
           )}

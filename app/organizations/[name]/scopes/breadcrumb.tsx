@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import { FolderTree } from "lucide-react";
+import { Folders } from "lucide-react";
 
 import { IScopeNode } from "@/types/scope";
 import {
@@ -66,13 +66,13 @@ export function ScopeBreadcrumb({
                 className="flex cursor-pointer items-center gap-1.5"
                 onClick={() => onNavigate(null)}
               >
-                <FolderTree className="size-3.5" />
+                <Folders className="size-3.5" />
                 All folders
               </button>
             </BreadcrumbLink>
           ) : (
             <BreadcrumbPage className="flex items-center gap-1.5">
-              <FolderTree className="size-3.5" />
+              <Folders className="size-3.5" />
               All folders
             </BreadcrumbPage>
           )}
