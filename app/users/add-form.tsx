@@ -40,11 +40,18 @@ export function CreateUserDialog({
   open,
   onOpenChange,
   onCreate,
+  currentUserRole,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreate: (payload: ICreateIUserPayload) => Promise<boolean>;
+  currentUserRole: SystemRole;
 }) {
+  const systemRoleOptions =
+    currentUserRole === SystemRole.SUPERADMIN
+      ? Object.values(SystemRole)
+      : [SystemRole.ADMIN, SystemRole.USER];
+
   const form = useAppForm({
     defaultValues: {
       username: "",
@@ -110,7 +117,7 @@ export function CreateUserDialog({
               {(field) => (
                 <field.SelectField
                   label="System Role"
-                  options={Object.values(SystemRole)}
+                  options={systemRoleOptions}
                 />
               )}
             </form.AppField>

@@ -363,6 +363,7 @@ export function UsersTable({
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreate={handleUserCreate}
+        currentUserRole={currentUser.systemRole}
       />
     </div>
   );

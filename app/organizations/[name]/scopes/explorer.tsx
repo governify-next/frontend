@@ -201,7 +201,11 @@ export function ScopesExplorer({
               <CardTitle>Organization structure</CardTitle>
               <CardDescription>
                 Browse your organization&apos;s folders. Open one to see its
-                contents.
+                contents.{" "}
+                <strong>
+                  {" "}
+                  Changes here do not affect existing agreements.
+                </strong>
               </CardDescription>
             </>
           )}
