@@ -1,0 +1,40 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { IconPlus } from "@tabler/icons-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { addOrganizationMember } from "@/data/organizations/actions";
+import { AddMemberDialog } from "./add-form";
+
+export function MembersAdminActions({ orgName }: { orgName: string }) {
+  const router = useRouter();
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const handleMemberAdd = async (payload: { username: string }) => {
+    const result = await addOrganizationMember(orgName, payload);
+
+    if (!result.ok) {
+      toast.error(result.error);
+      return false;
+    }
+
+    router.refresh();
+    toast.success("Member added.");
+    return true;
+  };
+
+  return (
+    <>
+      <Button onClick={() => setCreateOpen(true)}>
+        <IconPlus />
+        Add member
+      </Button>
+      <AddMemberDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreate={handleMemberAdd}
+      />
+    </>
+  );
+}
