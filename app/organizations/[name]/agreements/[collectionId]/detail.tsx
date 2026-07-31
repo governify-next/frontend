@@ -38,20 +38,21 @@ export function AgreementDetail({
   orgName: string;
   collection: IAgreementCollection;
 }) {
-  const [selected, setSelected] = useQueryState("version", parseAsInteger);
+  const [selectedNumber, setSelectedNumber] = useQueryState(
+    "version",
+    parseAsInteger,
+  );
 
   const versions = collection.agreementVersions;
   const activeNumber = collection.auditableVersionNumber;
 
-  // Default view: the active version, or the highest one when none is active.
-  const fallback =
-    versions.find((version) => version.versionNumber === activeNumber) ??
-    versions.reduce((max, version) =>
-      version.versionNumber > max.versionNumber ? version : max,
-    );
+  // The one in the URL, the active one, or the highest as a last resort.
   const version =
-    versions.find((candidate) => candidate.versionNumber === selected) ??
-    fallback;
+    versions.find((candidate) => candidate.versionNumber === selectedNumber) ??
+    versions.find((candidate) => candidate.versionNumber === activeNumber) ??
+    versions.reduce((max, candidate) =>
+      candidate.versionNumber > max.versionNumber ? candidate : max,
+    );
 
   const { agreementTemplateId, validity, signaturesId } = version.contract;
   const isActive = version.versionNumber === activeNumber;
@@ -62,49 +63,51 @@ export function AgreementDetail({
         <Button variant="outline" asChild>
           <Link href={`/organizations/${orgName}/agreements`}>
             <ChevronLeft />
-            Back to agreements
+            {/* Label dropped when the three controls no longer fit in one row. */}
+            <span className="sr-only @xl/main:not-sr-only">
+              Back to agreements
+            </span>
           </Link>
         </Button>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Version {version.versionNumber}
-              {isActive && <Badge variant="secondary">Active</Badge>}
-              <IconChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-auto">
-            {[...versions]
-              .sort((a, b) => b.versionNumber - a.versionNumber)
-              .map((candidate, index) => {
-                const selected =
+        <div className="ml-auto flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Version {version.versionNumber}
+                {isActive && <Badge variant="secondary">Active</Badge>}
+                <IconChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto">
+              {[...versions].reverse().map((candidate) => {
+                const isCurrent =
                   candidate.versionNumber === version.versionNumber;
 
                 return (
                   <DropdownMenuItem
-                    // Index as key: version numbers can repeat, see the note below.
-                    key={index}
-                    disabled={selected}
-                    onClick={() => setSelected(candidate.versionNumber)}
+                    key={candidate.versionNumber}
+                    disabled={isCurrent}
+                    onClick={() => setSelectedNumber(candidate.versionNumber)}
                   >
                     Version {candidate.versionNumber}
                     <span className="ml-auto flex items-center gap-2">
                       {candidate.versionNumber === activeNumber && (
                         <Badge variant="secondary">Active</Badge>
                       )}
-                      {selected && <IconCheck />}
+                      {isCurrent && <IconCheck />}
                     </span>
                   </DropdownMenuItem>
                 );
               })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <Button>
-          <Play />
-          Start calculations
-        </Button>
+          <Button>
+            <Play />
+            Start calculations
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -126,7 +129,7 @@ export function AgreementDetail({
             <Field label="Ends" value={formatReadableDate(validity.end)} />
             <Field
               label="Early termination"
-              value={formatReadableDate(validity.earlyTermination)}
+              value={formatReadableDate(validity.earlyTermination, "None")}
             />
           </dl>
         </CardContent>

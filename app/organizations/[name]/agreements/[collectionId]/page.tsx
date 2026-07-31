@@ -25,11 +25,7 @@ export default async function AgreementDetailPage({
   if (result.data.agreementVersions.length === 0) {
     return (
       <ErrorPage
-        result={{
-          ok: false,
-          status: 404,
-          error: "This agreement has no versions yet.",
-        }}
+        result={{ ok: false, status: 404, error: "No versions yet." }}
         message="Something went wrong while loading the agreement."
       />
     );

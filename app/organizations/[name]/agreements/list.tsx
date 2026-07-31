@@ -40,7 +40,7 @@ export function AgreementsList({
               {hasVersions ? (
                 <>
                   <Badge variant="secondary">
-                    {collection.auditableVersionNumber
+                    {collection.auditableVersionNumber !== null
                       ? "Active"
                       : "Not active"}
                   </Badge>
