@@ -1,11 +1,19 @@
-import { getAgreementCollection } from "@/data/agreements/fetch";
+import {
+  getAgreementCollection,
+  getConsolidationStateTasksForAgreementVersion,
+} from "@/data/agreements/fetch";
 import { ErrorPage } from "@/components/errors";
 import { AgreementDetail } from "./detail";
+import { loadAgreementVersionSearchParams } from "./search-params";
+import { SearchParams } from "nuqs/server";
+import { toast } from "sonner";
 
 export default async function AgreementDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ name: string; collectionId: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   const { name, collectionId } = await params;
   const orgName = decodeURIComponent(name);
@@ -31,5 +39,41 @@ export default async function AgreementDetailPage({
     );
   }
 
-  return <AgreementDetail orgName={orgName} collection={result.data} />;
+  const { version: selectedVersion } =
+    await loadAgreementVersionSearchParams(searchParams);
+  const collection = result.data;
+  const versions = collection.agreementVersions;
+  // The one in the URL, the active one, or the highest as a last resort.
+  const version =
+    versions.find((candidate) => candidate.versionNumber === selectedVersion) ??
+    versions.find(
+      (candidate) =>
+        candidate.versionNumber === collection.auditableVersionNumber,
+    ) ??
+    versions.reduce((max, candidate) =>
+      candidate.versionNumber > max.versionNumber ? candidate : max,
+    );
+
+  const hasConsolidationStateTasksForVersion =
+    await getConsolidationStateTasksForAgreementVersion(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ).then((result) => {
+      if (!result.ok) {
+        toast.error("There was an error while loading the calculations state.");
+        return false;
+      }
+      return result.data.length > 0;
+    });
+
+  return (
+    <AgreementDetail
+      orgName={orgName}
+      collection={result.data}
+      hasTasks={hasConsolidationStateTasksForVersion}
+      version={version}
+    />
+  );
 }

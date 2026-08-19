@@ -1,8 +1,9 @@
 "use client";
+
 import Link from "next/link";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
-import { ChevronLeft, Play } from "lucide-react";
+import { ChevronLeft, Pause, Play } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,8 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IAgreementCollection } from "@/types/agreement";
+import { IAgreementCollection, IAgreementVersion } from "@/types/agreement";
 import { formatReadableDate } from "@/lib/utils/formatDates";
+import { toggleConsolidationStateTasksForVersion } from "@/data/agreements/actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
@@ -34,28 +38,43 @@ function Field({ label, value }: { label: string; value: string }) {
 export function AgreementDetail({
   orgName,
   collection,
+  hasTasks,
+  version,
 }: {
   orgName: string;
   collection: IAgreementCollection;
+  hasTasks: boolean;
+  version: IAgreementVersion;
 }) {
-  const [selectedNumber, setSelectedNumber] = useQueryState(
+  const router = useRouter();
+  const [, setSelectedNumber] = useQueryState(
     "version",
-    parseAsInteger,
+    parseAsInteger.withOptions({ shallow: false }), // we need to call the server again to update the tasks version info
   );
 
   const versions = collection.agreementVersions;
   const activeNumber = collection.auditableVersionNumber;
 
-  // The one in the URL, the active one, or the highest as a last resort.
-  const version =
-    versions.find((candidate) => candidate.versionNumber === selectedNumber) ??
-    versions.find((candidate) => candidate.versionNumber === activeNumber) ??
-    versions.reduce((max, candidate) =>
-      candidate.versionNumber > max.versionNumber ? candidate : max,
-    );
-
   const { agreementTemplateId, validity, signaturesId } = version.contract;
   const isActive = version.versionNumber === activeNumber;
+
+  const handleToggle = async () => {
+    const result = await toggleConsolidationStateTasksForVersion(
+      !hasTasks,
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    );
+    if (!result.ok) {
+      toast.error("Failed to toggle calculations. Please try again.");
+      return;
+    }
+    router.refresh();
+    toast.success(
+      `Calculations ${!hasTasks ? "started" : "stopped"} successfully.`,
+    );
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
@@ -103,9 +122,9 @@ export function AgreementDetail({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button>
-            <Play />
-            Start calculations
+          <Button onClick={handleToggle}>
+            {hasTasks ? <Pause /> : <Play />}
+            {hasTasks ? "Stop" : "Start"} calculations
           </Button>
         </div>
       </div>
@@ -137,7 +156,7 @@ export function AgreementDetail({
 
       <Card>
         <CardHeader>
-          <CardTitle>Signatures</CardTitle>
+          <CardTitle>Guarantees</CardTitle>
           <CardDescription>
             This version has {signaturesId.length} signatures.
           </CardDescription>
