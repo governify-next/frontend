@@ -6,8 +6,8 @@ const dateTimeFormatter = new Intl.DateTimeFormat("es-ES", {
   minute: "2-digit",
 });
 
-export const formatReadableDate = (date?: Date | null) => {
-  if (!date) return "Never";
+export const formatReadableDate = (date?: Date | null, fallback = "Never") => {
+  if (!date) return fallback;
 
   return dateTimeFormatter.format(new Date(date));
 };

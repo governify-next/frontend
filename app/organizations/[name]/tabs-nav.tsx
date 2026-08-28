@@ -1,7 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderTree, House, Settings, ShieldCheck, Users } from "lucide-react";
+import {
+  FileSignature,
+  FolderTree,
+  House,
+  Settings,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function OrganizationTabsNav({
@@ -21,6 +28,12 @@ export function OrganizationTabsNav({
       label: "Scopes",
       href: `${base}/scopes`,
       icon: FolderTree,
+    },
+    {
+      value: "agreements",
+      label: "Agreements",
+      href: `${base}/agreements`,
+      icon: FileSignature,
     },
   ];
   const adminTabs = [

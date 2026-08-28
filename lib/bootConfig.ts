@@ -13,6 +13,9 @@ export const bootEnv = {
 
   SCOPE_SERVICE_URL: process.env.SCOPE_SERVICE_URL || "http://localhost:5901",
 
+  REGISTRY_SERVICE_URL:
+    process.env.REGISTRY_SERVICE_URL || "http://localhost:5902",
+
   // Cookie settings
   AUTH_ACCESS_COOKIE_NAME:
     process.env.AUTH_ACCESS_COOKIE_NAME ?? "governify_next_access_token",
