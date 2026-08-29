@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { IBasicUserInfo } from "@/types/user.types";
-import { avatarFallback } from "@/lib/utils/trimName";
+import { avatarFallback } from "@/lib/utils/formatter";
 
 export function NavUser({ user }: { user: IBasicUserInfo }) {
   const { isMobile } = useSidebar();

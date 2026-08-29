@@ -34,7 +34,7 @@ export function AgreementsList({
               <FileText />
             </ItemMedia>
             <ItemContent className="min-w-0">
-              <ItemTitle>{title}</ItemTitle>
+              <ItemTitle className="uppercase">{title}</ItemTitle>
             </ItemContent>
             <ItemActions>
               {hasVersions ? (

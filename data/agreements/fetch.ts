@@ -1,5 +1,9 @@
 import { bootEnv } from "../../lib/bootConfig";
-import { IAgreementCollection, ITask } from "@/types/agreement";
+import {
+  IAgreementCollection,
+  IAgreementVersion,
+  ITask,
+} from "@/types/agreement";
 import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const getAgreementCollections = async (orgName: string) => {
@@ -11,10 +15,10 @@ export const getAgreementCollections = async (orgName: string) => {
 
 export const getAgreementCollection = async (
   orgName: string,
-  collectionId: string,
+  agColId: string,
 ) => {
   return await apiFetcher<IAgreementCollection>(
-    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/agreementCollections/${collectionId}`,
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/agreementCollections/${agColId}`,
     { method: "GET" },
   );
 };
@@ -22,11 +26,23 @@ export const getAgreementCollection = async (
 export const getConsolidationStateTasksForAgreementVersion = async (
   orgName: string,
   scopeId: string,
-  collectionId: string,
-  versionNumber: number,
+  agColId: string,
+  agVersionNumber: number,
 ) => {
   return await apiFetcher<ITask[]>(
-    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${collectionId}/agreementVersions/${versionNumber}/tasks/states/consolidated`,
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${agColId}/agreementVersions/${agVersionNumber}/tasks/states/consolidated`,
+    { method: "GET" },
+  );
+};
+
+export const getAgreementVersionByCollection = async (
+  orgName: string,
+  scopeId: string,
+  agColId: string,
+  agVersionNumber: number,
+) => {
+  return await apiFetcher<IAgreementVersion>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${agColId}/agreementVersions/${agVersionNumber}?expand=true`,
     { method: "GET" },
   );
 };

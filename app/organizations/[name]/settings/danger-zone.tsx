@@ -19,7 +19,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
-import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { deleteOrganization } from "@/data/organizations/actions";
 
 export function DangerZone({ orgName }: { orgName: string }) {
@@ -70,7 +70,7 @@ export function DangerZone({ orgName }: { orgName: string }) {
         </CardContent>
       </Card>
 
-      <AlertDialogDestructive
+      <ConfirmDialog
         open={confirmOpen}
         onOpenChange={() => setConfirmOpen(false)}
         title="Delete organization?"

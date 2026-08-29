@@ -25,14 +25,14 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
-import { formatReadableDate } from "@/lib/utils/formatDates";
+import { formatReadableDate } from "@/lib/utils/formatter";
 import {
   IconCheck,
   IconChevronDown,
   IconDotsVertical,
   IconPlus,
 } from "@tabler/icons-react";
-import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
 import { UsersFilters } from "./filters";
@@ -334,7 +334,7 @@ export function UsersTable({
         }
       />
       <DataTable columns={tableColumns} data={users} pagination={pagination} />
-      <AlertDialogDestructive
+      <ConfirmDialog
         open={userToDelete !== null}
         onOpenChange={() => {
           setUserToDelete(null);

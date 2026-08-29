@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -106,7 +106,7 @@ export function RolesList({
           </Item>
         ))}
       </ItemGroup>
-      <AlertDialogDestructive
+      <ConfirmDialog
         open={roleToDelete !== null}
         onOpenChange={() => setRoleToDelete(null)}
         title="Delete role?"
