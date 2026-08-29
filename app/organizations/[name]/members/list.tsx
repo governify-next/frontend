@@ -20,10 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item-list";
 import { IMembership, IOrganization, IRole } from "@/types/organization";
-import { avatarFallback } from "@/lib/utils/trimName";
+import { avatarFallback } from "@/lib/utils/formatter";
 import {
   removeOrganizationMember,
   updateOrganizationMemberRoles,
@@ -146,7 +146,7 @@ export function MembersList({
           );
         }}
       />
-      <AlertDialogDestructive
+      <ConfirmDialog
         open={memberToRemove !== null}
         onOpenChange={() => setMemberToRemove(null)}
         title="Remove member?"

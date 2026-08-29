@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertDialogDestructive } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FolderIcon } from "./folder-icon";
 import { indexScopeTree, ScopeBreadcrumb } from "./breadcrumb";
 import { ScopeBasics, ScopeFormDialog } from "./form";
@@ -301,7 +301,7 @@ export function ScopesExplorer({
         defaultValues={{ name: "", description: "", type: addType }}
       />
 
-      <AlertDialogDestructive
+      <ConfirmDialog
         open={confirmDelete}
         onOpenChange={() => setConfirmDelete(false)}
         title="Delete this folder?"
