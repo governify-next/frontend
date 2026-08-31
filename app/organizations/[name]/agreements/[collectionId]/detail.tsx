@@ -155,9 +155,6 @@ function AgreementCollectionInfo({
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <span className="text-xs text-muted-foreground font-medium uppercase">
-          Agreement collection
-        </span>
         <div className="flex items-center gap-2">
           <span className="font-semibold text-2xl">
             {collection.displayName.toUpperCase() ||
@@ -351,6 +348,11 @@ function AgreementVersionInfo({
     router.refresh();
   };
 
+  const groupedSignatures = Map.groupBy(
+    signatures,
+    (signature) => signature.guarantee.name,
+  );
+
   return (
     <>
       <Card className="pt-0">
@@ -442,7 +444,7 @@ function AgreementVersionInfo({
             <div className="flex flex-col gap-2 @2xl/main:flex-row @2xl/main:items-center @2xl/main:gap-1">
               <div className="flex items-center gap-1">
                 <CardTitle>Guarantees</CardTitle>
-                <Badge variant="secondary">{signatures.length}</Badge>
+                <Badge variant="secondary">{groupedSignatures.size}</Badge>
               </div>
               <Minus
                 className="size-4 text-muted-foreground hidden @2xl/main:inline"
@@ -456,7 +458,7 @@ function AgreementVersionInfo({
           </CardHeader>
           <CardContent>
             <AgreementVersionSignatures
-              signatures={signatures}
+              groupedSignatures={groupedSignatures}
               timezone={version.contract.validity.timezone}
             />
           </CardContent>
@@ -526,17 +528,13 @@ function AgreementVersionDetails({ version }: { version: IAgreementVersion }) {
 }
 
 function AgreementVersionSignatures({
-  signatures,
+  groupedSignatures,
   timezone,
 }: {
-  signatures: ISignature[];
+  groupedSignatures: Map<string, ISignature[]>;
   timezone: string;
 }) {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
-  const groupedSignatures = Map.groupBy(
-    signatures,
-    (signature) => signature.guarantee.name,
-  );
   return (
     <Accordion type="single" collapsible>
       {Array.from(groupedSignatures).map(([guaranteeName, signatures]) => {
