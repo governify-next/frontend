@@ -1,23 +1,31 @@
+"use client";
+
 import * as React from "react";
 
 const MOBILE_BREAKPOINT = 768;
+const QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
+
+let mql: MediaQueryList | null = null;
+function getMql() {
+  mql ??= window.matchMedia(QUERY);
+  return mql;
+}
+
+function subscribe(onChange: () => void) {
+  const m = getMql();
+  m.addEventListener("change", onChange);
+  return () => m.removeEventListener("change", onChange);
+}
+
+function getSnapshot() {
+  return getMql().matches;
+}
+
+// El servidor no conoce el viewport: asumimos escritorio hasta hidratar.
+function getServerSnapshot() {
+  return false;
+}
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
-    undefined,
-  );
-
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    };
-    mql.addEventListener("change", onChange);
-    // TODO: solucionar fallo de render por shadcn
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return !!isMobile;
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
