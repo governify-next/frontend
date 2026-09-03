@@ -51,3 +51,24 @@ export const terminateAgreementVersion = async (
     { method: "POST", body: { earlyTermination: new Date().toISOString() } },
   );
 };
+
+export const generateStatesForVersion = async (
+  orgName: string,
+  scopeId: string,
+  collectionId: string,
+  versionNumber: number,
+  data: { startDate: Date; endDate: Date; replaceExisting: boolean },
+) => {
+  const { replaceExisting, ...dates } = data;
+  return await apiFetcher<void>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${collectionId}/agreementVersions/${versionNumber}/states/consolidated/generate`,
+    {
+      method: "POST",
+      body: {
+        ...dates,
+        temporalMode: "REPLAY",
+        ifExists: replaceExisting ? "REPLACE" : "KEEP",
+      },
+    },
+  );
+};

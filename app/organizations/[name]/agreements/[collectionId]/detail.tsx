@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { IconCheck, IconChevronDown, IconEdit } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconChevronDown,
+  IconEdit,
+  IconRepeatOff,
+} from "@tabler/icons-react";
 import {
   ArrowRight,
   Ban,
+  CalendarSync,
   ChevronLeft,
   Clock2,
   Globe,
   Info,
+  Magnet,
   Minus,
   Pause,
   Pin,
@@ -43,6 +50,7 @@ import {
 } from "@/types/agreement";
 import { breakOnUnderscore, formatReadableDate } from "@/lib/utils/formatter";
 import {
+  generateStatesForVersion,
   terminateAgreementVersion,
   toggleConsolidationStateTasksForVersion,
   updateAgreementCollection,
@@ -62,6 +70,16 @@ import { useAppForm } from "@/components/form";
 import { collectionFormSchema } from "@/schemas/collection";
 import { FieldDescription, FieldGroup } from "@/components/ui/field";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { fetchStatesFormSchema } from "@/schemas/agreement";
 
 // Parser synced with guaranteeTemplate.validator in registry
 const TOKEN_REGEX = /[A-Za-z_][A-Za-z0-9_-]*|\d+(?:\.\d+)?|[+\-*/()]/g;
@@ -294,6 +312,7 @@ function AgreementVersionInfo({
     parseAsInteger.withOptions({ shallow: false }), // we need to call the server again to update the tasks version info
   );
   const [openTerminateDialog, setOpenTerminateDialog] = useState(false);
+  const [openFetchStatesDialog, setOpenFetchStatesDialog] = useState(false);
 
   const versions = collection.agreementVersions;
   const activeNumber = collection.auditableVersionNumber;
@@ -353,6 +372,32 @@ function AgreementVersionInfo({
     (signature) => signature.guarantee.name,
   );
 
+  const generateStates = async (data: {
+    startDate: Date;
+    endDate: Date;
+    replaceExisting: boolean;
+  }) => {
+    const result = await generateStatesForVersion(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+      data,
+    );
+    if (!result.ok) {
+      toast.error("Failed to generate states. Please try again.");
+      return false;
+    }
+    toast.success(`States generated successfully.`);
+    router.refresh();
+    return true;
+  };
+
+  const enableRunningOptions =
+    enabledToggle &&
+    (calculationState === CalculationState.ALL_TASKS_ENABLED ||
+      calculationState === CalculationState.SOME_TASKS_DISABLED);
+
   return (
     <>
       <Card className="pt-0">
@@ -395,36 +440,48 @@ function AgreementVersionInfo({
             </CardTitle>
           </div>
           <div className="flex flex-col gap-2 @xl/main:flex-row @xl/main:items-center">
-            {enabledToggle &&
-              calculationState === CalculationState.NO_TASKS && (
-                <Button variant="success" onClick={() => handleToggle(true)}>
-                  <Play />
-                  Start calculations
+            {enableRunningOptions && (
+              <div className="items-center gap-2 hidden @3xl/main:flex">
+                <span
+                  className="size-1.5 rounded-full bg-green-600"
+                  aria-hidden
+                />
+                <span className="text-xs text-muted-foreground">
+                  {calculationState === CalculationState.ALL_TASKS_ENABLED
+                    ? "All tasks running"
+                    : "Some tasks running"}
+                </span>
+              </div>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <span>Calculation management</span>
+                  <IconChevronDown />
                 </Button>
-              )}
-
-            {enabledToggle &&
-              (calculationState === CalculationState.ALL_TASKS_ENABLED ||
-                calculationState === CalculationState.SOME_TASKS_DISABLED) && (
-                <div className="flex items-center gap-3">
-                  <div className="items-center gap-2 hidden @3xl/main:flex">
-                    <span
-                      className="size-1.5 rounded-full bg-green-600"
-                      aria-hidden
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {calculationState === CalculationState.ALL_TASKS_ENABLED
-                        ? "All tasks running"
-                        : "Some tasks running"}
-                    </span>
-                  </div>
-                  <Button variant="warning" onClick={() => handleToggle(false)}>
-                    <Pause />
-                    Stop calculations
-                  </Button>
-                </div>
-              )}
-
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-auto">
+                {enabledToggle &&
+                  calculationState === CalculationState.NO_TASKS && (
+                    <DropdownMenuItem onSelect={() => handleToggle(true)}>
+                      <CalendarSync />
+                      Start recurring tasks
+                    </DropdownMenuItem>
+                  )}
+                {enableRunningOptions && (
+                  <DropdownMenuItem onSelect={() => handleToggle(false)}>
+                    <IconRepeatOff />
+                    Stop recurring tasks
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onSelect={() => setOpenFetchStatesDialog(true)}
+                >
+                  <Magnet />
+                  Manual generation
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {isActive && (
               <Button
                 variant="destructive"
@@ -473,7 +530,100 @@ function AgreementVersionInfo({
         onConfirm={handleTerminateVersion}
         deleteText="Confirm"
       />
+      <ManualStatesDialog
+        open={openFetchStatesDialog}
+        onOpenChange={setOpenFetchStatesDialog}
+        onGenerate={generateStates}
+      />
     </>
+  );
+}
+
+function ManualStatesDialog({
+  open,
+  onOpenChange,
+  onGenerate,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onGenerate: (data: {
+    startDate: Date;
+    endDate: Date;
+    replaceExisting: boolean;
+  }) => Promise<boolean>;
+}) {
+  const form = useAppForm({
+    defaultValues: {
+      startDate: null as Date | null,
+      endDate: null as Date | null,
+      replaceExisting: false,
+    },
+    validators: {
+      onSubmit: fetchStatesFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const success = await onGenerate({
+        startDate: value.startDate as Date,
+        endDate: value.endDate as Date,
+        replaceExisting: value.replaceExisting,
+      });
+      if (success) {
+        form.reset();
+        onOpenChange(false);
+      }
+    },
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Generate calculations</DialogTitle>
+          <DialogDescription>
+            Fill in the details to generate calculations now. Click confirm when
+            you&apos;re done.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          id="fetch-states-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <FieldGroup className="gap-4">
+            <div className="flex flex-col gap-3">
+              <form.AppField
+                name="startDate"
+                children={(field) => (
+                  <field.DatePickerField label="Start Date" />
+                )}
+              />
+
+              <form.AppField
+                name="endDate"
+                children={(field) => <field.DatePickerField label="End Date" />}
+              />
+            </div>
+
+            <form.AppField name="replaceExisting">
+              {(field) => <field.CheckboxField label="Replace existing data" />}
+            </form.AppField>
+          </FieldGroup>
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" onClick={() => form.reset()}>
+              Cancel
+            </Button>
+          </DialogClose>
+          <form.AppForm>
+            <form.SubmitButton label="Generate" formId="fetch-states-form" />
+          </form.AppForm>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
