@@ -18,9 +18,7 @@ import {
   Info,
   Magnet,
   Minus,
-  Pause,
   Pin,
-  Play,
   PowerOff,
 } from "lucide-react";
 
@@ -440,16 +438,23 @@ function AgreementVersionInfo({
             </CardTitle>
           </div>
           <div className="flex flex-col gap-2 @xl/main:flex-row @xl/main:items-center">
-            {enableRunningOptions && (
+            {enabledToggle && (
               <div className="items-center gap-2 hidden @3xl/main:flex">
                 <span
-                  className="size-1.5 rounded-full bg-green-600"
+                  className={cn(
+                    "size-1.5 rounded-full",
+                    calculationState === CalculationState.NO_TASKS
+                      ? "bg-red-600"
+                      : "bg-green-600",
+                  )}
                   aria-hidden
                 />
                 <span className="text-xs text-muted-foreground">
-                  {calculationState === CalculationState.ALL_TASKS_ENABLED
-                    ? "All tasks running"
-                    : "Some tasks running"}
+                  {calculationState === CalculationState.NO_TASKS
+                    ? "No tasks running"
+                    : calculationState === CalculationState.ALL_TASKS_ENABLED
+                      ? "All tasks running"
+                      : "Some tasks running"}
                 </span>
               </div>
             )}
@@ -593,17 +598,13 @@ function ManualStatesDialog({
         >
           <FieldGroup className="gap-4">
             <div className="flex flex-col gap-3">
-              <form.AppField
-                name="startDate"
-                children={(field) => (
-                  <field.DatePickerField label="Start Date" />
-                )}
-              />
+              <form.AppField name="startDate">
+                {(field) => <field.DatePickerField label="Start Date" />}
+              </form.AppField>
 
-              <form.AppField
-                name="endDate"
-                children={(field) => <field.DatePickerField label="End Date" />}
-              />
+              <form.AppField name="endDate">
+                {(field) => <field.DatePickerField label="End Date" />}
+              </form.AppField>
             </div>
 
             <form.AppField name="replaceExisting">
@@ -801,9 +802,7 @@ function SignatureExpression({
                 size="sm"
                 key={index}
                 onClick={() => {
-                  selectedMetric === token
-                    ? onMetricSelected(null)
-                    : onMetricSelected(token);
+                  onMetricSelected(selectedMetric === token ? null : token);
                 }}
               >
                 <span className="@2xl/main:hidden">
