@@ -1030,7 +1030,9 @@ function MetricCard({
                             <span className="wrap-anywhere">
                               {typeof value === "string"
                                 ? value
-                                : JSON.stringify(value)}
+                                : Array.isArray(value)
+                                  ? value.join(", ")
+                                  : JSON.stringify(value)}
                             </span>
                           </div>
                         );
