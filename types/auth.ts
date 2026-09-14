@@ -1,0 +1,14 @@
+export type LoginResponse = {
+  success: boolean;
+  message?: string;
+  data: {
+    token: string;
+    refreshToken: string;
+    sessionId: string;
+  };
+};
+
+export type SessionTokens = {
+  token: string;
+  refreshToken: string;
+};
