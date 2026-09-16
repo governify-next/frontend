@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import * as session from "@/lib/auth/session";
 
-const publicRoutes = ["/login"];
-
 export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isPublicRoute = publicRoutes.includes(path);
+  const isPublicRoute = path === "/login" || path.startsWith("/invites/");
   const accessToken = await session.getAccessToken();
   const refreshToken = await session.getRefreshToken();
 

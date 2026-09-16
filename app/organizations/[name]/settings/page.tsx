@@ -1,8 +1,12 @@
-import { getOrganization } from "@/data/organizations/fetch";
+import {
+  getOrganization,
+  getOrganizationInviteToken,
+} from "@/data/organizations/fetch";
 import { UpdateOrganizationForm } from "./update-form";
 import { DangerZone } from "./danger-zone";
 import { ErrorPage } from "@/components/errors";
 import { isUserAdminOfOrganization } from "@/data/organizations/actions";
+import InviteZone from "./invite-zone";
 
 export default async function OrganizationSettingsPage({
   params,
@@ -50,9 +54,14 @@ export default async function OrganizationSettingsPage({
 
   const organization = organizationResult.data;
 
+  const tokenResult = await getOrganizationInviteToken(organization.name);
+
+  const token = tokenResult.ok ? tokenResult.data : null;
+
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pt-4">
       <UpdateOrganizationForm organization={organization} />
+      <InviteZone organization={organization} token={token} />
       <DangerZone orgName={organization.name} />
     </div>
   );
