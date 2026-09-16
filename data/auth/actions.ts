@@ -5,6 +5,8 @@ import * as session from "@/lib/auth/session";
 import { bootEnv } from "@/lib/bootConfig";
 import type { LoginResponse } from "@/types/auth";
 import { apiFetcher } from "../../lib/utils/fetcher";
+import { IUserInfo } from "@/types/user.types";
+import { IMembership } from "@/types/organization";
 
 async function getLoginSession(credentials: {
   login: string;
@@ -45,4 +47,20 @@ export const logoutAction = async () => {
 
   await session.deleteSessionTokens();
   redirect("/login");
+};
+
+export const registerInOrganizationAction = async (
+  token: string,
+  payload: {
+    username: string;
+    name: string;
+    surname: string;
+    email: string;
+    password: string;
+  },
+) => {
+  return await apiFetcher<IMembership>(
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/invites/${token}`,
+    { method: "POST", body: payload, skipAuth: true },
+  );
 };

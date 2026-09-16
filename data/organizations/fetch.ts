@@ -38,3 +38,12 @@ export const getOrganizationMembers = async (name: string) => {
     },
   );
 };
+
+export const getOrganizationInviteToken = cache(async (name: string) => {
+  return await apiFetcher<string | null>(
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${name}/invite`,
+    {
+      method: "GET",
+    },
+  );
+});
