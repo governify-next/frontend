@@ -60,7 +60,7 @@ export default function InviteZone({
       </CardHeader>
       {link && (
         <CardContent>
-          <code className="block rounded-md border bg-muted px-2 py-2 text-xs">
+          <code className="block overflow-x-auto whitespace-nowrap rounded-md border bg-muted px-2 py-2 text-xs">
             {link}
           </code>
         </CardContent>
