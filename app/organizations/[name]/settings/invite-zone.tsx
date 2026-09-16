@@ -23,7 +23,8 @@ export default function InviteZone({
   const [link, setLink] = useState<string | null>(null);
 
   const handleShowLink = async (newToken: boolean = false) => {
-    if (!token || newToken) {
+    let inviteToken = token;
+    if (!inviteToken || newToken) {
       const tokenResult = await generateOrganizationInviteToken(
         organization.name,
       );
@@ -32,9 +33,9 @@ export default function InviteZone({
         setLink(null);
         return;
       }
-      token = tokenResult.data;
+      inviteToken = tokenResult.data;
     }
-    setLink(`${window.location.origin}/invites/${token}`);
+    setLink(`${window.location.origin}/invites/${inviteToken}`);
   };
   return (
     <Card>
