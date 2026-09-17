@@ -5,7 +5,7 @@ import * as session from "@/lib/auth/session";
 import { bootEnv } from "@/lib/bootConfig";
 import type { LoginResponse } from "@/types/auth";
 import { apiFetcher } from "../../lib/utils/fetcher";
-import { IUserInfo } from "@/types/user.types";
+import { IUserInfo, SystemRole } from "@/types/user.types";
 import { IMembership } from "@/types/organization";
 
 async function getLoginSession(credentials: {
@@ -29,6 +29,32 @@ export const loginAction = async (payload: {
   }
 
   await session.createSessionTokens(loginResult.data);
+  // TODO: Remove this when USERs can login to the previous commit
+  const userResult = await session.getCurrentUser();
+
+  if (!userResult.ok) {
+    return userResult.error;
+  }
+
+  const user = userResult.data;
+
+  if (user.systemRole !== SystemRole.SUPERADMIN) {
+    const refreshToken = await session.getRefreshToken();
+
+    if (refreshToken) {
+      await apiFetcher<void>(
+        `${bootEnv.AUTHENTICATOR_SERVICE_URL}/api/v1/users/logout`,
+        {
+          method: "POST",
+          body: { refreshToken },
+          skipAuth: true,
+        },
+      );
+    }
+
+    await session.deleteSessionTokens();
+    return "You are not authorized to login yet. We looking forward to seeing you soon!";
+  }
 };
 
 export const logoutAction = async () => {

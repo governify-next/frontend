@@ -5,7 +5,7 @@ import { useAppForm } from "@/components/form";
 import { registerFormSchema } from "@/schemas/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { registerInOrganizationAction, loginAction } from "@/data/auth/actions";
+import { registerInOrganizationAction } from "@/data/auth/actions";
 
 export function RegisterUserForm({ token }: { token: string }) {
   const router = useRouter();
@@ -28,14 +28,16 @@ export function RegisterUserForm({ token }: { token: string }) {
         toast.error(registerResult.error);
         return;
       }
-      const loginError = await loginAction({
-        login: value.username,
-        password: value.password,
-      });
-      if (loginError) {
-        toast.error(loginError);
-        return;
-      }
+
+      // TODO: Uncomment this when USERs can login
+      // const loginError = await loginAction({
+      //   login: value.username,
+      //   password: value.password,
+      // });
+      // if (loginError) {
+      //   toast.error(loginError);
+      //   return;
+      // }
       router.push("/");
     },
   });
