@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/governify-next/frontend/compare/v1.1.0...v1.2.0) (2026-09-19)
+
+
+### Features
+
+* implement user registration via invite links along organizations ([e630f49](https://github.com/governify-next/frontend/commit/e630f492543ceaf4ebf68e287ad95c9d36a158de))
+* implement user registration via invite links along organizations ([39e723f](https://github.com/governify-next/frontend/commit/39e723f98edc856ef8b83bbed225b6d31bcbb099))
+* replace placeholder image with logo ([42dcbe9](https://github.com/governify-next/frontend/commit/42dcbe91a71e0987d89ac27863c00375b4562c0c))
+* replace placeholder image with logo ([3fc67e0](https://github.com/governify-next/frontend/commit/3fc67e0f882111626e267234cedc41a4020de240))
+
+
+### Bug Fixes
+
+* ensure code display visualization for invite link ([b6fdf5c](https://github.com/governify-next/frontend/commit/b6fdf5c1f7048660d8a1eaea683764a3017a517a))
+* new version ([1f0b575](https://github.com/governify-next/frontend/commit/1f0b575b5f9c48635a93ff8c4fb9e91cecd49767))
+* update invite token handling in InviteZone component ([e052503](https://github.com/governify-next/frontend/commit/e052503532f8e745720b8daf877dd2258e1f1503))
+
 ## 1.1.0 (2026-09-14)
 
 
