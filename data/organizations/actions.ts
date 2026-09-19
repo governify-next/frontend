@@ -103,3 +103,10 @@ export const isUserAdminOfOrganization = cache(async (orgName: string) => {
     { method: "GET" },
   );
 });
+
+export const generateOrganizationInviteToken = async (orgName: string) => {
+  return await apiFetcher<string>(
+    `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/invite`,
+    { method: "POST" },
+  );
+};

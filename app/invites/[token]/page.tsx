@@ -1,8 +1,13 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
-import { LoginUserForm } from "@/app/login/login-form";
+import { RegisterUserForm } from "./register-form";
 
-export default function LoginPage() {
+export default async function InvitePage({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -16,7 +21,7 @@ export default function LoginPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginUserForm />
+            <RegisterUserForm token={token} />
           </div>
         </div>
       </div>
