@@ -1,6 +1,8 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { RegisterUserForm } from "./register-form";
+import { getOrganizationByInviteToken } from "@/data/organizations/fetch";
+import { ErrorPage } from "@/components/errors";
 
 export default async function InvitePage({
   params,
@@ -8,6 +10,15 @@ export default async function InvitePage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const organizationResult = await getOrganizationByInviteToken(token);
+  if (!organizationResult.ok) {
+    return (
+      <ErrorPage
+        result={organizationResult}
+        message="Something went wrong while loading invitation page."
+      />
+    );
+  }
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">

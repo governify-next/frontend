@@ -533,7 +533,7 @@ function AgreementVersionInfo({
         icon={<Ban />}
         description="This will terminate the currently auditable version."
         onConfirm={handleTerminateVersion}
-        deleteText="Confirm"
+        confirmText="Confirm"
       />
       <ManualStatesDialog
         open={openFetchStatesDialog}
@@ -877,7 +877,6 @@ function SignatureMetrics({
     (signature) => signature.signatureId === selectedSignatureId,
   );
   const metrics = selectedSignature!.guarantee.metrics;
-  // "flex flex-col gap-2 @lg/main:flex-row @lg/main:items-center @lg/main:gap-2 pb-4"
   return (
     <div>
       <div
@@ -903,7 +902,7 @@ function SignatureMetrics({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="primarySoft" size="sm">
-                <span>#{selectedSignatureId}</span>
+                <span># {selectedSignature?.visualizationConfig.label}</span>
                 <IconChevronDown />
               </Button>
             </DropdownMenuTrigger>
@@ -919,7 +918,7 @@ function SignatureMetrics({
                       setSelectedSignatureId(signature.signatureId)
                     }
                   >
-                    #{signature.signatureId}
+                    # {signature.visualizationConfig.label}
                     <span>{isCurrent && <IconCheck />}</span>
                   </DropdownMenuItem>
                 );

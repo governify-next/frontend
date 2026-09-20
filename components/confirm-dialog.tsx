@@ -19,7 +19,7 @@ export function ConfirmDialog({
   description,
   icon,
   onConfirm,
-  deleteText = "Delete",
+  confirmText = "Delete",
 }: {
   open: boolean;
   onOpenChange: () => void;
@@ -27,7 +27,7 @@ export function ConfirmDialog({
   description: string;
   icon?: React.ReactNode;
   onConfirm: () => void;
-  deleteText?: string;
+  confirmText?: string;
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -42,7 +42,7 @@ export function ConfirmDialog({
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={onConfirm}>
-            {deleteText}
+            {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
