@@ -533,7 +533,7 @@ function AgreementVersionInfo({
         icon={<Ban />}
         description="This will terminate the currently auditable version."
         onConfirm={handleTerminateVersion}
-        deleteText="Confirm"
+        confirmText="Confirm"
       />
       <ManualStatesDialog
         open={openFetchStatesDialog}
