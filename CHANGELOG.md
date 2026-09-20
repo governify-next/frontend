@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/governify-next/frontend/compare/v1.2.0...v1.3.0) (2026-09-20)
+
+
+### Features
+
+* add visualization label to signature metrics display ([2c7fcc8](https://github.com/governify-next/frontend/commit/2c7fcc8d3e997ebfa2015f569a08182b663d2856))
+* enhance invitation flow with error handling and confirmation dialog ([1235b16](https://github.com/governify-next/frontend/commit/1235b16c0dfc2b4fbe5b14fb0f2a514273f31cad))
+
 ## [1.2.0](https://github.com/governify-next/frontend/compare/v1.1.0...v1.2.0) (2026-09-19)
 
 
