@@ -33,6 +33,9 @@ export interface IMetric {
 
 export interface ISignature {
   signatureId: string;
+  visualizationConfig: {
+    label: string;
+  };
   guarantee: IGuarantee;
 }
 
