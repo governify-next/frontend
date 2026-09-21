@@ -77,6 +77,8 @@ export function DatePickerTime({
               captionLayout="dropdown"
               defaultMonth={value ?? undefined}
               onSelect={handleSelectDay}
+              disabled={{ after: new Date() }}
+              endMonth={new Date()}
             />
           </PopoverContent>
         </Popover>
