@@ -9,4 +9,8 @@ export const fetchStatesFormSchema = z
   .refine((data) => data.endDate >= data.startDate, {
     message: "End date must be on or after start date",
     path: ["endDate"],
+  })
+  .refine((data) => data.endDate <= new Date(), {
+    message: "Dates can't be in the future",
+    path: ["endDate"],
   });
