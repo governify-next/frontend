@@ -15,6 +15,8 @@ export const bootEnv = {
 
   REGISTRY_SERVICE_URL:
     process.env.REGISTRY_SERVICE_URL || "http://localhost:5902",
+  REPORTER_SERVICE_URL:
+    process.env.REPORTER_SERVICE_URL || "http://localhost:5905",
 
   // Cookie settings
   AUTH_ACCESS_COOKIE_NAME:

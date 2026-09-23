@@ -50,7 +50,7 @@ import { breakOnUnderscore, formatReadableDate } from "@/lib/utils/formatter";
 import {
   generateStatesForVersion,
   terminateAgreementVersion,
-  toggleConsolidationStateTasksForVersion,
+  toggleAutomaticTrackingForVersion,
   updateAgreementCollection,
 } from "@/data/agreements/actions";
 import { toast } from "sonner";
@@ -329,7 +329,7 @@ function AgreementVersionInfo({
   const enabledToggle = end > new Date();
 
   const handleToggle = async (start: boolean, refresh = true) => {
-    const result = await toggleConsolidationStateTasksForVersion(
+    const result = await toggleAutomaticTrackingForVersion(
       start,
       orgName,
       collection.scopeId,

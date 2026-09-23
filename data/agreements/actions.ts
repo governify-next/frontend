@@ -1,23 +1,27 @@
 "use server";
 
 import { bootEnv } from "@/lib/bootConfig";
-import { apiFetcher } from "@/lib/utils/fetcher";
+import { apiFetcher, type Result } from "@/lib/utils/fetcher";
 import {
   IAgreementCollection,
   IAgreementCollectionPayload,
   ITask,
 } from "@/types/agreement";
 
-export const toggleConsolidationStateTasksForVersion = async (
+export const toggleAutomaticTrackingForVersion = async (
   enabled: boolean,
   orgName: string,
   scopeId: string,
   collectionId: string,
   versionNumber: number,
-) => {
+): Promise<Result<ITask[]>> => {
+  await apiFetcher<Record<string, unknown>>(
+    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/influx/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states/sync?enabled=${enabled}`,
+    { method: "POST", body: { interval: 1_200_000, lookbackMs: 3_600_000 } },
+  );
   return await apiFetcher<ITask[]>(
-    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${collectionId}/agreementVersions/${versionNumber}/tasks/states/consolidated?enabled=${enabled}`,
-    { method: "POST" },
+      `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${collectionId}/agreementVersions/${versionNumber}/tasks/states/consolidated?enabled=${enabled}`,
+      { method: "POST" },
   );
 };
 
