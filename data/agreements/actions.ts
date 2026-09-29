@@ -15,14 +15,24 @@ export const toggleAutomaticTrackingForVersion = async (
   collectionId: string,
   versionNumber: number,
 ): Promise<Result<ITask[]>> => {
-  await apiFetcher<Record<string, unknown>>(
+  const syncResult = await apiFetcher<Record<string, unknown>>(
     `${bootEnv.REPORTER_SERVICE_URL}/api/v1/influx/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states/sync?enabled=${enabled}`,
     { method: "POST", body: { interval: 1_200_000, lookbackMs: 3_600_000 } },
   );
-  return await apiFetcher<ITask[]>(
-      `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${collectionId}/agreementVersions/${versionNumber}/tasks/states/consolidated?enabled=${enabled}`,
-      { method: "POST" },
+  const tasksUrl = `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states`;
+  const consolidatedResult = await apiFetcher<ITask[]>(
+    `${tasksUrl}/consolidated?enabled=${enabled}`,
+    { method: "POST" },
   );
+  const evolutiveResult = await apiFetcher<ITask[]>(
+    `${tasksUrl}/evolutive?enabled=${enabled}`,
+    { method: "POST" },
+  );
+  // Attempt every task group, including on stop; surface partial failures to the UI.
+  if (!syncResult.ok) return syncResult;
+  if (!consolidatedResult.ok) return consolidatedResult;
+  if (!evolutiveResult.ok) return evolutiveResult;
+  return { ok: true, data: [...consolidatedResult.data, ...evolutiveResult.data] };
 };
 
 export const updateAgreementCollection = async (

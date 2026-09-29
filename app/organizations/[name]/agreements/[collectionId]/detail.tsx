@@ -340,17 +340,19 @@ function AgreementVersionInfo({
       toast.error(
         `Failed to ${start ? "start" : "stop"} tracking. Please try again.`,
       );
-      return;
+      router.refresh();
+      return false;
     }
     if (refresh) {
       router.refresh();
       toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
     }
+    return true;
   };
 
   const handleTerminateVersion = async () => {
     // Ensure calculations are stopped
-    await handleToggle(false, false);
+    if (!(await handleToggle(false, false))) return;
 
     const result = await terminateAgreementVersion(
       orgName,
