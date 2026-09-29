@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/governify-next/frontend/compare/v1.3.0...v1.4.0) (2026-09-29)
+
+
+### Features
+
+* new version ([1ed8fbe](https://github.com/governify-next/frontend/commit/1ed8fbe2f9629acdef09250f754a050d063f99e5))
+* toggleConsolidationStateTasksForVersion to toggleAutomaticTrackingForVersion ([f4981b3](https://github.com/governify-next/frontend/commit/f4981b3fb7e2d051883a4785fba7fbc0f4136765))
+
 ## [1.3.0](https://github.com/governify-next/frontend/compare/v1.2.0...v1.3.0) (2026-09-20)
 
 
