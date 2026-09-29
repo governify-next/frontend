@@ -1,15 +1,18 @@
+export interface IWindow {
+  period: {
+    unit: string;
+    value: number;
+  }[];
+  anchorDate: Date;
+}
+
 export interface IGuarantee {
   name: string;
   numericExpression: string;
   comparator: string;
   threshold: number;
-  window: {
-    period: {
-      unit: string;
-      value: number;
-    }[];
-    anchorDate: Date;
-  };
+  window: IWindow;
+  evolutiveWindow: IWindow | null;
   metrics: IMetric[];
 }
 

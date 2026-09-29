@@ -4,7 +4,7 @@ import { Clock2, Pin } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { IGuarantee, ISignature } from "@/types/agreement";
+import { IGuarantee, ISignature, IWindow } from "@/types/agreement";
 import { breakOnUnderscore, formatReadableDate } from "@/lib/utils/formatter";
 import {
   Accordion,
@@ -45,6 +45,9 @@ const formatComparator = (comparator: string) => {
   }
 };
 
+const formatPeriod = (window: IWindow) =>
+  window.period.map((period) => `${period.value} ${period.unit}`).join(", ");
+
 export function AgreementVersionSignatures({
   groupedSignatures,
   timezone,
@@ -70,19 +73,7 @@ export function AgreementVersionSignatures({
                   {firstSignature.guarantee.threshold}
                 </Badge>
                 <Badge variant="secondary">
-                  {firstSignature.guarantee.window.period.map(
-                    (period, index) => {
-                      return (
-                        <span key={index}>
-                          {period.value} {period.unit}
-                          {index <
-                          firstSignature.guarantee.window.period.length - 1
-                            ? ","
-                            : ""}
-                        </span>
-                      );
-                    },
-                  )}
+                  {formatPeriod(firstSignature.guarantee.window)}
                 </Badge>
               </div>
             </AccordionTrigger>
@@ -206,26 +197,48 @@ function SignatureInfo({
   guarantee: IGuarantee;
   timezone: string;
 }) {
-  return (
-    <div className="flex items-center">
+  const { window, evolutiveWindow } = guarantee;
+
+  if (!evolutiveWindow) {
+    return (
       <div className="flex flex-col gap-2 @xl/main:flex-row @xl/main:items-center @xl/main:gap-8">
         <div className="flex items-center gap-2">
           <Clock2 className="text-muted-foreground size-4" />
-          <span className="text-muted-foreground">Evaluated every </span>
-          {guarantee.window.period.map((period, index) => {
-            return (
-              <span key={index}>
-                {period.value} {period.unit}
-                {index < guarantee.window.period.length - 1 ? "," : ""}
-              </span>
-            );
-          })}
+          <span className="text-muted-foreground">Evaluated every</span>
+          {formatPeriod(window)}
         </div>
         <div className="flex items-center gap-2">
           <Pin className="text-muted-foreground size-4" />
-          <span className="text-muted-foreground">Anchored at </span>
-          {formatReadableDate(guarantee.window.anchorDate, timezone)}
+          <span className="text-muted-foreground">Anchored at</span>
+          {formatReadableDate(window.anchorDate, timezone)}
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-[auto_1fr] items-center gap-3 @xl/main:grid-cols-[auto_auto_auto] @xl/main:justify-start @xl/main:gap-2">
+      <Clock2 className="text-muted-foreground size-4" />
+      <div className="flex flex-col gap-1 border-l pl-3 @xl/main:contents">
+        <span>
+          <span className="text-muted-foreground">Evaluated every</span>{" "}
+          {formatPeriod(window)}
+        </span>
+        <span className="@xl/main:ml-6 @xl/main:border-l @xl/main:pl-8">
+          <span className="text-muted-foreground">Tracked every</span>{" "}
+          {formatPeriod(evolutiveWindow)}
+        </span>
+      </div>
+      <Pin className="text-muted-foreground size-4" />
+      <div className="flex flex-col gap-1 border-l pl-3 @xl/main:contents">
+        <span>
+          <span className="text-muted-foreground">Evaluation anchored at</span>{" "}
+          {formatReadableDate(window.anchorDate, timezone)}
+        </span>
+        <span className="@xl/main:ml-6 @xl/main:border-l @xl/main:pl-8">
+          <span className="text-muted-foreground">Tracking anchored at</span>{" "}
+          {formatReadableDate(evolutiveWindow.anchorDate, timezone)}
+        </span>
       </div>
     </div>
   );
