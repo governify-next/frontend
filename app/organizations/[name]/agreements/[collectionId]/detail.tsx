@@ -16,9 +16,9 @@ import {
   Clock2,
   Globe,
   Info,
-  Magnet,
   Minus,
   Pin,
+  PlayIcon,
   PowerOff,
 } from "lucide-react";
 
@@ -50,7 +50,7 @@ import { breakOnUnderscore, formatReadableDate } from "@/lib/utils/formatter";
 import {
   generateStatesForVersion,
   terminateAgreementVersion,
-  toggleConsolidationStateTasksForVersion,
+  toggleAutomaticTrackingForVersion,
   updateAgreementCollection,
 } from "@/data/agreements/actions";
 import { toast } from "sonner";
@@ -329,7 +329,7 @@ function AgreementVersionInfo({
   const enabledToggle = end > new Date();
 
   const handleToggle = async (start: boolean, refresh = true) => {
-    const result = await toggleConsolidationStateTasksForVersion(
+    const result = await toggleAutomaticTrackingForVersion(
       start,
       orgName,
       collection.scopeId,
@@ -337,20 +337,22 @@ function AgreementVersionInfo({
       version.versionNumber,
     );
     if (!result.ok) {
-      toast.error("Failed to toggle calculations. Please try again.");
-      return;
+      toast.error(
+        `Failed to ${start ? "start" : "stop"} tracking. Please try again.`,
+      );
+      router.refresh();
+      return false;
     }
     if (refresh) {
       router.refresh();
-      toast.success(
-        `Calculations ${start ? "started" : "stopped"} successfully.`,
-      );
+      toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
     }
+    return true;
   };
 
   const handleTerminateVersion = async () => {
     // Ensure calculations are stopped
-    await handleToggle(false, false);
+    if (!(await handleToggle(false, false))) return;
 
     const result = await terminateAgreementVersion(
       orgName,
@@ -383,10 +385,10 @@ function AgreementVersionInfo({
       data,
     );
     if (!result.ok) {
-      toast.error("Failed to generate states. Please try again.");
+      toast.error("Failed to collect data. Please try again.");
       return false;
     }
-    toast.success(`States generated successfully.`);
+    toast.success(`Data collected successfully.`);
     router.refresh();
     return true;
   };
@@ -458,35 +460,26 @@ function AgreementVersionInfo({
                 </span>
               </div>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <span>Calculation management</span>
-                  <IconChevronDown />
+            {enabledToggle &&
+              calculationState === CalculationState.NO_TASKS && (
+                <Button variant="outline" onClick={() => handleToggle(true)}>
+                  <CalendarSync />
+                  Start tracking
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-auto">
-                {enabledToggle &&
-                  calculationState === CalculationState.NO_TASKS && (
-                    <DropdownMenuItem onSelect={() => handleToggle(true)}>
-                      <CalendarSync />
-                      Start recurring tasks
-                    </DropdownMenuItem>
-                  )}
-                {enableRunningOptions && (
-                  <DropdownMenuItem onSelect={() => handleToggle(false)}>
-                    <IconRepeatOff />
-                    Stop recurring tasks
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  onSelect={() => setOpenFetchStatesDialog(true)}
-                >
-                  <Magnet />
-                  Manual generation
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+            {enableRunningOptions && (
+              <Button variant="outline" onClick={() => handleToggle(false)}>
+                <IconRepeatOff />
+                Stop tracking
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setOpenFetchStatesDialog(true)}
+            >
+              <PlayIcon />
+              Track period
+            </Button>
             {isActive && (
               <Button
                 variant="destructive"
@@ -582,9 +575,9 @@ function ManualStatesDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Generate calculations</DialogTitle>
+          <DialogTitle>Track a past period</DialogTitle>
           <DialogDescription>
-            Fill in the details to generate calculations now. Click confirm when
+            Collect past data for the dates you choose. Click run when
             you&apos;re done.
           </DialogDescription>
         </DialogHeader>
@@ -620,7 +613,7 @@ function ManualStatesDialog({
             </Button>
           </DialogClose>
           <form.AppForm>
-            <form.SubmitButton label="Generate" formId="fetch-states-form" />
+            <form.SubmitButton label="Run" formId="fetch-states-form" />
           </form.AppForm>
         </DialogFooter>
       </DialogContent>

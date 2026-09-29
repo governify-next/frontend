@@ -1,7 +1,7 @@
 import {
   getAgreementCollection,
   getAgreementVersionByCollection,
-  getConsolidationStateTasksForAgreementVersion,
+  getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
 import { ErrorPage } from "@/components/errors";
 import { AgreementDetail } from "./detail";
@@ -55,7 +55,7 @@ export default async function AgreementDetailPage({
       candidate.versionNumber > max.versionNumber ? candidate : max,
     );
 
-  const stateTasksResult = await getConsolidationStateTasksForAgreementVersion(
+  const stateTasksResult = await getStateTasksForAgreementVersion(
     orgName,
     collection.scopeId,
     collection._id,
