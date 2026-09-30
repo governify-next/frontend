@@ -33,6 +33,7 @@ import {
   IAgreementVersion,
   ISignature,
 } from "@/types/agreement";
+import { IDashboardData } from "@/types/dashboard";
 import { formatReadableDate } from "@/lib/utils/formatter";
 import {
   generateStatesForVersion,
@@ -47,6 +48,7 @@ import { cn } from "@/lib/utils/cn";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ManualStatesDialog } from "./manual-states-dialog";
 import { AgreementVersionSignatures } from "./signatures";
+import { DashboardRange } from "./dashboard-range";
 
 export function AgreementVersionInfo({
   collection,
@@ -54,12 +56,16 @@ export function AgreementVersionInfo({
   orgName,
   calculationState,
   signatures,
+  dashboard,
+  range,
 }: {
   collection: IAgreementCollection;
   version: IAgreementVersion;
   orgName: string;
   calculationState: CalculationState;
   signatures: ISignature[];
+  dashboard: IDashboardData | null;
+  range: { from: Date; to: Date };
 }) {
   const router = useRouter();
   const [, setSelectedNumber] = useQueryState(
@@ -268,10 +274,13 @@ export function AgreementVersionInfo({
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
+            <DashboardRange range={range} />
             <AgreementVersionSignatures
               groupedSignatures={groupedSignatures}
               timezone={version.contract.validity.timezone}
+              dashboard={dashboard}
+              range={range}
             />
           </CardContent>
         </div>

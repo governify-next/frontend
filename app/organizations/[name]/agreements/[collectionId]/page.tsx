@@ -1,6 +1,7 @@
 import {
   getAgreementCollection,
   getAgreementVersionByCollection,
+  getAgreementVersionDashboardData,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
 import { ErrorPage } from "@/components/errors";
@@ -40,8 +41,11 @@ export default async function AgreementDetailPage({
     );
   }
 
-  const { version: selectedVersion } =
-    await loadAgreementVersionSearchParams(searchParams);
+  const {
+    version: selectedVersion,
+    from,
+    to,
+  } = await loadAgreementVersionSearchParams(searchParams);
   const collection = collectionResult.data;
   const versions = collection.agreementVersions;
   // The one in the URL, the active one, or the highest as a last resort.
@@ -103,12 +107,29 @@ export default async function AgreementDetailPage({
     );
   }
 
+  // PoC: dashboard range defaults to the version validity, as in Grafana.
+  const { validity } = agreementFullVersionResult.data.contract;
+  const range = {
+    from: from ?? new Date(validity.initial),
+    to: to ?? new Date(validity.earlyTermination ?? validity.end),
+  };
+  const dashboardResult = await getAgreementVersionDashboardData(
+    orgName,
+    collection.scopeId,
+    collection._id,
+    version.versionNumber,
+    range.from,
+    range.to,
+  );
+
   return (
     <AgreementDetail
       orgName={orgName}
       collection={collectionResult.data}
       calculationState={calculationState}
       version={agreementFullVersionResult.data}
+      dashboard={dashboardResult.ok ? dashboardResult.data : null}
+      range={range}
     />
   );
 }

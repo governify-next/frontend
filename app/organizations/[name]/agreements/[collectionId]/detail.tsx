@@ -9,6 +9,7 @@ import {
   IAgreementCollection,
   IAgreementVersion,
 } from "@/types/agreement";
+import { IDashboardData } from "@/types/dashboard";
 import { useState } from "react";
 import {
   AgreementCollectionEditCard,
@@ -21,11 +22,15 @@ export function AgreementDetail({
   collection,
   calculationState,
   version,
+  dashboard,
+  range,
 }: {
   orgName: string;
   collection: IAgreementCollection;
   calculationState: CalculationState;
   version: IAgreementVersion;
+  dashboard: IDashboardData | null;
+  range: { from: Date; to: Date };
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const { signatures } = version.contract;
@@ -64,6 +69,8 @@ export function AgreementDetail({
         orgName={orgName}
         calculationState={calculationState}
         signatures={signatures}
+        dashboard={dashboard}
+        range={range}
       />
     </div>
   );

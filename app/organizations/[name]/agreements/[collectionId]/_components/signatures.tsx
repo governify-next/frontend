@@ -15,6 +15,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { SignatureMetrics } from "./signature-metrics";
+import { GuaranteeCharts } from "./guarantee-charts";
+import { IDashboardData } from "@/types/dashboard";
 
 // Parser synced with guaranteeTemplate.validator in registry
 const TOKEN_REGEX = /[A-Za-z_][A-Za-z0-9_-]*|\d+(?:\.\d+)?|[+\-*/()]/g;
@@ -51,9 +53,13 @@ const formatPeriod = (window: IWindow) =>
 export function AgreementVersionSignatures({
   groupedSignatures,
   timezone,
+  dashboard,
+  range,
 }: {
   groupedSignatures: Map<string, ISignature[]>;
   timezone: string;
+  dashboard: IDashboardData | null;
+  range: { from: Date; to: Date };
 }) {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   return (
@@ -88,6 +94,11 @@ export function AgreementVersionSignatures({
               <SignatureMetrics
                 signatures={signatures}
                 selectedMetric={selectedMetric}
+              />
+              <GuaranteeCharts
+                signatures={signatures}
+                data={dashboard?.[guaranteeName]}
+                range={range}
               />
             </AccordionContent>
           </AccordionItem>
