@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import type { EChartsCoreOption } from "echarts/core";
 
-import { chartColors, EChart } from "@/components/charts/echart";
+import { chartColors, EChart } from "@/components/chart/echart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ISignature } from "@/types/agreement";

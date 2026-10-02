@@ -13,7 +13,6 @@ import {
 import { CanvasRenderer } from "echarts/renderers";
 import type { ECElementEvent, EChartsCoreOption } from "echarts/core";
 
-// Only the modules we use end up in the bundle.
 echarts.use([
   BarChart,
   GaugeChart,
@@ -26,16 +25,15 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-// shadcn tokens from globals.css (light), converted from oklch to hex for the canvas.
 export const chartColors = {
-  foreground: "#090b0c", // --foreground
-  mutedForeground: "#67787c", // --muted-foreground
-  border: "#e3e7e8", // --border
-  muted: "#f1f3f3", // --muted
-  primary: "#007595", // --primary
-  destructive: "#e7000b", // --destructive
-  success: "#00a63e", // tailwind green-600, as in version-info.tsx
-  warning: "#fe9a00", // tailwind amber-500
+  foreground: "#090b0c",
+  mutedForeground: "#67787c",
+  border: "#e3e7e8",
+  muted: "#f1f3f3",
+  primary: "#007595",
+  destructive: "#e7000b",
+  success: "#00a63e",
+  warning: "#fe9a00",
 };
 
 const axis = {
@@ -54,14 +52,13 @@ const shadcnTheme = {
     "#fe9a00", // amber-500
     "#62748e", // slate-500
   ],
-  backgroundColor: "transparent",
   textStyle: {
     fontFamily: "Geist, 'Geist Fallback', sans-serif",
     color: chartColors.foreground,
   },
   legend: { textStyle: { color: chartColors.mutedForeground } },
   tooltip: {
-    backgroundColor: "#ffffff", // --popover
+    backgroundColor: "#ffffff",
     borderColor: chartColors.border,
     textStyle: { color: chartColors.foreground, fontSize: 12 },
     extraCssText:

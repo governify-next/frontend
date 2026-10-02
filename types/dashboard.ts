@@ -1,4 +1,3 @@
-// PoC: shape returned by the reporter for the ECharts dashboard.
 export interface IDashboardPoint {
   time: string;
   signatureId: string;
