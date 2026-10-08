@@ -1,6 +1,6 @@
 "use client";
 
-import { parseAsInteger, useQueryState } from "nuqs";
+import { useQueryStates } from "nuqs";
 import { IconCheck, IconChevronDown, IconRepeatOff } from "@tabler/icons-react";
 import {
   ArrowRight,
@@ -33,8 +33,8 @@ import {
   IAgreementVersion,
   ISignature,
 } from "@/types/agreement";
-import { IDashboardData } from "@/types/dashboard";
 import { formatReadableDate } from "@/lib/utils/formatter";
+import { getValidityEnd } from "@/lib/utils/validity";
 import {
   generateStatesForVersion,
   terminateAgreementVersion,
@@ -43,12 +43,14 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { TransitionStartFunction, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ManualStatesDialog } from "./manual-states-dialog";
 import { AgreementVersionSignatures } from "./signatures";
-import { DashboardRange } from "./dashboard-range";
+import { Result } from "@/lib/utils/fetcher";
+import { IComplianceData } from "@/types/compliance";
+import { agreementVersionSearchParams } from "../search-params";
 
 export function AgreementVersionInfo({
   collection,
@@ -56,22 +58,21 @@ export function AgreementVersionInfo({
   orgName,
   calculationState,
   signatures,
-  dashboard,
   range,
+  compliance,
+  startTransition,
 }: {
   collection: IAgreementCollection;
   version: IAgreementVersion;
   orgName: string;
   calculationState: CalculationState;
   signatures: ISignature[];
-  dashboard: IDashboardData | null;
   range: { from: Date; to: Date };
+  compliance: Promise<Result<IComplianceData>>;
+  startTransition: TransitionStartFunction;
 }) {
   const router = useRouter();
-  const [, setSelectedNumber] = useQueryState(
-    "version",
-    parseAsInteger.withOptions({ shallow: false }), // we need to call the server again to update the tasks version info
-  );
+  const [, setSearchParams] = useQueryStates(agreementVersionSearchParams);
   const [openTerminateDialog, setOpenTerminateDialog] = useState(false);
   const [openFetchStatesDialog, setOpenFetchStatesDialog] = useState(false);
 
@@ -80,14 +81,7 @@ export function AgreementVersionInfo({
   const isActive = version.versionNumber === activeNumber;
 
   // Check if version is terminated for showing the toggle buttons
-  const earlyTermination = version.contract.validity.earlyTermination
-    ? new Date(version.contract.validity.earlyTermination)
-    : null;
-  const contractEnd = new Date(version.contract.validity.end);
-  const end =
-    earlyTermination && earlyTermination < contractEnd
-      ? earlyTermination
-      : contractEnd;
+  const end = getValidityEnd(version.contract.validity);
 
   const enabledToggle = end > new Date();
 
@@ -184,7 +178,16 @@ export function AgreementVersionInfo({
                     <DropdownMenuItem
                       key={candidate.versionNumber}
                       disabled={isCurrent}
-                      onClick={() => setSelectedNumber(candidate.versionNumber)}
+                      onClick={() =>
+                        setSearchParams(
+                          {
+                            version: candidate.versionNumber,
+                            from: null,
+                            to: null,
+                          },
+                          { shallow: false, startTransition },
+                        )
+                      }
                     >
                       Version {candidate.versionNumber}
                       <span className="ml-auto flex items-center gap-2">
@@ -275,12 +278,17 @@ export function AgreementVersionInfo({
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <DashboardRange range={range} />
             <AgreementVersionSignatures
+              key={version.versionNumber}
               groupedSignatures={groupedSignatures}
               timezone={version.contract.validity.timezone}
-              dashboard={dashboard}
+              validity={{
+                initial: new Date(version.contract.validity.initial),
+                end,
+              }}
+              versionNumber={version.versionNumber}
               range={range}
+              compliance={compliance}
             />
           </CardContent>
         </div>

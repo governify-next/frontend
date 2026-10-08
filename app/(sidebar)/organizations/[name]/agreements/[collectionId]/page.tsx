@@ -1,7 +1,7 @@
 import {
   getAgreementCollection,
   getAgreementVersionByCollection,
-  getAgreementVersionDashboardData,
+  getAgreementVersionComplianceData,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
 import { ErrorPage } from "@/components/errors";
@@ -9,6 +9,7 @@ import { AgreementDetail } from "./detail";
 import { loadAgreementVersionSearchParams } from "./search-params";
 import { SearchParams } from "nuqs/server";
 import { CalculationState, ITask } from "@/types/agreement";
+import { getDefaultComplianceRange } from "@/lib/utils/validity";
 
 export default async function AgreementDetailPage({
   params,
@@ -19,6 +20,14 @@ export default async function AgreementDetailPage({
 }) {
   const { name, collectionId } = await params;
   const orgName = decodeURIComponent(name);
+  const {
+    version: selectedVersion,
+    from,
+    to,
+  } = await loadAgreementVersionSearchParams(
+    searchParams,
+    `/organizations/${name}/agreements/${collectionId}`,
+  );
 
   const collectionResult = await getAgreementCollection(orgName, collectionId);
 
@@ -31,7 +40,6 @@ export default async function AgreementDetailPage({
     );
   }
 
-  // if url typed by hand
   if (collectionResult.data.agreementVersions.length === 0) {
     return (
       <ErrorPage
@@ -41,14 +49,8 @@ export default async function AgreementDetailPage({
     );
   }
 
-  const {
-    version: selectedVersion,
-    from,
-    to,
-  } = await loadAgreementVersionSearchParams(searchParams);
   const collection = collectionResult.data;
   const versions = collection.agreementVersions;
-  // The one in the URL, the active one, or the highest as a last resort.
   const version =
     versions.find((candidate) => candidate.versionNumber === selectedVersion) ??
     versions.find(
@@ -76,16 +78,12 @@ export default async function AgreementDetailPage({
   }
 
   const getCalculationState = (stateTasks: ITask[]) => {
-    // 1. No hay tareas (data.length === 0) -> start verde
-    // 2. Hay tareas, todas con enabled a false -> start verde
     if (stateTasks.length === 0 || stateTasks.every((task) => !task.enabled)) {
       return CalculationState.NO_TASKS;
     }
-    // 3. Hay tareas, todas con enabled a true -> stop rojo
     if (stateTasks.every((task) => task.enabled)) {
       return CalculationState.ALL_TASKS_ENABLED;
     }
-    // 4. Hay tareas, alguna con enabled a false -> stop anaranjado
     return CalculationState.SOME_TASKS_DISABLED;
   };
 
@@ -107,13 +105,9 @@ export default async function AgreementDetailPage({
     );
   }
 
-  // PoC: dashboard range defaults to the version validity, as in Grafana.
-  const { validity } = agreementFullVersionResult.data.contract;
-  const range = {
-    from: from ?? new Date(validity.initial),
-    to: to ?? new Date(validity.earlyTermination ?? validity.end),
-  };
-  const dashboardResult = await getAgreementVersionDashboardData(
+  const range = from && to ? { from, to } : getDefaultComplianceRange();
+
+  const compliance = getAgreementVersionComplianceData(
     orgName,
     collection.scopeId,
     collection._id,
@@ -128,8 +122,8 @@ export default async function AgreementDetailPage({
       collection={collectionResult.data}
       calculationState={calculationState}
       version={agreementFullVersionResult.data}
-      dashboard={dashboardResult.ok ? dashboardResult.data : null}
       range={range}
+      compliance={compliance}
     />
   );
 }

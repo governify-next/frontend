@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import { Result } from "@/lib/utils/fetcher";
+import { IComplianceData } from "@/types/compliance";
 import { SignatureMetrics } from "./signature-metrics";
 import { GuaranteeCharts } from "./guarantee-charts";
-import { IDashboardData } from "@/types/dashboard";
 
 // Parser synced with guaranteeTemplate.validator in registry
 const TOKEN_REGEX = /[A-Za-z_][A-Za-z0-9_-]*|\d+(?:\.\d+)?|[+\-*/()]/g;
@@ -53,13 +54,17 @@ const formatPeriod = (window: IWindow) =>
 export function AgreementVersionSignatures({
   groupedSignatures,
   timezone,
-  dashboard,
+  validity,
+  versionNumber,
   range,
+  compliance,
 }: {
   groupedSignatures: Map<string, ISignature[]>;
   timezone: string;
-  dashboard: IDashboardData | null;
+  validity: { initial: Date; end: Date };
+  versionNumber: number;
   range: { from: Date; to: Date };
+  compliance: Promise<Result<IComplianceData>>;
 }) {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   return (
@@ -97,8 +102,11 @@ export function AgreementVersionSignatures({
               />
               <GuaranteeCharts
                 signatures={signatures}
-                data={dashboard?.[guaranteeName]}
+                guaranteeName={guaranteeName}
+                validity={validity}
+                versionNumber={versionNumber}
                 range={range}
+                compliance={compliance}
               />
             </AccordionContent>
           </AccordionItem>

@@ -4,7 +4,7 @@ import {
   IAgreementVersion,
   ITask,
 } from "@/types/agreement";
-import { IDashboardData } from "@/types/dashboard";
+import { IComplianceData } from "@/types/compliance";
 import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const getAgreementCollections = async (orgName: string) => {
@@ -52,8 +52,7 @@ export const getAgreementVersionByCollection = async (
   );
 };
 
-// PoC: data for the ECharts dashboard.
-export const getAgreementVersionDashboardData = async (
+export const getAgreementVersionComplianceData = async (
   orgName: string,
   scopeId: string,
   agColId: string,
@@ -65,7 +64,7 @@ export const getAgreementVersionDashboardData = async (
     from: from.toISOString(),
     to: to.toISOString(),
   });
-  return await apiFetcher<IDashboardData>(
+  return await apiFetcher<IComplianceData>(
     `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}/data?${range}`,
     { method: "GET" },
   );

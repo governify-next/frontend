@@ -92,7 +92,7 @@ export function SignatureMetrics({
             metric={metric}
             index={index + 1}
             key={metric.metricName}
-            disabled={selectedMetric !== metric.metricName}
+            selected={selectedMetric === metric.metricName}
           />
         ))}
       </div>
@@ -103,10 +103,10 @@ export function SignatureMetrics({
 function MetricCard({
   metric,
   index,
-  disabled,
+  selected,
 }: {
   metric: IMetric;
-  disabled: boolean;
+  selected: boolean;
   index: number;
 }) {
   const hasFilters =
@@ -123,9 +123,8 @@ function MetricCard({
   return (
     <Card
       className={cn(
-        "gap-3 transition-opacity",
-        disabled && "opacity-50",
-        !disabled &&
+        "gap-3",
+        selected &&
           "ring-1 ring-primary shadow-[0_0_8px_2px] shadow-primary/25",
       )}
     >
