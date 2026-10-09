@@ -8,7 +8,6 @@ export const PALETTE = {
   amber: "#fea91e",
   green: "#11bc6d",
   black: "#000000",
-  white: "#ffffff",
   gray: "#e8ebf0",
 };
 
@@ -43,7 +42,10 @@ export const gaugeGradient = (progress: number) => ({
   ],
 });
 
-export const tooltipBase = { backgroundColor: PALETTE.white };
+export const tooltipBase = {
+  className:
+    "hidden rounded-md! border-0! bg-popover! p-3! font-sans! text-sm! text-popover-foreground! shadow-md! ring-1! ring-foreground/10",
+};
 
 export const legendBase = {
   bottom: 0,

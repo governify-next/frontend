@@ -25,3 +25,14 @@ export interface IGuaranteeCompliance {
 }
 
 export type IComplianceData = Record<string, IGuaranteeCompliance>;
+
+export type IComplianceTimelinePoint = Pick<
+  ICompliancePoint,
+  "time" | "value" | "consolidated"
+> & {
+  x: number;
+  y: number;
+  label: string;
+  color: string;
+  pinned: boolean;
+};

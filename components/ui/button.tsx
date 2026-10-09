@@ -16,13 +16,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "border-destructive/25 bg-destructive/10 text-destructive hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         success:
           "bg-green-600/10 text-green-700 hover:bg-green-600/20 focus-visible:border-green-600/40 focus-visible:ring-green-600/20 dark:bg-green-600/20 dark:text-green-400 dark:hover:bg-green-600/30 dark:focus-visible:ring-green-600/40",
         warning:
           "bg-orange-500/10 text-orange-700 hover:bg-orange-500/20 focus-visible:border-orange-500/40 focus-visible:ring-orange-500/20 dark:bg-orange-500/20 dark:text-orange-400 dark:hover:bg-orange-500/30 dark:focus-visible:ring-orange-500/40",
         primarySoft:
-          "border border-dashed border-primary/25 bg-primary/5 text-primary shadow-none hover:border-primary/40 hover:bg-primary/15 focus-visible:border-primary/40 focus-visible:ring-primary/20 dark:bg-primary/10 dark:hover:bg-primary/20",
+          "border border-primary/25 bg-primary/5 text-primary shadow-none hover:border-primary/40 hover:bg-primary/15 focus-visible:border-primary/40 focus-visible:ring-primary/20 dark:bg-primary/10 dark:hover:bg-primary/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
