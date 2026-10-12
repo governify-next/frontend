@@ -5,7 +5,11 @@ import { Clock2, Pin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IGuarantee, ISignature, IWindow } from "@/types/agreement";
-import { breakOnUnderscore, formatReadableDate } from "@/lib/utils/formatter";
+import {
+  breakOnUnderscore,
+  formatReadableDate,
+  tokenizeExpression,
+} from "@/lib/utils/formatter";
 import {
   Accordion,
   AccordionContent,
@@ -15,22 +19,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Result } from "@/lib/utils/fetcher";
-import { IComplianceData } from "@/types/compliance";
+import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { SignatureMetrics } from "./signature-metrics";
 import { GuaranteeCharts } from "./guarantee-charts";
-
-// Parser synced with guaranteeTemplate.validator in registry
-const TOKEN_REGEX = /[A-Za-z_][A-Za-z0-9_-]*|\d+(?:\.\d+)?|[+\-*/()]/g;
-const REPLACEMENTS: Record<string, string> = { "*": "×", "-": "−" };
-
-const tokenizeExpression = (expression: string) => {
-  const tokens = expression.match(TOKEN_REGEX);
-
-  // If something missing, return null
-  if (!tokens || tokens.join("") !== expression) return null;
-
-  return tokens.map((token) => REPLACEMENTS[token] ?? token);
-};
 
 const formatComparator = (comparator: string) => {
   switch (comparator) {
@@ -58,6 +49,7 @@ export function AgreementVersionSignatures({
   versionNumber,
   range,
   compliance,
+  getState,
 }: {
   groupedSignatures: Map<string, ISignature[]>;
   timezone: string;
@@ -65,6 +57,7 @@ export function AgreementVersionSignatures({
   versionNumber: number;
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   return (
@@ -107,6 +100,7 @@ export function AgreementVersionSignatures({
                 versionNumber={versionNumber}
                 range={range}
                 compliance={compliance}
+                getState={getState}
               />
             </AccordionContent>
           </AccordionItem>

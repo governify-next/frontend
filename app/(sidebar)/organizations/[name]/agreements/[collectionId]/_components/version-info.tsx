@@ -49,7 +49,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ManualStatesDialog } from "./manual-states-dialog";
 import { AgreementVersionSignatures } from "./signatures";
 import { Result } from "@/lib/utils/fetcher";
-import { IComplianceData } from "@/types/compliance";
+import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { agreementVersionSearchParams } from "../search-params";
 
 export function AgreementVersionInfo({
@@ -60,6 +60,7 @@ export function AgreementVersionInfo({
   signatures,
   range,
   compliance,
+  getState,
   startTransition,
 }: {
   collection: IAgreementCollection;
@@ -69,6 +70,7 @@ export function AgreementVersionInfo({
   signatures: ISignature[];
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
   startTransition: TransitionStartFunction;
 }) {
   const router = useRouter();
@@ -289,6 +291,7 @@ export function AgreementVersionInfo({
               versionNumber={version.versionNumber}
               range={range}
               compliance={compliance}
+              getState={getState}
             />
           </CardContent>
         </div>

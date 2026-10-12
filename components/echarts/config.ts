@@ -1,12 +1,12 @@
 import { color } from "echarts";
-import "echarts/theme/blue.js";
+import "echarts/theme/tech-blue.js";
 
-export const THEME = "blue";
+export const THEME = "tech-blue";
 
 export const PALETTE = {
-  red: "#f13841",
+  red: "#d53d3a",
   amber: "#fea91e",
-  green: "#11bc6d",
+  green: "#2e9463",
   black: "#000000",
   gray: "#e8ebf0",
 };

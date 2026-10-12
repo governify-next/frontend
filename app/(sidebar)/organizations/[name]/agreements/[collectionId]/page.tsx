@@ -4,6 +4,7 @@ import {
   getAgreementVersionComplianceData,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
+import { getAgreementVersionState } from "@/data/agreements/actions";
 import { ErrorPage } from "@/components/errors";
 import { AgreementDetail } from "./detail";
 import { loadAgreementVersionSearchParams } from "./search-params";
@@ -124,6 +125,13 @@ export default async function AgreementDetailPage({
       version={agreementFullVersionResult.data}
       range={range}
       compliance={compliance}
+      getState={getAgreementVersionState.bind(
+        null,
+        orgName,
+        collection.scopeId,
+        collection._id,
+        version.versionNumber,
+      )}
     />
   );
 }

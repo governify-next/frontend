@@ -7,7 +7,7 @@ import {
   IAgreementVersion,
 } from "@/types/agreement";
 import { Result } from "@/lib/utils/fetcher";
-import { IComplianceData } from "@/types/compliance";
+import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { AgreementHeader } from "./_components/agreement-header";
 import {
   AgreementCollectionEditCard,
@@ -22,6 +22,7 @@ export function AgreementDetail({
   version,
   range,
   compliance,
+  getState,
 }: {
   orgName: string;
   collection: IAgreementCollection;
@@ -29,6 +30,7 @@ export function AgreementDetail({
   version: IAgreementVersion;
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [isNavigating, startTransition] = useTransition();
@@ -66,6 +68,7 @@ export function AgreementDetail({
           signatures={signatures}
           range={range}
           compliance={compliance}
+          getState={getState}
           startTransition={startTransition}
         />
       </div>

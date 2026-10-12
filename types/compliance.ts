@@ -1,8 +1,5 @@
 export type ComplianceStatus =
-  | "COMPLIANT"
-  | "NON_COMPLIANT"
-  | "INDETERMINATE"
-  | "PENDING";
+  "COMPLIANT" | "NON_COMPLIANT" | "INDETERMINATE" | "PENDING";
 
 export interface ICompliancePoint {
   time: string;
@@ -24,11 +21,24 @@ export interface IGuaranteeCompliance {
   points: ICompliancePoint[];
 }
 
+export interface IComplianceState {
+  metrics: {
+    metricName: string;
+    status: "PENDING" | "COMPUTED" | "UNAVAILABLE" | "FAILED";
+    value: number | null;
+    errorMessage: string | null;
+    evidences: Record<string, unknown>[];
+  }[];
+  numericExpression: string;
+  numericExpressionValue: number | null;
+  complianceStatus: ComplianceStatus;
+}
+
 export type IComplianceData = Record<string, IGuaranteeCompliance>;
 
 export type IComplianceTimelinePoint = Pick<
   ICompliancePoint,
-  "time" | "value" | "consolidated"
+  "time" | "value" | "consolidated" | "stateId"
 > & {
   x: number;
   y: number;

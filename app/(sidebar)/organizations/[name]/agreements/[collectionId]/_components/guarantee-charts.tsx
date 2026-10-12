@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ISignature } from "@/types/agreement";
-import { IComplianceData } from "@/types/compliance";
+import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { Spinner } from "@/components/ui/spinner";
 import { Result } from "@/lib/utils/fetcher";
 import { agreementVersionSearchParams } from "../search-params";
@@ -23,6 +23,7 @@ export function GuaranteeCharts({
   versionNumber,
   range,
   compliance,
+  getState,
 }: {
   signatures: ISignature[];
   guaranteeName: string;
@@ -30,6 +31,7 @@ export function GuaranteeCharts({
   versionNumber: number;
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
   return (
     <div>
@@ -53,6 +55,7 @@ export function GuaranteeCharts({
           validity={validity}
           range={range}
           compliance={compliance}
+          getState={getState}
         />
       </Suspense>
     </div>
@@ -65,12 +68,14 @@ function ComplianceCharts({
   validity,
   range,
   compliance,
+  getState,
 }: {
   signatures: ISignature[];
   guaranteeName: string;
   validity: { initial: Date; end: Date };
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
   const result = use(compliance);
   const [{ showEvolutivePoints }] = useQueryStates(
@@ -117,6 +122,7 @@ function ComplianceCharts({
           </CardHeader>
           <CardContent className="flex-1">
             <TimelineChart
+              getState={getState}
               range={range}
               validity={validity}
               threshold={{
