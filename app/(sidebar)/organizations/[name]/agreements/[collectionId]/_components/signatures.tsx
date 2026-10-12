@@ -59,7 +59,6 @@ export function AgreementVersionSignatures({
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
-  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   return (
     <Accordion type="single" collapsible>
       {Array.from(groupedSignatures).map(([guaranteeName, signatures]) => {
@@ -82,20 +81,11 @@ export function AgreementVersionSignatures({
               </div>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-5 px-1">
-              <SignatureObjective
-                guarantee={firstSignature.guarantee}
-                comparator={comparator}
-                onMetricSelected={setSelectedMetric}
-                selectedMetric={selectedMetric}
-                timezone={timezone}
-              />
-              <SignatureMetrics
-                signatures={signatures}
-                selectedMetric={selectedMetric}
-              />
-              <GuaranteeCharts
+              <GuaranteeDetails
                 signatures={signatures}
                 guaranteeName={guaranteeName}
+                comparator={comparator}
+                timezone={timezone}
                 validity={validity}
                 versionNumber={versionNumber}
                 range={range}
@@ -107,6 +97,63 @@ export function AgreementVersionSignatures({
         );
       })}
     </Accordion>
+  );
+}
+
+function GuaranteeDetails({
+  signatures,
+  guaranteeName,
+  comparator,
+  timezone,
+  validity,
+  versionNumber,
+  range,
+  compliance,
+  getState,
+}: {
+  signatures: ISignature[];
+  guaranteeName: string;
+  comparator: string;
+  timezone: string;
+  validity: { initial: Date; end: Date };
+  versionNumber: number;
+  range: { from: Date; to: Date };
+  compliance: Promise<Result<IComplianceData>>;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
+}) {
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [metricsOpen, setMetricsOpen] = useState(false);
+  return (
+    <>
+      <SignatureObjective
+        guarantee={signatures[0].guarantee}
+        comparator={comparator}
+        onMetricSelected={(metric) => {
+          setSelectedMetric(metric);
+          if (metric) setMetricsOpen(true);
+        }}
+        selectedMetric={selectedMetric}
+        timezone={timezone}
+      />
+      <GuaranteeCharts
+        signatures={signatures}
+        guaranteeName={guaranteeName}
+        validity={validity}
+        versionNumber={versionNumber}
+        range={range}
+        compliance={compliance}
+        getState={getState}
+      />
+      <SignatureMetrics
+        signatures={signatures}
+        selectedMetric={selectedMetric}
+        open={metricsOpen}
+        onOpenChange={(open) => {
+          setMetricsOpen(open);
+          if (!open) setSelectedMetric(null);
+        }}
+      />
+    </>
   );
 }
 

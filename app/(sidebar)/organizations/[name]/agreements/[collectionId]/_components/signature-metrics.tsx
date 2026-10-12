@@ -14,7 +14,7 @@ import {
 import { IMetric, ISignature } from "@/types/agreement";
 import { breakOnUnderscore } from "@/lib/utils/formatter";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import {
   Collapsible,
@@ -25,9 +25,13 @@ import {
 export function SignatureMetrics({
   signatures,
   selectedMetric,
+  open,
+  onOpenChange,
 }: {
   signatures: ISignature[];
   selectedMetric: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const [selectedSignatureId, setSelectedSignatureId] = useState<string>(
     signatures[0].signatureId,
@@ -37,27 +41,33 @@ export function SignatureMetrics({
   );
   const metrics = selectedSignature!.guarantee.metrics;
   return (
-    <div>
+    <Collapsible
+      open={open}
+      onOpenChange={onOpenChange}
+      className="flex flex-col gap-4"
+    >
       <div
         className={cn(
-          signatures.length > 1
-            ? "flex flex-col gap-2 @lg/main:flex-row @lg/main:items-center @lg/main:gap-2 pb-4"
-            : "flex items-center gap-2 pb-4",
+          "flex gap-2",
+          signatures.length > 1 && open
+            ? "flex-col @lg/main:flex-row @lg/main:items-center"
+            : "items-center",
         )}
       >
-        <div className="flex items-center gap-1">
-          <span className="text-xs font-medium uppercase text-muted-foreground">
-            Metrics
-          </span>
-          <Badge variant="muted">{metrics.length}</Badge>
-        </div>
-        <Separator
-          className={cn(
-            "shrink",
-            signatures.length > 1 && "hidden @lg/main:block",
-          )}
-        />
-        {signatures.length > 1 && (
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="group flex flex-1 cursor-pointer items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span className="text-xs font-medium uppercase text-muted-foreground">
+              Metrics
+            </span>
+            <Badge variant="muted">{metrics.length}</Badge>
+            <Separator className="shrink" />
+            <IconChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+          </button>
+        </CollapsibleTrigger>
+        {signatures.length > 1 && open && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="primarySoft" size="sm">
@@ -86,7 +96,7 @@ export function SignatureMetrics({
           </DropdownMenu>
         )}
       </div>
-      <div className="grid grid-cols-1 items-start gap-4 px-1 @4xl/main:grid-cols-2">
+      <CollapsibleContent className="grid grid-cols-1 items-start gap-4 px-1 @4xl/main:grid-cols-2">
         {metrics.map((metric, index) => (
           <MetricCard
             metric={metric}
@@ -95,8 +105,8 @@ export function SignatureMetrics({
             selected={selectedMetric === metric.metricName}
           />
         ))}
-      </div>
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -109,6 +119,12 @@ function MetricCard({
   selected: boolean;
   index: number;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (selected) {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [selected]);
   const hasFilters =
     Object.entries(metric.metricConfig.event.processConfig).length > 0;
   const hasConfiguration =
@@ -122,6 +138,7 @@ function MetricCard({
     .join(", ");
   return (
     <Card
+      ref={ref}
       className={cn(
         "gap-3",
         selected &&
