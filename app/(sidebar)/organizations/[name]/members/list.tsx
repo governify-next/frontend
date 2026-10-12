@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ItemList } from "@/components/item-list";
+import { ItemList } from "@/components/item/item-list";
 import { IMembership, IOrganization, IRole } from "@/types/organization";
 import { avatarFallback } from "@/lib/utils/formatter";
 import {

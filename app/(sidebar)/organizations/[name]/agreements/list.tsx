@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ItemList } from "@/components/item-list";
+import { ItemList } from "@/components/item/item-list";
+import { LinkPendingIcon } from "@/components/link-pending-icon";
 import { IAgreementCollection } from "@/types/agreement";
 
 export function AgreementsList({
@@ -54,7 +55,9 @@ export function AgreementsList({
                       href={`/organizations/${orgName}/agreements/${collection._id}`}
                       aria-label={`View ${title}`}
                     >
-                      <Eye />
+                      <LinkPendingIcon>
+                        <Eye />
+                      </LinkPendingIcon>
                     </Link>
                   </Button>
                 </>

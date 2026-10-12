@@ -16,13 +16,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "border-destructive/25 bg-destructive/10 text-destructive hover:border-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         success:
           "bg-green-600/10 text-green-700 hover:bg-green-600/20 focus-visible:border-green-600/40 focus-visible:ring-green-600/20 dark:bg-green-600/20 dark:text-green-400 dark:hover:bg-green-600/30 dark:focus-visible:ring-green-600/40",
         warning:
           "bg-orange-500/10 text-orange-700 hover:bg-orange-500/20 focus-visible:border-orange-500/40 focus-visible:ring-orange-500/20 dark:bg-orange-500/20 dark:text-orange-400 dark:hover:bg-orange-500/30 dark:focus-visible:ring-orange-500/40",
         primarySoft:
-          "border border-dashed border-primary/25 bg-primary/5 text-primary shadow-none hover:border-primary/40 hover:bg-primary/15 focus-visible:border-primary/40 focus-visible:ring-primary/20 dark:bg-primary/10 dark:hover:bg-primary/20",
+          "border border-primary/25 bg-primary/5 text-primary shadow-none hover:border-primary/40 hover:bg-primary/15 focus-visible:border-primary/40 focus-visible:ring-primary/20 dark:bg-primary/10 dark:hover:bg-primary/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -33,7 +33,7 @@ const buttonVariants = cva(
         lg: "h-10 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         icon: "size-9",
         "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),8px)] in-data-[slot=button-group]:rounded-md [&_svg:not([class*='size-'])]:size-3",
+          "size-6 rounded-[min(var(--radius-md),8px)] in-data-[slot=button-group]:rounded-md [&_svg]:stroke-[2.5] [&_svg:not([class*='size-'])]:size-3",
         "icon-sm":
           "size-8 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-md",
         "icon-lg": "size-10",

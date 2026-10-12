@@ -7,6 +7,7 @@ import {
   IAgreementCollectionPayload,
   ITask,
 } from "@/types/agreement";
+import { IComplianceState } from "@/types/compliance";
 
 export const toggleAutomaticTrackingForVersion = async (
   enabled: boolean,
@@ -84,5 +85,18 @@ export const generateStatesForVersion = async (
         ifExists: replaceExisting ? "REPLACE" : "KEEP",
       },
     },
+  );
+};
+
+export const getAgreementVersionState = async (
+  orgName: string,
+  scopeId: string,
+  collectionId: string,
+  versionNumber: number,
+  stateId: string,
+) => {
+  return await apiFetcher<IComplianceState>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/states/${encodeURIComponent(stateId)}`,
+    { method: "GET" },
   );
 };

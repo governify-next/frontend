@@ -4,6 +4,7 @@ import {
   IAgreementVersion,
   ITask,
 } from "@/types/agreement";
+import { IComplianceData } from "@/types/compliance";
 import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const getAgreementCollections = async (orgName: string) => {
@@ -47,6 +48,24 @@ export const getAgreementVersionByCollection = async (
 ) => {
   return await apiFetcher<IAgreementVersion>(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/scopes/${scopeId}/agreementCollections/${agColId}/agreementVersions/${agVersionNumber}?expand=true`,
+    { method: "GET" },
+  );
+};
+
+export const getAgreementVersionComplianceData = async (
+  orgName: string,
+  scopeId: string,
+  agColId: string,
+  agVersionNumber: number,
+  from: Date,
+  to: Date,
+) => {
+  const range = new URLSearchParams({
+    from: from.toISOString(),
+    to: to.toISOString(),
+  });
+  return await apiFetcher<IComplianceData>(
+    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}/data?${range}`,
     { method: "GET" },
   );
 };

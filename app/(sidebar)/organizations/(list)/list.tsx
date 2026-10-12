@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/item";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ItemList } from "@/components/item-list";
+import { ItemList } from "@/components/item/item-list";
+import { LinkPendingIcon } from "@/components/link-pending-icon";
 import { IOrganization } from "@/types/organization";
 import { Pagination } from "@/types/pagination";
 
@@ -63,7 +64,9 @@ export function OrganizationsList({
                   href={`/organizations/${org.name}`}
                   aria-label={`View ${title}`}
                 >
-                  <ChevronRight />
+                  <LinkPendingIcon>
+                    <ChevronRight />
+                  </LinkPendingIcon>
                 </Link>
               </Button>
             </ItemActions>

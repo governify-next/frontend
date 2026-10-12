@@ -1,0 +1,613 @@
+"use client";
+
+import { type ReactNode, useEffect, useMemo, useState } from "react";
+import ReactECharts from "echarts-for-react";
+import { format } from "date-fns";
+import { X } from "lucide-react";
+import type {
+  DefaultLabelFormatterCallbackParams,
+  ECElementEvent,
+  EChartsType,
+} from "echarts";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
+import { geistSans } from "@/lib/fonts";
+import type { Result } from "@/lib/utils/fetcher";
+import { DATE_TIME_FORMAT, tokenizeExpression } from "@/lib/utils/formatter";
+import type {
+  IComplianceState,
+  IComplianceTimelinePoint,
+} from "@/types/compliance";
+import {
+  complianceColor,
+  gaugeBase,
+  gaugeGradient,
+  gridBase,
+  legendBase,
+  PALETTE,
+  THEME,
+  tooltipBase,
+} from "./config";
+
+export function ComplianceGauge({
+  value,
+  label,
+}: {
+  value: number | null;
+  label: string;
+}) {
+  return (
+    <ReactECharts
+      theme={THEME}
+      style={{ height: 150 }}
+      option={{
+        series: [
+          {
+            ...gaugeBase,
+            radius: "92%",
+            axisLine: {
+              lineStyle: { width: 15, color: [[1, PALETTE.gray]] },
+            },
+            progress: {
+              show: true,
+              width: 15,
+              itemStyle: { color: gaugeGradient((value ?? 0) / 100) },
+            },
+            detail: {
+              offsetCenter: [0, 0],
+              fontSize: 22,
+              fontFamily: geistSans.style.fontFamily,
+              formatter: () =>
+                value === null ? "N/A" : `${value.toFixed(1)}%`,
+            },
+            title: {
+              offsetCenter: [0, "40%"],
+              fontSize: 12,
+              fontFamily: geistSans.style.fontFamily,
+            },
+            data: [{ value, name: label }],
+          },
+          {
+            ...gaugeBase,
+            radius: "99%",
+            axisLine: { show: false },
+            progress: {
+              show: true,
+              width: 4,
+              itemStyle: { color: gaugeGradient(1) },
+            },
+            detail: { show: false },
+            data: [{ value: 100 }],
+          },
+        ],
+      }}
+    />
+  );
+}
+
+export function TimelineChart({
+  series,
+  range,
+  validity,
+  threshold,
+  getState,
+}: {
+  series: {
+    name: string;
+    data: {
+      time: string;
+      value: number;
+      consolidated: boolean;
+      stateId: string;
+    }[];
+  }[];
+  range: { from: Date; to: Date };
+  validity: { initial: Date; end: Date };
+  threshold: { value: number; comparator: string };
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
+}) {
+  const [point, setPoint] = useState<IComplianceTimelinePoint | null>(null);
+  const [inspecting, setInspecting] = useState(false);
+  const inspectedTime = inspecting && point ? point.time : null;
+  const inspectedColor = inspecting ? point?.color : undefined;
+
+  const onEvents = useMemo(() => {
+    const toPoint = (
+      params: ECElementEvent,
+      chart: EChartsType,
+      pinned: boolean,
+    ) => {
+      if (params.componentType !== "series") return null;
+      const { name: label, data } = series[params.seriesIndex ?? 0];
+      const item = data[params.dataIndex];
+      const [x, y] = chart.convertToPixel({ seriesIndex: params.seriesIndex }, [
+        item.time,
+        item.value,
+      ]);
+      return {
+        x,
+        y,
+        label,
+        color: params.color as string,
+        ...item,
+        pinned,
+      };
+    };
+    return {
+      mouseover: (params: ECElementEvent, chart: EChartsType) => {
+        const hovered = toPoint(params, chart, false);
+        setPoint((current) => (current?.pinned ? current : hovered));
+      },
+      mouseout: () => setPoint((current) => (current?.pinned ? current : null)),
+      click: (params: ECElementEvent, chart: EChartsType) => {
+        setInspecting(false);
+        setPoint(toPoint(params, chart, true));
+      },
+    };
+  }, [series]);
+
+  const option = useMemo(
+    () => ({
+      legend: legendBase,
+      tooltip: tooltipBase,
+      grid: gridBase,
+      xAxis: {
+        type: "time",
+        min: range.from,
+        max: range.to,
+        splitNumber: 10,
+        splitLine: { show: true },
+        axisTick: { show: false },
+        axisLabel: {
+          formatter: {
+            day: "{MM}/{dd}",
+            hour: "{HH}:{mm}",
+            minute: "{HH}:{mm}",
+          },
+        },
+      },
+      yAxis: { type: "value" },
+      series: [
+        ...series.map(({ name, data }, index) => ({
+          type: "line",
+          name,
+          tooltip: { show: false },
+          data: data.map(({ time, value, consolidated }) => ({
+            value: [time, value],
+            symbolSize: consolidated ? 6 : 4,
+          })),
+          markLine: index === 0 && {
+            z: 2,
+            silent: true,
+            symbol: "none",
+            label: { show: false },
+            lineStyle: {
+              type: "solid",
+              color: complianceColor(
+                [">=", "<=", "=="].includes(threshold.comparator),
+              ),
+            },
+            data: [{ yAxis: threshold.value }],
+          },
+          markArea: index === 0 && {
+            silent: true,
+            data: [
+              [
+                {
+                  yAxis: threshold.value,
+                  itemStyle: {
+                    color: complianceColor(
+                      [">", ">=", "!="].includes(threshold.comparator),
+                    ),
+                    opacity: 0.1,
+                  },
+                },
+                {},
+              ],
+              [
+                {
+                  itemStyle: {
+                    color: complianceColor(
+                      ["<", "<=", "!="].includes(threshold.comparator),
+                    ),
+                    opacity: 0.1,
+                  },
+                },
+                { yAxis: threshold.value },
+              ],
+            ],
+          },
+        })),
+        {
+          type: "line",
+          data: [],
+          markLine: {
+            z: 1,
+            silent: true,
+            symbol: "none",
+            label: { show: false },
+            lineStyle: { type: "dashed", color: inspectedColor, width: 2 },
+            data: inspectedTime ? [{ xAxis: inspectedTime }] : [],
+          },
+        },
+        {
+          type: "line",
+          data: [],
+          markLine: {
+            symbol: "none",
+            label: { show: false },
+            lineStyle: { type: "dashed", color: PALETTE.black, width: 2 },
+            tooltip: {
+              formatter: ({
+                name,
+                value,
+              }: DefaultLabelFormatterCallbackParams) =>
+                `<div class="[text-align-last:justify]">${format(value as Date, DATE_TIME_FORMAT)}</div><div class="my-1.5 border-t"></div><div class="text-center">${name}</div>`,
+            },
+            data: [
+              { xAxis: validity.initial, name: "Agreement start" },
+              { xAxis: validity.end, name: "Agreement end" },
+            ],
+          },
+        },
+      ],
+    }),
+    [series, range, validity, threshold, inspectedTime, inspectedColor],
+  );
+
+  const onClose = () => {
+    setInspecting(false);
+    setPoint(null);
+  };
+
+  return (
+    <div className="relative h-full">
+      <ReactECharts
+        theme={THEME}
+        style={{ height: "100%", minHeight: 250 }}
+        onEvents={onEvents}
+        option={option}
+      />
+      {point &&
+        (inspecting ? (
+          <EvidencesCard point={point} getState={getState} onClose={onClose} />
+        ) : (
+          <PointPopover
+            point={point}
+            onClose={onClose}
+            onInspect={() => setInspecting(true)}
+          />
+        ))}
+    </div>
+  );
+}
+
+export function SignatureComplianceChart({
+  rows,
+}: {
+  rows: {
+    label: string;
+    allTime: number | null;
+    selectedPeriod: number | null;
+  }[];
+}) {
+  return (
+    <ReactECharts
+      theme={THEME}
+      style={{ height: Math.max(150, rows.length * 70 + 60) }}
+      option={{
+        legend: legendBase,
+        grid: gridBase,
+        tooltip: {
+          ...tooltipBase,
+          trigger: "axis",
+          axisPointer: { type: "shadow" },
+          formatter: (params: DefaultLabelFormatterCallbackParams[]) => {
+            const { label, allTime, selectedPeriod } =
+              rows[params[0].dataIndex];
+            return `<div class="text-center">${label}</div><div class="my-1.5 border-t"></div>${params
+              .map(({ marker, seriesName, seriesIndex }) => {
+                const value = [allTime, selectedPeriod][seriesIndex ?? 0];
+                return `<div class="flex justify-between gap-6"><span>${marker}${seriesName}</span><span class="font-medium">${value === null ? "N/A" : `${value.toFixed(1)}%`}</span></div>`;
+              })
+              .join("")}`;
+          },
+        },
+        xAxis: {
+          type: "value",
+          min: 0,
+          max: 100,
+          interval: 5,
+          axisLabel: { formatter: (value: number) => `${value.toFixed(1)}%` },
+        },
+        yAxis: { type: "category", data: rows.map(({ label }) => label) },
+        series: [
+          {
+            type: "bar",
+            name: "All time",
+            barMinHeight: 3,
+            data: rows.map(({ allTime }) => allTime),
+          },
+          {
+            type: "bar",
+            name: "Selected period",
+            barMinHeight: 3,
+            data: rows.map(({ selectedPeriod }) => selectedPeriod),
+          },
+        ],
+      }}
+    />
+  );
+}
+
+function PointPopover({
+  point,
+  onClose,
+  onInspect,
+}: {
+  point: IComplianceTimelinePoint;
+  onClose: () => void;
+  onInspect: () => void;
+}) {
+  return (
+    <Popover open onOpenChange={() => point.pinned && onClose()}>
+      <PopoverAnchor
+        className="absolute"
+        style={{ left: point.x, top: point.y }}
+      />
+      <PopoverContent
+        side="right"
+        align="start"
+        sideOffset={20}
+        alignOffset={20}
+        sticky="always"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className="w-60 gap-0 p-3"
+      >
+        <div className="flex items-center gap-1">
+          <span className="flex-1 [text-align-last:justify]">
+            {format(new Date(point.time), DATE_TIME_FORMAT)}
+          </span>
+          {point.pinned && (
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label="Close"
+              className="-my-0.5"
+              onClick={onClose}
+            >
+              <X />
+            </Button>
+          )}
+        </div>
+        <PointRow label="Value">{point.value}</PointRow>
+        <PointRow label="Type">
+          {point.consolidated ? "Consolidated" : "Evolutive"}
+        </PointRow>
+        <PointRow label="Signature">
+          <span
+            className="mr-1 size-2.5 shrink-0 rounded-full"
+            style={{ backgroundColor: point.color }}
+          />
+          <span className="truncate" title={point.label}>
+            {point.label}
+          </span>
+        </PointRow>
+        {point.pinned && (
+          <>
+            <Separator className="my-1.5" />
+            <Button variant="primarySoft" size="sm" onClick={onInspect}>
+              Show evidences
+            </Button>
+          </>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function EvidencesCard({
+  point,
+  getState,
+  onClose,
+}: {
+  point: IComplianceTimelinePoint;
+  getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onClose: () => void;
+}) {
+  const [result, setResult] = useState<Result<IComplianceState> | null>(null);
+  const [openMetric, setOpenMetric] = useState("");
+
+  useEffect(() => {
+    getState(point.stateId).then(setResult);
+  }, [point.stateId, getState]);
+
+  return (
+    <Popover open onOpenChange={onClose}>
+      <PopoverAnchor
+        className="absolute"
+        style={{ left: point.x, top: "100%" }}
+      />
+      <PopoverContent
+        side="bottom"
+        align="center"
+        sideOffset={-45}
+        collisionPadding={{ left: 16, right: 16, bottom: -1000 }}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className="flex w-[32rem] flex-col gap-0 p-0"
+      >
+        <PopoverHeader className="border-b px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
+            <PopoverTitle>Evidences</PopoverTitle>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label="Close"
+              onClick={onClose}
+            >
+              <X />
+            </Button>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <PopoverDescription className="shrink-0">
+              {format(new Date(point.time), DATE_TIME_FORMAT)}
+            </PopoverDescription>
+            {result?.ok && (
+              <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
+                <NumericExpression
+                  state={result.data}
+                  openMetric={openMetric}
+                  onToggle={(name) =>
+                    setOpenMetric((current) => (current === name ? "" : name))
+                  }
+                />
+                <span>=</span>
+                <span>{result.data.numericExpressionValue ?? "N/A"}</span>
+              </div>
+            )}
+          </div>
+        </PopoverHeader>
+        <div className="px-3">
+          {!result ? (
+            <div className="flex justify-center py-4">
+              <Spinner className="size-5 text-muted-foreground" />
+            </div>
+          ) : !result.ok ? (
+            <span className="flex justify-center py-4 text-muted-foreground">
+              Something went wrong while loading the evidences.
+            </span>
+          ) : (
+            <Accordion
+              type="single"
+              collapsible
+              value={openMetric}
+              onValueChange={setOpenMetric}
+            >
+              {result.data.metrics.map((metric) => (
+                <AccordionItem
+                  key={metric.metricName}
+                  value={metric.metricName}
+                >
+                  <AccordionTrigger className="items-center gap-2 py-2">
+                    <span className="flex-1 truncate">{metric.metricName}</span>
+                    <Badge variant="secondary">
+                      {metric.value ?? metric.status}
+                    </Badge>
+                  </AccordionTrigger>
+                  <AccordionContent className="flex max-h-64 flex-col gap-3 overflow-y-auto pb-3">
+                    {metric.status === "FAILED" && metric.errorMessage ? (
+                      <span className="break-words text-destructive">
+                        {metric.errorMessage}
+                      </span>
+                    ) : metric.evidences.length === 0 ? (
+                      <span className="text-muted-foreground">
+                        No evidences for this metric
+                      </span>
+                    ) : (
+                      metric.evidences.map((evidence, index) => (
+                        <div key={index} className="flex flex-col gap-1">
+                          <span>{index + 1}.</span>
+                          <pre className="rounded-md bg-muted p-2 font-mono text-xs break-all whitespace-pre-wrap">
+                            {JSON.stringify(evidence, null, 2)}
+                          </pre>
+                        </div>
+                      ))
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </div>
+        <div className="flex items-center justify-between gap-3 border-t p-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span
+              className="size-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: point.color }}
+            />
+            <span className="truncate" title={point.label}>
+              {point.label}
+            </span>
+            <span className="shrink-0 text-muted-foreground">
+              {point.consolidated ? "Consolidated" : "Evolutive"}
+            </span>
+          </div>
+          {result?.ok && (
+            <Badge
+              variant={
+                result.data.complianceStatus === "COMPLIANT"
+                  ? "success"
+                  : result.data.complianceStatus === "NON_COMPLIANT"
+                    ? "destructive"
+                    : "muted"
+              }
+            >
+              {result.data.complianceStatus.charAt(0) +
+                result.data.complianceStatus
+                  .slice(1)
+                  .toLowerCase()
+                  .replace("_", " ")}
+            </Badge>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function NumericExpression({
+  state,
+  openMetric,
+  onToggle,
+}: {
+  state: IComplianceState;
+  openMetric: string;
+  onToggle: (metricName: string) => void;
+}) {
+  const tokens = tokenizeExpression(state.numericExpression);
+  if (tokens === null) return <span>{state.numericExpression}</span>;
+  return tokens.map((token, index) => {
+    const metric = state.metrics.find(({ metricName }) => metricName === token);
+    return metric ? (
+      <Button
+        key={index}
+        size="xs"
+        variant={openMetric === token ? "default" : "primarySoft"}
+        onClick={() => onToggle(token)}
+      >
+        {metric.value ?? "N/A"}
+      </Button>
+    ) : (
+      <span key={index}>{token}</span>
+    );
+  });
+}
+
+function PointRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <>
+      <Separator className="my-1.5" />
+      <div className="flex justify-between gap-6">
+        <span>{label}</span>
+        <span className="flex min-w-0 items-center">{children}</span>
+      </div>
+    </>
+  );
+}
