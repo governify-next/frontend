@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getCurrentUser } from "@/lib/auth/session";
 import { ErrorPage } from "../errors";
+import { bootEnv } from "@/lib/bootConfig";
 
 const data = {
   navItems: [
@@ -48,7 +49,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Governify Next</span>
+                  <span className="truncate font-medium">
+                    {bootEnv.FRONTEND_APP_NAME}
+                  </span>
                   <span className="truncate text-xs">Workspace</span>
                 </div>
               </Link>

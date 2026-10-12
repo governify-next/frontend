@@ -7,7 +7,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { registerInOrganizationAction } from "@/data/auth/actions";
 
-export function RegisterUserForm({ token }: { token: string }) {
+export function RegisterUserForm({
+  token,
+  appName,
+}: {
+  token: string;
+  appName: string;
+}) {
   const router = useRouter();
   const form = useAppForm({
     defaultValues: {
@@ -53,7 +59,7 @@ export function RegisterUserForm({ token }: { token: string }) {
     >
       <FieldGroup className="!gap-6">
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Welcome to Governify</h1>
+          <h1 className="text-2xl font-bold">Welcome to {appName}</h1>
           <p className="text-sm text-balance text-muted-foreground">
             Fill in the form below to create your account
           </p>

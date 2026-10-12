@@ -6,6 +6,7 @@ export const bootEnv = {
   GOV_LOG_LEVEL: process.env.GOV_LOG_LEVEL || "INFO",
   GOV_SERVICE_NAME: process.env.GOV_SERVICE_NAME || "frontend",
   PORT: process.env.PORT || "3000",
+  FRONTEND_APP_NAME: process.env.FRONTEND_APP_NAME?.trim() || "Governify Next",
 
   // Internal service URLs
   AUTHENTICATOR_SERVICE_URL:

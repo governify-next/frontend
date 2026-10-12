@@ -3,6 +3,7 @@ import { GalleryVerticalEnd } from "lucide-react";
 import { RegisterUserForm } from "./register-form";
 import { getOrganizationByInviteToken } from "@/data/organizations/fetch";
 import { ErrorPage } from "@/components/errors";
+import { bootEnv } from "@/lib/bootConfig";
 
 export default async function InvitePage({
   params,
@@ -27,12 +28,12 @@ export default async function InvitePage({
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            Governify Next
+            {bootEnv.FRONTEND_APP_NAME}
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <RegisterUserForm token={token} />
+            <RegisterUserForm token={token} appName={bootEnv.FRONTEND_APP_NAME} />
           </div>
         </div>
       </div>

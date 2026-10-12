@@ -1,6 +1,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { LoginUserForm } from "@/app/login/login-form";
+import { bootEnv } from "@/lib/bootConfig";
 
 export default function LoginPage() {
   return (
@@ -11,7 +12,7 @@ export default function LoginPage() {
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            Governify Next
+            {bootEnv.FRONTEND_APP_NAME}
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
