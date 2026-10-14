@@ -190,7 +190,7 @@ export function TimelineChart({
         boundaryGap: [0, "10%"],
       },
       series: [
-        ...series.map(({ name, data }, index) => ({
+        ...series.map(({ name, data }) => ({
           type: "line",
           name,
           tooltip: { show: false },
@@ -198,7 +198,11 @@ export function TimelineChart({
             value: [time, value],
             symbolSize: consolidated ? 6 : 4,
           })),
-          markLine: index === 0 && {
+        })),
+        {
+          type: "line",
+          data: [],
+          markLine: {
             z: 2,
             silent: true,
             symbol: "none",
@@ -211,7 +215,7 @@ export function TimelineChart({
             },
             data: [{ yAxis: threshold.value }],
           },
-          markArea: index === 0 && {
+          markArea: {
             silent: true,
             data: [
               [
@@ -239,7 +243,7 @@ export function TimelineChart({
               ],
             ],
           },
-        })),
+        },
         {
           type: "line",
           data: [],
