@@ -27,11 +27,13 @@ import {
 export function AgreementHeader({
   orgName,
   range,
+  validity,
   isNavigating,
   startTransition,
 }: {
   orgName: string;
   range: { from: Date; to: Date };
+  validity: { initial: Date; end: Date };
   isNavigating: boolean;
   startTransition: TransitionStartFunction;
 }) {
@@ -70,7 +72,11 @@ export function AgreementHeader({
         />
       </Label>
       <div className="ml-auto flex items-center gap-2">
-        <TimeRangePicker range={range} startTransition={startTransition} />
+        <TimeRangePicker
+          range={range}
+          validity={validity}
+          startTransition={startTransition}
+        />
         <ButtonGroup>
           <Button
             variant="outline"

@@ -7,6 +7,7 @@ import {
   IAgreementVersion,
 } from "@/types/agreement";
 import { Result } from "@/lib/utils/fetcher";
+import { getValidityEnd } from "@/lib/utils/validity";
 import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { AgreementHeader } from "./_components/agreement-header";
 import {
@@ -41,6 +42,10 @@ export function AgreementDetail({
       <AgreementHeader
         orgName={orgName}
         range={range}
+        validity={{
+          initial: new Date(version.contract.validity.initial),
+          end: getValidityEnd(version.contract.validity),
+        }}
         isNavigating={isNavigating}
         startTransition={startTransition}
       />

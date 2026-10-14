@@ -2,7 +2,7 @@
 
 import { TransitionStartFunction, useState } from "react";
 import { useQueryStates } from "nuqs";
-import { endOfDay, format, isValid, parse } from "date-fns";
+import { endOfDay, format, isValid, parse, sub } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { IconChevronDown } from "@tabler/icons-react";
 
@@ -50,9 +50,11 @@ const validateRange = (inputs: { from: string; to: string }) => {
 
 export function TimeRangePicker({
   range,
+  validity,
   startTransition,
 }: {
   range: { from: Date; to: Date };
+  validity: { initial: Date; end: Date };
   startTransition: TransitionStartFunction;
 }) {
   const [{ from, to }, setSearchParams] = useQueryStates(
@@ -68,6 +70,11 @@ export function TimeRangePicker({
   const closeCalendar = () => {
     setCalendarOpen(false);
     if (!selected.to) setSelected(validRange ?? current);
+  };
+
+  const applyRange = (newRange: { from: Date; to: Date }) => {
+    setSearchParams(newRange, { shallow: false, startTransition });
+    setOpen(false);
   };
 
   return (
@@ -158,14 +165,52 @@ export function TimeRangePicker({
           </FieldGroup>
           <Button
             disabled={!validRange}
-            onClick={() => {
-              if (!validRange) return;
-              setSearchParams(validRange, { shallow: false, startTransition });
-              setOpen(false);
-            }}
+            onClick={() => validRange && applyRange(validRange)}
           >
             Apply time range
           </Button>
+        </div>
+        <Separator orientation="vertical" />
+        <div className="flex w-44 flex-col gap-2 pt-1">
+          <PopoverTitle>Quick ranges</PopoverTitle>
+          <div className="relative flex-1">
+            <div className="absolute inset-0 flex flex-col overflow-y-auto">
+              {[
+                { label: "Agreement validity" },
+                { label: "Last 5 minutes", duration: { minutes: 5 } },
+                { label: "Last 15 minutes", duration: { minutes: 15 } },
+                { label: "Last 30 minutes", duration: { minutes: 30 } },
+                { label: "Last 1 hour", duration: { hours: 1 } },
+                { label: "Last 3 hours", duration: { hours: 3 } },
+                { label: "Last 6 hours", duration: { hours: 6 } },
+                { label: "Last 12 hours", duration: { hours: 12 } },
+                { label: "Last 24 hours", duration: { hours: 24 } },
+                { label: "Last 2 days", duration: { days: 2 } },
+                { label: "Last 7 days", duration: { days: 7 } },
+                { label: "Last 30 days", duration: { days: 30 } },
+                { label: "Last 90 days", duration: { days: 90 } },
+                { label: "Last 6 months", duration: { months: 6 } },
+                { label: "Last 1 year", duration: { years: 1 } },
+              ].map(({ label, duration }) => (
+                <Button
+                  key={label}
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start"
+                  onClick={() => {
+                    const now = new Date();
+                    applyRange(
+                      duration
+                        ? { from: sub(now, duration), to: now }
+                        : { from: validity.initial, to: validity.end },
+                    );
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
