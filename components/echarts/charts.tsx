@@ -183,7 +183,12 @@ export function TimelineChart({
           },
         },
       },
-      yAxis: { type: "value" },
+      yAxis: {
+        type: "value",
+        dataMin: threshold.value,
+        dataMax: threshold.value,
+        boundaryGap: [0, "10%"],
+      },
       series: [
         ...series.map(({ name, data }, index) => ({
           type: "line",
