@@ -1,6 +1,13 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactECharts from "echarts-for-react";
 import { format } from "date-fns";
 import { X } from "lucide-react";
@@ -296,7 +303,11 @@ export function TimelineChart({
       />
       {point &&
         (inspecting ? (
-          <EvidencesCard point={point} getState={getState} onClose={onClose} />
+          <EvidencesPopover
+            point={point}
+            getState={getState}
+            onClose={onClose}
+          />
         ) : (
           <PointPopover
             point={point}
@@ -432,7 +443,10 @@ function PointPopover({
   );
 }
 
-function EvidencesCard({
+const TOP_LEGEND_OFFSET = -10;
+const BOTTOM_LEGEND_OFFSET = 43;
+
+function EvidencesPopover({
   point,
   getState,
   onClose,
@@ -443,22 +457,37 @@ function EvidencesCard({
 }) {
   const [result, setResult] = useState<Result<IComplianceState> | null>(null);
   const [openMetric, setOpenMetric] = useState("");
+  const [side, setSide] = useState<"top" | "bottom">("bottom");
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getState(point.stateId).then(setResult);
   }, [point.stateId, getState]);
 
+  useLayoutEffect(() => {
+    if (!anchorRef.current) return;
+    const cardBottom =
+      anchorRef.current.getBoundingClientRect().bottom + // chart bottom position relative to the current window
+      window.scrollY - // sum y scrolled space to transform to the absolute position
+      BOTTOM_LEGEND_OFFSET + // remove the legend space
+      460; // approximate value of the loaded basic card with open metric
+    setSide(
+      cardBottom <= document.documentElement.scrollHeight ? "bottom" : "top",
+    );
+  }, []);
+
   return (
     <Popover open onOpenChange={onClose}>
       <PopoverAnchor
-        className="absolute"
-        style={{ left: point.x, top: "100%" }}
+        ref={anchorRef}
+        className="absolute inset-y-0"
+        style={{ left: point.x }}
       />
       <PopoverContent
-        side="bottom"
+        side={side}
         align="center"
-        sideOffset={-45}
-        collisionPadding={{ left: 16, right: 16, bottom: -1000 }}
+        sideOffset={side === "top" ? TOP_LEGEND_OFFSET : -BOTTOM_LEGEND_OFFSET}
+        collisionPadding={{ left: 16, right: 16, top: -1000, bottom: -1000 }} // padding in top and bottom to avoid flip while scrolling
         onOpenAutoFocus={(event) => event.preventDefault()}
         className="flex w-[32rem] flex-col gap-0 p-0"
       >
