@@ -1,5 +1,8 @@
 export type ComplianceStatus =
-  "COMPLIANT" | "NON_COMPLIANT" | "INDETERMINATE" | "PENDING";
+  | "COMPLIANT"
+  | "NON_COMPLIANT"
+  | "INDETERMINATE"
+  | "PENDING";
 
 export interface ICompliancePoint {
   time: string;
@@ -36,10 +39,12 @@ export interface IComplianceState {
 
 export type IComplianceData = Record<string, IGuaranteeCompliance>;
 
-export type IComplianceTimelinePoint = Pick<
+export type IComplianceChartPoint = Pick<
   ICompliancePoint,
-  "time" | "value" | "consolidated" | "stateId"
-> & {
+  "time" | "value" | "consolidated" | "stateId" | "complianceStatus"
+>;
+
+export type IComplianceChartFocusedPoint = IComplianceChartPoint & {
   x: number;
   y: number;
   label: string;

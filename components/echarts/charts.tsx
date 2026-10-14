@@ -37,10 +37,15 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { geistSans } from "@/lib/fonts";
 import type { Result } from "@/lib/utils/fetcher";
-import { DATE_TIME_FORMAT, tokenizeExpression } from "@/lib/utils/formatter";
+import {
+  DATE_TIME_FORMAT,
+  formatComplianceStatus,
+  tokenizeExpression,
+} from "@/lib/utils/formatter";
 import type {
+  IComplianceChartFocusedPoint,
+  IComplianceChartPoint,
   IComplianceState,
-  IComplianceTimelinePoint,
 } from "@/types/compliance";
 import {
   complianceColor,
@@ -116,21 +121,13 @@ export function TimelineChart({
   threshold,
   getState,
 }: {
-  series: {
-    name: string;
-    data: {
-      time: string;
-      value: number;
-      consolidated: boolean;
-      stateId: string;
-    }[];
-  }[];
+  series: { name: string; data: IComplianceChartPoint[] }[];
   range: { from: Date; to: Date };
   validity: { initial: Date; end: Date };
   threshold: { value: number; comparator: string };
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
-  const [point, setPoint] = useState<IComplianceTimelinePoint | null>(null);
+  const [point, setPoint] = useState<IComplianceChartFocusedPoint | null>(null);
   const [inspecting, setInspecting] = useState(false);
   const inspectedTime = inspecting && point ? point.time : null;
   const inspectedColor = inspecting ? point?.color : undefined;
@@ -382,7 +379,7 @@ function PointPopover({
   onClose,
   onInspect,
 }: {
-  point: IComplianceTimelinePoint;
+  point: IComplianceChartFocusedPoint;
   onClose: () => void;
   onInspect: () => void;
 }) {
@@ -418,6 +415,9 @@ function PointPopover({
           )}
         </div>
         <PointRow label="Value">{point.value}</PointRow>
+        <PointRow label="Status">
+          {formatComplianceStatus(point.complianceStatus)}
+        </PointRow>
         <PointRow label="Type">
           {point.consolidated ? "Consolidated" : "Evolutive"}
         </PointRow>
@@ -451,7 +451,7 @@ function EvidencesPopover({
   getState,
   onClose,
 }: {
-  point: IComplianceTimelinePoint;
+  point: IComplianceChartFocusedPoint;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
   onClose: () => void;
 }) {
@@ -597,11 +597,7 @@ function EvidencesPopover({
                     : "muted"
               }
             >
-              {result.data.complianceStatus.charAt(0) +
-                result.data.complianceStatus
-                  .slice(1)
-                  .toLowerCase()
-                  .replace("_", " ")}
+              {formatComplianceStatus(result.data.complianceStatus)}
             </Badge>
           )}
         </div>

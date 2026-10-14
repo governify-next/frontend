@@ -1,3 +1,5 @@
+import type { ComplianceStatus } from "@/types/compliance";
+
 export const DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 export const avatarFallback = (text: string) => {
@@ -21,6 +23,9 @@ export const formatReadableDate = (
     timeZoneName: timeZone ? "short" : undefined,
   }).format(new Date(date));
 };
+
+export const formatComplianceStatus = (status: ComplianceStatus) =>
+  status.charAt(0) + status.slice(1).toLowerCase().replace("_", " ");
 
 export const breakOnUnderscore = (text: string) =>
   text.replaceAll("_", "_\u200B");
