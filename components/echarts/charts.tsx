@@ -67,7 +67,6 @@ export function ComplianceGauge({
 }) {
   return (
     <ReactECharts
-      theme={THEME}
       style={{ height: 150 }}
       option={{
         series: [
@@ -293,7 +292,7 @@ export function TimelineChart({
   return (
     <div className="relative h-full">
       <ReactECharts
-        theme={THEME}
+        theme={THEME.timeline}
         style={{ height: "100%", minHeight: 250 }}
         onEvents={onEvents}
         option={option}
@@ -327,7 +326,7 @@ export function SignatureComplianceChart({
 }) {
   return (
     <ReactECharts
-      theme={THEME}
+      theme={THEME.compliance}
       style={{ height: Math.max(150, rows.length * 70 + 60) }}
       option={{
         legend: legendBase,
@@ -352,7 +351,9 @@ export function SignatureComplianceChart({
           min: 0,
           max: 100,
           interval: 5,
-          axisLabel: { formatter: (value: number) => `${value.toFixed(1)}%` },
+          axisLabel: {
+            formatter: (value: number) => `${value.toFixed(1)}%`,
+          },
         },
         yAxis: { type: "category", data: rows.map(({ label }) => label) },
         series: [
