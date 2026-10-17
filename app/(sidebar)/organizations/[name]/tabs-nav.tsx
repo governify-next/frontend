@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils/cn";
 
 export function OrganizationTabsNav({
   orgName,
@@ -57,7 +58,10 @@ export function OrganizationTabsNav({
 
   return (
     <Tabs value={active} className="w-full">
-      <TabsList variant="line" className="gap-6">
+      <TabsList
+        variant="line"
+        className="w-full gap-2 @3xl/main:w-fit @3xl/main:gap-6"
+      >
         {baseTabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
@@ -67,7 +71,13 @@ export function OrganizationTabsNav({
           >
             <Link href={tab.href}>
               <tab.icon />
-              {tab.label}
+              <span
+                className={cn(
+                  tab.value !== active && "sr-only @3xl/main:not-sr-only",
+                )}
+              >
+                {tab.label}
+              </span>
             </Link>
           </TabsTrigger>
         ))}

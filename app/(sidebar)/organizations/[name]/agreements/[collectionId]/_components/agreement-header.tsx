@@ -52,34 +52,42 @@ export function AgreementHeader({
   }, [refresh, isNavigating, router, startTransition]);
 
   return (
-    <div className="-mx-4 flex flex-wrap items-center gap-2 bg-background px-4 pt-2 pb-4 md:sticky md:top-0 md:z-10 lg:-mx-6 lg:px-6">
-      <Button variant="outline" asChild>
-        <Link href={`/organizations/${orgName}/agreements`}>
-          <ChevronLeft />
-          <span className="sr-only @xl/main:not-sr-only">
-            Back to agreements
-          </span>
-        </Link>
-      </Button>
-      <Label className={buttonVariants({ variant: "outline" })}>
-        Evolutive points
-        <Switch
-          checked={showEvolutivePoints}
-          disabled={isNavigating}
-          onCheckedChange={(checked) =>
-            setSearchParams({ showEvolutivePoints: checked })
-          }
-        />
-      </Label>
-      <div className="ml-auto flex items-center gap-2">
+    <div className="-mx-4 flex flex-col gap-2 bg-background px-4 pt-2 pb-4 sticky top-0 z-10 lg:-mx-6 lg:px-6 @2xl/main:flex-row @2xl/main:flex-wrap @2xl/main:items-center">
+      <div className="flex gap-2">
+        <Button variant="outline" asChild>
+          <Link href={`/organizations/${orgName}/agreements`}>
+            <ChevronLeft />
+            <span className="@2xl/main:sr-only @5xl/main:not-sr-only">
+              Back to agreements
+            </span>
+          </Link>
+        </Button>
+        <Label
+          className={buttonVariants({
+            variant: "outline",
+            className: "flex-1 @2xl/main:flex-none",
+          })}
+        >
+          Evolutive points
+          <Switch
+            checked={showEvolutivePoints}
+            disabled={isNavigating}
+            onCheckedChange={(checked) =>
+              setSearchParams({ showEvolutivePoints: checked })
+            }
+          />
+        </Label>
+      </div>
+      <div className="flex flex-col gap-2 @2xl/main:ml-auto @2xl/main:flex-row @2xl/main:items-center">
         <TimeRangePicker
           range={range}
           validity={validity}
           startTransition={startTransition}
         />
-        <ButtonGroup>
+        <ButtonGroup className="w-full @2xl/main:w-fit">
           <Button
             variant="outline"
+            className="flex-1"
             disabled={isNavigating}
             onClick={() => startTransition(() => router.refresh())}
           >

@@ -160,12 +160,12 @@ export function AgreementVersionInfo({
   return (
     <>
       <Card className="pt-0">
-        <CardHeader className="flex items-center justify-between border-b bg-muted/50 pt-4 pb-4! ">
+        <CardHeader className="grid grid-cols-[auto_auto] items-center justify-between gap-2 border-b bg-muted/50 pt-4 pb-4! @3xl/main:flex">
           <div className="flex items-center gap-2">
-            <CardTitle className="hidden @4xl/main:inline">Viewing</CardTitle>
+            <CardTitle className="hidden @5xl/main:inline">Viewing</CardTitle>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="grow">
                   Version {version.versionNumber}
                   {isActive && <Badge variant="secondary">Active</Badge>}
                   <IconChevronDown />
@@ -207,9 +207,9 @@ export function AgreementVersionInfo({
               of {collection.agreementVersions.length}
             </CardTitle>
           </div>
-          <div className="flex flex-col gap-2 @xl/main:flex-row @xl/main:items-center">
+          <div className="contents @3xl/main:flex @3xl/main:items-center @3xl/main:gap-2">
             {enabledToggle && (
-              <div className="items-center gap-2 hidden @3xl/main:flex">
+              <div className="items-center gap-2 hidden @5xl/main:flex">
                 <span
                   className={cn(
                     "size-1.5 rounded-full",
@@ -230,19 +230,28 @@ export function AgreementVersionInfo({
             )}
             {enabledToggle &&
               calculationState === CalculationState.NO_TASKS && (
-                <Button variant="outline" onClick={() => handleToggle(true)}>
+                <Button
+                  variant="outline"
+                  className="col-start-2"
+                  onClick={() => handleToggle(true)}
+                >
                   <CalendarSync />
                   Start tracking
                 </Button>
               )}
             {enableRunningOptions && (
-              <Button variant="outline" onClick={() => handleToggle(false)}>
+              <Button
+                variant="outline"
+                className="col-start-2"
+                onClick={() => handleToggle(false)}
+              >
                 <IconRepeatOff />
                 Stop tracking
               </Button>
             )}
             <Button
               variant="outline"
+              className="col-start-2"
               onClick={() => setOpenFetchStatesDialog(true)}
             >
               <PlayIcon />
@@ -251,6 +260,7 @@ export function AgreementVersionInfo({
             {isActive && (
               <Button
                 variant="destructive"
+                className="col-start-1 row-start-2"
                 onClick={() => setOpenTerminateDialog(true)}
               >
                 <PowerOff className="size-4" />
@@ -332,11 +342,11 @@ function AgreementVersionDetails({ version }: { version: IAgreementVersion }) {
           <span className="text-xs font-medium uppercase text-muted-foreground">
             Validity
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start gap-1 @md/main:flex-row @md/main:items-center @md/main:gap-2">
             <span>
               {formatReadableDate(validity.initial, validity.timezone)}
             </span>
-            <ArrowRight className="size-4 text-muted-foreground" />
+            <ArrowRight className="size-4 rotate-90 text-muted-foreground @md/main:rotate-0" />
             <span>{formatReadableDate(validity.end, validity.timezone)}</span>
           </div>
           <div className="flex items-center gap-1">

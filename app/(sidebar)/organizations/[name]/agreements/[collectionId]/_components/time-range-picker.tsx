@@ -24,19 +24,22 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays } from "lucide-react";
-import { DATE_TIME_FORMAT } from "@/lib/utils/formatter";
+import {
+  COMPACT_DATE_TIME_FORMAT,
+  EXPAND_DATE_TIME_FORMAT,
+} from "@/lib/utils/formatter";
 import { agreementVersionSearchParams } from "../search-params";
 
-const INVALID_DATE_ERROR = `Invalid date, use ${DATE_TIME_FORMAT}`;
+const INVALID_DATE_ERROR = `Invalid date, use ${EXPAND_DATE_TIME_FORMAT}`;
 
 const formatRange = (range: { from: Date; to: Date }) => ({
-  from: format(range.from, DATE_TIME_FORMAT),
-  to: format(range.to, DATE_TIME_FORMAT),
+  from: format(range.from, EXPAND_DATE_TIME_FORMAT),
+  to: format(range.to, EXPAND_DATE_TIME_FORMAT),
 });
 
 const validateRange = (inputs: { from: string; to: string }) => {
-  const from = parse(inputs.from, DATE_TIME_FORMAT, new Date());
-  const to = parse(inputs.to, DATE_TIME_FORMAT, new Date());
+  const from = parse(inputs.from, EXPAND_DATE_TIME_FORMAT, new Date());
+  const to = parse(inputs.to, EXPAND_DATE_TIME_FORMAT, new Date());
   const errors = {
     from: !isValid(from)
       ? INVALID_DATE_ERROR
@@ -92,12 +95,22 @@ export function TimeRangePicker({
     >
       <PopoverTrigger asChild>
         <Button variant="outline">
-          {format(current.from, DATE_TIME_FORMAT)} to{" "}
-          {format(current.to, DATE_TIME_FORMAT)}
+          <span className="hidden @2xl/main:inline @4xl/main:hidden">
+            {format(current.from, COMPACT_DATE_TIME_FORMAT)} to{" "}
+            {format(current.to, COMPACT_DATE_TIME_FORMAT)}
+          </span>
+          <span className="@2xl/main:hidden @4xl/main:inline">
+            {format(current.from, EXPAND_DATE_TIME_FORMAT)} to{" "}
+            {format(current.to, EXPAND_DATE_TIME_FORMAT)}
+          </span>
           <IconChevronDown />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-auto flex-row">
+      <PopoverContent
+        align="end"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        className="max-h-(--radix-popover-content-available-height) w-72 max-w-[calc(100vw-2rem)] overflow-y-auto lg:w-auto lg:max-w-none lg:flex-row"
+      >
         {calendarOpen && (
           <>
             <Calendar
@@ -117,12 +130,15 @@ export function TimeRangePicker({
                 }
               }}
               defaultMonth={selected.to}
-              className="p-0"
+              className="p-0 max-lg:self-center"
             />
-            <Separator orientation="vertical" />
+            <Separator
+              orientation="vertical"
+              className="max-lg:h-px max-lg:w-full!"
+            />
           </>
         )}
-        <div className="flex w-72 flex-col justify-between gap-4 pt-1">
+        <div className="flex w-full flex-col justify-between gap-4 pt-1 lg:w-72">
           <PopoverTitle>Absolute time range</PopoverTitle>
           <FieldGroup className="gap-4">
             {(
@@ -170,11 +186,14 @@ export function TimeRangePicker({
             Apply time range
           </Button>
         </div>
-        <Separator orientation="vertical" />
-        <div className="flex w-44 flex-col gap-2 pt-1">
+        <Separator
+          orientation="vertical"
+          className="max-lg:h-px max-lg:w-full!"
+        />
+        <div className="flex w-full flex-col gap-2 pt-1 lg:w-44">
           <PopoverTitle>Quick ranges</PopoverTitle>
-          <div className="relative flex-1">
-            <div className="absolute inset-0 flex flex-col overflow-y-auto">
+          <div className="lg:relative lg:flex-1">
+            <div className="flex max-h-36 flex-col overflow-y-auto lg:absolute lg:inset-0 lg:max-h-none">
               {[
                 { label: "Agreement validity" },
                 { label: "Last 5 minutes", duration: { minutes: 5 } },

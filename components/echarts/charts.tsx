@@ -35,10 +35,12 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { geistSans } from "@/lib/fonts";
 import type { Result } from "@/lib/utils/fetcher";
 import {
-  DATE_TIME_FORMAT,
+  breakOnUnderscore,
+  EXPAND_DATE_TIME_FORMAT,
   formatComplianceStatus,
   tokenizeExpression,
 } from "@/lib/utils/formatter";
@@ -179,6 +181,7 @@ export function TimelineChart({
         splitLine: { show: true },
         axisTick: { show: false },
         axisLabel: {
+          hideOverlap: true,
           formatter: {
             day: "{MM}/{dd}",
             hour: "{HH}:{mm}",
@@ -271,7 +274,7 @@ export function TimelineChart({
                 name,
                 value,
               }: DefaultLabelFormatterCallbackParams) =>
-                `<div class="[text-align-last:justify]">${format(value as Date, DATE_TIME_FORMAT)}</div><div class="my-1.5 border-t"></div><div class="text-center">${name}</div>`,
+                `<div class="[text-align-last:justify]">${format(value as Date, EXPAND_DATE_TIME_FORMAT)}</div><div class="my-1.5 border-t"></div><div class="text-center">${name}</div>`,
             },
             data: [
               { xAxis: validity.initial, name: "Agreement start" },
@@ -350,10 +353,8 @@ export function SignatureComplianceChart({
           type: "value",
           min: 0,
           max: 100,
-          interval: 5,
-          axisLabel: {
-            formatter: (value: number) => `${value.toFixed(1)}%`,
-          },
+          interval: 10,
+          axisLabel: { hideOverlap: true, formatter: "{value}%" },
         },
         yAxis: { type: "category", data: rows.map(({ label }) => label) },
         series: [
@@ -384,6 +385,8 @@ function PointPopover({
   onClose: () => void;
   onInspect: () => void;
 }) {
+  const isMobile = useIsMobile();
+
   return (
     <Popover open onOpenChange={() => point.pinned && onClose()}>
       <PopoverAnchor
@@ -391,17 +394,18 @@ function PointPopover({
         style={{ left: point.x, top: point.y }}
       />
       <PopoverContent
-        side="right"
-        align="start"
+        side={isMobile ? "bottom" : "right"}
+        align={isMobile ? "center" : "start"}
         sideOffset={20}
-        alignOffset={20}
+        alignOffset={isMobile ? 0 : 20}
+        collisionPadding={16}
         sticky="always"
         onOpenAutoFocus={(event) => event.preventDefault()}
         className="w-60 gap-0 p-3"
       >
         <div className="flex items-center gap-1">
           <span className="flex-1 [text-align-last:justify]">
-            {format(new Date(point.time), DATE_TIME_FORMAT)}
+            {format(new Date(point.time), EXPAND_DATE_TIME_FORMAT)}
           </span>
           {point.pinned && (
             <Button
@@ -490,7 +494,7 @@ function EvidencesPopover({
         sideOffset={side === "top" ? TOP_LEGEND_OFFSET : -BOTTOM_LEGEND_OFFSET}
         collisionPadding={{ left: 16, right: 16, top: -1000, bottom: -1000 }} // padding in top and bottom to avoid flip while scrolling
         onOpenAutoFocus={(event) => event.preventDefault()}
-        className="flex w-[32rem] flex-col gap-0 p-0"
+        className="flex w-[min(32rem,calc(100vw-2rem))] flex-col gap-0 p-0"
       >
         <PopoverHeader className="border-b px-3 py-2">
           <div className="flex items-center justify-between gap-3">
@@ -506,7 +510,7 @@ function EvidencesPopover({
           </div>
           <div className="flex items-center justify-between gap-3">
             <PopoverDescription className="shrink-0">
-              {format(new Date(point.time), DATE_TIME_FORMAT)}
+              {format(new Date(point.time), EXPAND_DATE_TIME_FORMAT)}
             </PopoverDescription>
             {result?.ok && (
               <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
@@ -545,7 +549,9 @@ function EvidencesPopover({
                   value={metric.metricName}
                 >
                   <AccordionTrigger className="items-center gap-2 py-2">
-                    <span className="flex-1 truncate">{metric.metricName}</span>
+                    <span className="flex-1">
+                      {breakOnUnderscore(metric.metricName)}
+                    </span>
                     <Badge variant="secondary">
                       {metric.value ?? metric.status}
                     </Badge>
