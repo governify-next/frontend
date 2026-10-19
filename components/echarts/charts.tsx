@@ -10,7 +10,7 @@ import {
 } from "react";
 import ReactECharts from "echarts-for-react";
 import { format } from "date-fns";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, ExternalLink, X } from "lucide-react";
 import type {
   DefaultLabelFormatterCallbackParams,
   ECElementEvent,
@@ -626,14 +626,42 @@ function EvidencesPopover({
                         No evidences for this metric
                       </span>
                     ) : (
-                      metric.evidences.map((evidence, index) => (
-                        <div key={index} className="flex flex-col gap-1">
-                          <span>{index + 1}.</span>
-                          <pre className="rounded-md bg-muted p-2 font-mono text-xs break-all whitespace-pre-wrap">
-                            {JSON.stringify(evidence, null, 2)}
-                          </pre>
-                        </div>
-                      ))
+                      metric.evidences.map((evidence, index) => {
+                        // TODO: may require changes to handle other type of evidences
+                        const { url, content } = evidence as {
+                          url?: string;
+                          content?: { url?: string };
+                        };
+                        const href = url ?? content?.url;
+                        return (
+                          <div key={index} className="flex flex-col gap-1">
+                            <div className="flex items-baseline gap-2">
+                              <span>{index + 1}.</span>
+                              {href && (
+                                <Button
+                                  asChild
+                                  variant="link"
+                                  size="xs"
+                                  className="h-auto p-0"
+                                >
+                                  <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={`Open ${href}`}
+                                  >
+                                    Open URL
+                                    <ExternalLink />
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                            <pre className="rounded-md bg-muted p-2 font-mono text-xs break-all whitespace-pre-wrap">
+                              {JSON.stringify(evidence, null, 2)}
+                            </pre>
+                          </div>
+                        );
+                      })
                     )}
                   </AccordionContent>
                 </AccordionItem>
