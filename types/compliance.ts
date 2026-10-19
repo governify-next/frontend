@@ -44,10 +44,18 @@ export type IComplianceChartPoint = Pick<
   "time" | "value" | "consolidated" | "stateId" | "complianceStatus"
 >;
 
-export type IComplianceChartFocusedPoint = IComplianceChartPoint & {
+export type IComplianceChartFocusedPoint = Omit<
+  IComplianceChartPoint,
+  "stateId"
+> & {
   x: number;
   y: number;
+  members: IComplianceChartMember[];
+  pinned: boolean;
+};
+
+export type IComplianceChartMember = {
   label: string;
   color: string;
-  pinned: boolean;
+  stateId: string;
 };

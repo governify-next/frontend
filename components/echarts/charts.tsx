@@ -10,7 +10,7 @@ import {
 } from "react";
 import ReactECharts from "echarts-for-react";
 import { format } from "date-fns";
-import { X } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
 import type {
   DefaultLabelFormatterCallbackParams,
   ECElementEvent,
@@ -37,6 +37,7 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { geistSans } from "@/lib/fonts";
+import { cn } from "@/lib/utils/cn";
 import type { Result } from "@/lib/utils/fetcher";
 import {
   breakOnUnderscore,
@@ -46,6 +47,7 @@ import {
 } from "@/lib/utils/formatter";
 import type {
   IComplianceChartFocusedPoint,
+  IComplianceChartMember,
   IComplianceChartPoint,
   IComplianceState,
 } from "@/types/compliance";
@@ -129,9 +131,12 @@ export function TimelineChart({
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
 }) {
   const [point, setPoint] = useState<IComplianceChartFocusedPoint | null>(null);
-  const [inspecting, setInspecting] = useState(false);
-  const inspectedTime = inspecting && point ? point.time : null;
-  const inspectedColor = inspecting ? point?.color : undefined;
+  const [inspected, setInspected] = useState<IComplianceChartMember | null>(
+    null,
+  );
+  const legendSelected = useRef<Record<string, boolean>>({});
+  const inspectedTime = inspected && point ? point.time : null;
+  const inspectedColor = inspected?.color;
 
   const onEvents = useMemo(() => {
     const toPoint = (
@@ -140,19 +145,34 @@ export function TimelineChart({
       pinned: boolean,
     ) => {
       if (params.componentType !== "series") return null;
-      const { name: label, data } = series[params.seriesIndex ?? 0];
-      const item = data[params.dataIndex];
+      const { time, value, consolidated, complianceStatus } =
+        series[params.seriesIndex ?? 0].data[params.dataIndex];
       const [x, y] = chart.convertToPixel({ seriesIndex: params.seriesIndex }, [
-        item.time,
-        item.value,
+        time,
+        value,
       ]);
       return {
         x,
         y,
-        label,
-        color: params.color as string,
-        ...item,
+        time,
+        value,
+        consolidated,
+        complianceStatus,
         pinned,
+        members: series.flatMap(({ name, data }, seriesIndex) => {
+          const match =
+            legendSelected.current[name] !== false &&
+            data.find((item) => item.time === time && item.value === value);
+          return match
+            ? [
+                {
+                  label: name,
+                  color: chart.getVisual({ seriesIndex }, "color") as string,
+                  stateId: match.stateId,
+                },
+              ]
+            : [];
+        }),
       };
     };
     return {
@@ -162,8 +182,15 @@ export function TimelineChart({
       },
       mouseout: () => setPoint((current) => (current?.pinned ? current : null)),
       click: (params: ECElementEvent, chart: EChartsType) => {
-        setInspecting(false);
+        setInspected(null);
         setPoint(toPoint(params, chart, true));
+      },
+      legendselectchanged: ({
+        selected,
+      }: {
+        selected: Record<string, boolean>;
+      }) => {
+        legendSelected.current = selected;
       },
     };
   }, [series]);
@@ -288,7 +315,7 @@ export function TimelineChart({
   );
 
   const onClose = () => {
-    setInspecting(false);
+    setInspected(null);
     setPoint(null);
   };
 
@@ -301,9 +328,10 @@ export function TimelineChart({
         option={option}
       />
       {point &&
-        (inspecting ? (
+        (inspected ? (
           <EvidencesPopover
             point={point}
+            member={inspected}
             getState={getState}
             onClose={onClose}
           />
@@ -311,7 +339,7 @@ export function TimelineChart({
           <PointPopover
             point={point}
             onClose={onClose}
-            onInspect={() => setInspecting(true)}
+            onInspect={setInspected}
           />
         ))}
     </div>
@@ -383,7 +411,7 @@ function PointPopover({
 }: {
   point: IComplianceChartFocusedPoint;
   onClose: () => void;
-  onInspect: () => void;
+  onInspect: (member: IComplianceChartMember) => void;
 }) {
   const isMobile = useIsMobile();
 
@@ -426,23 +454,53 @@ function PointPopover({
         <PointRow label="Type">
           {point.consolidated ? "Consolidated" : "Evolutive"}
         </PointRow>
-        <PointRow label="Signature">
-          <span
-            className="mr-1 size-2.5 shrink-0 rounded-full"
-            style={{ backgroundColor: point.color }}
-          />
-          <span className="truncate" title={point.label}>
-            {point.label}
-          </span>
-        </PointRow>
-        {point.pinned && (
-          <>
-            <Separator className="my-1.5" />
-            <Button variant="primarySoft" size="sm" onClick={onInspect}>
-              Show evidences
-            </Button>
-          </>
-        )}
+        <Separator className="my-1.5" />
+        {point.pinned
+          ? point.members.map((member) => (
+              <Button
+                key={member.stateId}
+                variant="ghost"
+                size="sm"
+                aria-label={`Show evidences for ${member.label}`}
+                className="-mx-1.5 h-7 px-1.5 font-normal"
+                onClick={() => onInspect(member)}
+              >
+                <span
+                  className="size-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: member.color }}
+                />
+                <span
+                  className="flex-1 truncate text-left"
+                  title={member.label}
+                >
+                  {member.label}
+                </span>
+                <span
+                  className={cn(
+                    "text-muted-foreground",
+                    !isMobile &&
+                      "opacity-0 group-hover/button:opacity-100 group-focus-visible/button:opacity-100",
+                  )}
+                >
+                  Evidences
+                </span>
+                <ChevronRight className="text-muted-foreground" />
+              </Button>
+            ))
+          : point.members.map((member) => (
+              <div
+                key={member.stateId}
+                className="flex h-7 min-w-0 items-center justify-center gap-1"
+              >
+                <span
+                  className="size-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: member.color }}
+                />
+                <span className="truncate" title={member.label}>
+                  {member.label}
+                </span>
+              </div>
+            ))}
       </PopoverContent>
     </Popover>
   );
@@ -453,10 +511,12 @@ const BOTTOM_LEGEND_OFFSET = 43;
 
 function EvidencesPopover({
   point,
+  member,
   getState,
   onClose,
 }: {
   point: IComplianceChartFocusedPoint;
+  member: IComplianceChartMember;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
   onClose: () => void;
 }) {
@@ -466,8 +526,8 @@ function EvidencesPopover({
   const anchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getState(point.stateId).then(setResult);
-  }, [point.stateId, getState]);
+    getState(member.stateId).then(setResult);
+  }, [member.stateId, getState]);
 
   useLayoutEffect(() => {
     if (!anchorRef.current) return;
@@ -585,10 +645,10 @@ function EvidencesPopover({
           <div className="flex min-w-0 items-center gap-2">
             <span
               className="size-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: point.color }}
+              style={{ backgroundColor: member.color }}
             />
-            <span className="truncate" title={point.label}>
-              {point.label}
+            <span className="truncate" title={member.label}>
+              {member.label}
             </span>
             <span className="shrink-0 text-muted-foreground">
               {point.consolidated ? "Consolidated" : "Evolutive"}
