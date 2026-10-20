@@ -78,6 +78,7 @@ export function TimelineChart({
   const [inspected, setInspected] = useState<IComplianceChartMember | null>(
     null,
   );
+  const [brushing, setBrushing] = useState(false);
   const legendSelected = useRef<Record<string, boolean>>({});
   const inspectedTime = inspected && point ? point.time : null;
   const inspectedColor = inspected?.color;
@@ -279,7 +280,20 @@ export function TimelineChart({
   };
 
   return (
-    <div className="relative h-full">
+    <div
+      className={cn(
+        "relative h-full",
+        brushing
+          ? "[&_[style*='cursor:_crosshair']]:cursor-zoom-in!"
+          : "[&_[style*='cursor:_crosshair']]:cursor-default!",
+      )}
+      onPointerDown={() =>
+        window.addEventListener("pointerup", () => setBrushing(false), {
+          once: true,
+        })
+      }
+      onPointerMove={(event) => event.buttons === 1 && setBrushing(true)}
+    >
       <ReactECharts
         theme={THEME.timeline}
         style={{ height: "100%", minHeight: 250 }}
