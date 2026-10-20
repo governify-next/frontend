@@ -1,8 +1,14 @@
 "use client";
 
+import { useState, useTransition } from "react";
+
 import { Button } from "@/components/ui/button";
-import { useAppForm } from "@/components/form";
-import { FieldGroup } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DateRangeInputs,
+  validateDateRange,
+} from "@/components/date/date-range-inputs";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   Dialog,
   DialogClose,
@@ -12,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { fetchStatesFormSchema } from "@/schemas/agreement";
+import { Spinner } from "@/components/ui/spinner";
 
 export function ManualStatesDialog({
   open,
@@ -27,29 +33,24 @@ export function ManualStatesDialog({
     replaceExisting: boolean;
   }) => Promise<boolean>;
 }) {
-  const form = useAppForm({
-    defaultValues: {
-      startDate: null as Date | null,
-      endDate: null as Date | null,
-      replaceExisting: false,
-    },
-    validators: {
-      onSubmit: fetchStatesFormSchema,
-    },
-    onSubmit: async ({ value }) => {
-      const success = await onGenerate({
-        startDate: value.startDate as Date,
-        endDate: value.endDate as Date,
-        replaceExisting: value.replaceExisting,
-      });
-      if (success) {
-        form.reset();
-        onOpenChange(false);
-      }
-    },
+  const [inputs, setInputs] = useState({ from: "", to: "" });
+  const [replaceExisting, setReplaceExisting] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const { range, errors } = validateDateRange(inputs, {
+    disableFuture: true,
   });
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setInputs({ from: "", to: "" });
+      setReplaceExisting(false);
+    }
+    onOpenChange(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Track a past period</DialogTitle>
@@ -59,39 +60,49 @@ export function ManualStatesDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="fetch-states-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup className="gap-4">
-            <div className="flex flex-col gap-3">
-              <form.AppField name="startDate">
-                {(field) => <field.DatePickerField label="Start Date" />}
-              </form.AppField>
-
-              <form.AppField name="endDate">
-                {(field) => <field.DatePickerField label="End Date" />}
-              </form.AppField>
-            </div>
-
-            <form.AppField name="replaceExisting">
-              {(field) => <field.CheckboxField label="Replace existing data" />}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+        <FieldGroup className="gap-4">
+          <DateRangeInputs
+            id="manual-states"
+            value={inputs}
+            errors={errors}
+            onChange={setInputs}
+            disableFuture
+          />
+          <Field orientation="horizontal">
+            <Checkbox
+              id="manual-states-replace-existing"
+              checked={replaceExisting}
+              onCheckedChange={(checked) =>
+                setReplaceExisting(checked === true)
+              }
+            />
+            <FieldLabel htmlFor="manual-states-replace-existing">
+              Replace existing data
+            </FieldLabel>
+          </Field>
+        </FieldGroup>
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" onClick={() => form.reset()}>
-              Cancel
-            </Button>
+            <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <form.AppForm>
-            <form.SubmitButton label="Run" formId="fetch-states-form" />
-          </form.AppForm>
+          <Button
+            disabled={!range || isPending}
+            onClick={() =>
+              range &&
+              startTransition(async () => {
+                const success = await onGenerate({
+                  startDate: range.from,
+                  endDate: range.to,
+                  replaceExisting,
+                });
+                if (success) handleOpenChange(false);
+              })
+            }
+          >
+            {isPending && <Spinner />}
+            Run
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
