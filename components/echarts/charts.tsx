@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import ReactECharts from "echarts-for-react";
-import { format } from "date-fns";
+import { format, roundToNearestMinutes } from "date-fns";
 import { ChevronRight, ExternalLink, X } from "lucide-react";
 import type {
   DefaultLabelFormatterCallbackParams,
@@ -123,12 +123,14 @@ export function TimelineChart({
   validity,
   threshold,
   getState,
+  onZoom,
 }: {
   series: { name: string; data: IComplianceChartPoint[] }[];
   range: { from: Date; to: Date };
   validity: { initial: Date; end: Date };
   threshold: { value: number; comparator: string };
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   const [point, setPoint] = useState<IComplianceChartFocusedPoint | null>(null);
   const [inspected, setInspected] = useState<IComplianceChartMember | null>(
@@ -192,14 +194,29 @@ export function TimelineChart({
       }) => {
         legendSelected.current = selected;
       },
+      brushEnd: (
+        { areas }: { areas: { coordRange: [number, number] }[] },
+        chart: EChartsType,
+      ) => {
+        chart.dispatchAction({ type: "brush", areas: [] });
+        const zoomed = areas[0]?.coordRange;
+        if (!zoomed) return;
+        const [from, to] = zoomed.map((time) => roundToNearestMinutes(time));
+        if (from.getTime() === to.getTime()) return; // from = to prohibited
+        setInspected(null);
+        setPoint(null);
+        onZoom({ from, to });
+      },
     };
-  }, [series]);
+  }, [series, onZoom]);
 
   const option = useMemo(
     () => ({
       legend: legendBase,
       tooltip: tooltipBase,
       grid: gridBase,
+      brush: { xAxisIndex: 0, brushType: "lineX" },
+      toolbox: { show: false },
       xAxis: {
         type: "time",
         min: range.from,
@@ -325,6 +342,13 @@ export function TimelineChart({
         theme={THEME.timeline}
         style={{ height: "100%", minHeight: 250 }}
         onEvents={onEvents}
+        onChartReady={(chart) =>
+          chart.dispatchAction({
+            type: "takeGlobalCursor",
+            key: "brush",
+            brushOption: {},
+          })
+        }
         option={option}
       />
       {point &&

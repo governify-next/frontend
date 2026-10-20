@@ -50,6 +50,7 @@ export function AgreementVersionSignatures({
   range,
   compliance,
   getState,
+  onZoom,
 }: {
   groupedSignatures: Map<string, ISignature[]>;
   timezone: string;
@@ -58,6 +59,7 @@ export function AgreementVersionSignatures({
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   return (
     <Accordion type="single" collapsible>
@@ -91,6 +93,7 @@ export function AgreementVersionSignatures({
                 range={range}
                 compliance={compliance}
                 getState={getState}
+                onZoom={onZoom}
               />
             </AccordionContent>
           </AccordionItem>
@@ -110,6 +113,7 @@ function GuaranteeDetails({
   range,
   compliance,
   getState,
+  onZoom,
 }: {
   signatures: ISignature[];
   guaranteeName: string;
@@ -120,6 +124,7 @@ function GuaranteeDetails({
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [metricsOpen, setMetricsOpen] = useState(false);
@@ -143,6 +148,7 @@ function GuaranteeDetails({
         range={range}
         compliance={compliance}
         getState={getState}
+        onZoom={onZoom}
       />
       <SignatureMetrics
         signatures={signatures}

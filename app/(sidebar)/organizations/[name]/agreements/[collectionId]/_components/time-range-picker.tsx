@@ -94,12 +94,12 @@ export function TimeRangePicker({
       }}
     >
       <PopoverTrigger asChild>
-        <Button variant="outline">
-          <span className="hidden @2xl/main:inline @4xl/main:hidden">
+        <Button variant="outline" className="flex-1">
+          <span className="@4xl/main:hidden">
             {format(current.from, COMPACT_DATE_TIME_FORMAT)} to{" "}
             {format(current.to, COMPACT_DATE_TIME_FORMAT)}
           </span>
-          <span className="@2xl/main:hidden @4xl/main:inline">
+          <span className="hidden @4xl/main:inline">
             {format(current.from, EXPAND_DATE_TIME_FORMAT)} to{" "}
             {format(current.to, EXPAND_DATE_TIME_FORMAT)}
           </span>

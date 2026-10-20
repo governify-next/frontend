@@ -62,6 +62,7 @@ export function AgreementVersionInfo({
   compliance,
   getState,
   startTransition,
+  onZoom,
 }: {
   collection: IAgreementCollection;
   version: IAgreementVersion;
@@ -72,6 +73,7 @@ export function AgreementVersionInfo({
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
   startTransition: TransitionStartFunction;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   const router = useRouter();
   const [, setSearchParams] = useQueryStates(agreementVersionSearchParams);
@@ -302,6 +304,7 @@ export function AgreementVersionInfo({
               range={range}
               compliance={compliance}
               getState={getState}
+              onZoom={onZoom}
             />
           </CardContent>
         </div>

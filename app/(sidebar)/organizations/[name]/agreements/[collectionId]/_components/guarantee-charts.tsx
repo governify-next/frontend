@@ -24,6 +24,7 @@ export function GuaranteeCharts({
   range,
   compliance,
   getState,
+  onZoom,
 }: {
   signatures: ISignature[];
   guaranteeName: string;
@@ -32,6 +33,7 @@ export function GuaranteeCharts({
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   return (
     <div>
@@ -56,6 +58,7 @@ export function GuaranteeCharts({
           range={range}
           compliance={compliance}
           getState={getState}
+          onZoom={onZoom}
         />
       </Suspense>
     </div>
@@ -69,6 +72,7 @@ function ComplianceCharts({
   range,
   compliance,
   getState,
+  onZoom,
 }: {
   signatures: ISignature[];
   guaranteeName: string;
@@ -76,6 +80,7 @@ function ComplianceCharts({
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  onZoom: (range: { from: Date; to: Date }) => void;
 }) {
   const result = use(compliance);
   const [{ showEvolutivePoints }] = useQueryStates(
@@ -123,6 +128,7 @@ function ComplianceCharts({
           <CardContent className="flex-1">
             <TimelineChart
               getState={getState}
+              onZoom={onZoom}
               range={range}
               validity={validity}
               threshold={{
