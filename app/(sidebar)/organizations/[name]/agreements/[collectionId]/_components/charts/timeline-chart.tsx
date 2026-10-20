@@ -36,7 +36,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { geistSans } from "@/lib/fonts";
+import {
+  complianceColor,
+  gridBase,
+  legendBase,
+  PALETTE,
+  THEME,
+  tooltipBase,
+} from "@/lib/echarts";
 import { cn } from "@/lib/utils/cn";
 import type { Result } from "@/lib/utils/fetcher";
 import {
@@ -45,77 +52,12 @@ import {
   formatComplianceStatus,
   tokenizeExpression,
 } from "@/lib/utils/formatter";
+import type { IComplianceState } from "@/types/compliance";
 import type {
   IComplianceChartFocusedPoint,
   IComplianceChartMember,
   IComplianceChartPoint,
-  IComplianceState,
-} from "@/types/compliance";
-import {
-  complianceColor,
-  gaugeBase,
-  gaugeGradient,
-  gridBase,
-  legendBase,
-  PALETTE,
-  THEME,
-  tooltipBase,
-} from "./config";
-
-export function ComplianceGauge({
-  value,
-  label,
-}: {
-  value: number | null;
-  label: string;
-}) {
-  return (
-    <ReactECharts
-      style={{ height: 150 }}
-      option={{
-        series: [
-          {
-            ...gaugeBase,
-            radius: "92%",
-            axisLine: {
-              lineStyle: { width: 15, color: [[1, PALETTE.gray]] },
-            },
-            progress: {
-              show: true,
-              width: 15,
-              itemStyle: { color: gaugeGradient((value ?? 0) / 100) },
-            },
-            detail: {
-              offsetCenter: [0, 0],
-              fontSize: 22,
-              fontFamily: geistSans.style.fontFamily,
-              formatter: () =>
-                value === null ? "N/A" : `${value.toFixed(1)}%`,
-            },
-            title: {
-              offsetCenter: [0, "40%"],
-              fontSize: 12,
-              fontFamily: geistSans.style.fontFamily,
-            },
-            data: [{ value, name: label }],
-          },
-          {
-            ...gaugeBase,
-            radius: "99%",
-            axisLine: { show: false },
-            progress: {
-              show: true,
-              width: 4,
-              itemStyle: { color: gaugeGradient(1) },
-            },
-            detail: { show: false },
-            data: [{ value: 100 }],
-          },
-        ],
-      }}
-    />
-  );
-}
+} from "@/types/echarts.types";
 
 export function TimelineChart({
   series,
@@ -369,65 +311,6 @@ export function TimelineChart({
     </div>
   );
 }
-
-export function SignatureComplianceChart({
-  rows,
-}: {
-  rows: {
-    label: string;
-    allTime: number | null;
-    selectedPeriod: number | null;
-  }[];
-}) {
-  return (
-    <ReactECharts
-      theme={THEME.compliance}
-      style={{ height: Math.max(150, rows.length * 70 + 60) }}
-      option={{
-        legend: legendBase,
-        grid: gridBase,
-        tooltip: {
-          ...tooltipBase,
-          trigger: "axis",
-          axisPointer: { type: "shadow" },
-          formatter: (params: DefaultLabelFormatterCallbackParams[]) => {
-            const { label, allTime, selectedPeriod } =
-              rows[params[0].dataIndex];
-            return `<div class="text-center">${label}</div><div class="my-1.5 border-t"></div>${params
-              .map(({ marker, seriesName, seriesIndex }) => {
-                const value = [allTime, selectedPeriod][seriesIndex ?? 0];
-                return `<div class="flex justify-between gap-6"><span>${marker}${seriesName}</span><span class="font-medium">${value === null ? "N/A" : `${value.toFixed(1)}%`}</span></div>`;
-              })
-              .join("")}`;
-          },
-        },
-        xAxis: {
-          type: "value",
-          min: 0,
-          max: 100,
-          interval: 10,
-          axisLabel: { hideOverlap: true, formatter: "{value}%" },
-        },
-        yAxis: { type: "category", data: rows.map(({ label }) => label) },
-        series: [
-          {
-            type: "bar",
-            name: "All time",
-            barMinHeight: 3,
-            data: rows.map(({ allTime }) => allTime),
-          },
-          {
-            type: "bar",
-            name: "Selected period",
-            barMinHeight: 3,
-            data: rows.map(({ selectedPeriod }) => selectedPeriod),
-          },
-        ],
-      }}
-    />
-  );
-}
-
 function PointPopover({
   point,
   onClose,

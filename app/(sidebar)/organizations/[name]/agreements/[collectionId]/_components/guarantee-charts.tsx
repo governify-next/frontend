@@ -3,11 +3,6 @@
 import { Suspense, use } from "react";
 import { useQueryStates } from "nuqs";
 
-import {
-  ComplianceGauge,
-  SignatureComplianceChart,
-  TimelineChart,
-} from "@/components/echarts/charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ISignature } from "@/types/agreement";
@@ -15,6 +10,9 @@ import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { Spinner } from "@/components/ui/spinner";
 import { Result } from "@/lib/utils/fetcher";
 import { agreementVersionSearchParams } from "../search-params";
+import { ComplianceGauge } from "./charts/compliance-gauge";
+import { SignatureComplianceChart } from "./charts/signature-compliance-chart";
+import { TimelineChart } from "./charts/timeline-chart";
 
 export function GuaranteeCharts({
   signatures,
