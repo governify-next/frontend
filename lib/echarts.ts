@@ -1,7 +1,17 @@
-import { color } from "echarts";
-import "echarts/theme/tech-blue.js";
+import { color, registerTheme } from "echarts";
 
-export const THEME = "tech-blue";
+export const THEME = { compliance: "compliance", timeline: "timeline" };
+
+registerTheme(THEME.compliance, {
+  color: ["#4d4d4d", "#3a5897"],
+  tooltip: {
+    axisPointer: { shadowStyle: { color: "rgba(200, 200, 200, 0.3)" } },
+  },
+});
+
+registerTheme(THEME.timeline, {
+  color: ["#3d8fe8", "#8a3fbf", "#e08bc0", "#c0508f", "#6fb3e8", "#008ea8"],
+});
 
 export const PALETTE = {
   red: "#d53d3a",
