@@ -1,13 +1,12 @@
 "use client";
 
-import { ChevronsUpDown, LogOut, UserPen } from "lucide-react";
+import { EllipsisVertical, LogOut } from "lucide-react";
 import { logoutAction } from "@/data/auth/actions";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -44,7 +43,7 @@ export function NavUser({ user }: { user: IBasicUserInfo }) {
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <EllipsisVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -53,7 +52,7 @@ export function NavUser({ user }: { user: IBasicUserInfo }) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
+            <DropdownMenuLabel className="p-0 font-normal text-foreground">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
@@ -67,13 +66,6 @@ export function NavUser({ user }: { user: IBasicUserInfo }) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserPen />
-                Account
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <form action={logoutAction}>
               <DropdownMenuItem asChild>

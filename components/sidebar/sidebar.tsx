@@ -3,7 +3,7 @@ import { SystemRole } from "@/types/user.types";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Suspense } from "react";
-import { Building2, Command, Users } from "lucide-react";
+import { Command, LayoutGrid, Users } from "lucide-react";
 
 import { NavItems } from "@/components/sidebar/nav-items";
 import { NavUser } from "@/components/sidebar/nav-user";
@@ -25,13 +25,13 @@ const data = {
     {
       title: "Organizations",
       url: "/organizations",
-      icon: Building2,
+      icon: <LayoutGrid />,
       roles: [SystemRole.USER, SystemRole.ADMIN, SystemRole.SUPERADMIN],
     },
     {
       title: "Users",
       url: "/users",
-      icon: Users,
+      icon: <Users />,
       roles: [SystemRole.ADMIN, SystemRole.SUPERADMIN],
     },
   ],
@@ -39,7 +39,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
