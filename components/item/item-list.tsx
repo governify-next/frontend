@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { ItemGroup } from "@/components/ui/item";
 import { cn } from "@/lib/utils/cn";
-import { DataTablePagination } from "@/components/data-table/pagination";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Pagination } from "@/types/pagination";
 import { usePaginationParams } from "@/hooks/use-pagination-params";
 
@@ -19,11 +19,13 @@ export function ItemList<T>({
   renderItem,
   className,
   pagination,
+  itemLabel,
 }: {
   data: T[];
   renderItem: (item: T) => React.ReactNode;
   className?: string;
   pagination?: Pagination;
+  itemLabel?: string;
 }) {
   const isManualPagination = pagination !== undefined;
   const {
@@ -46,6 +48,7 @@ export function ItemList<T>({
       ? {
           manualPagination: true,
           pageCount,
+          rowCount: pagination.totalItems,
           state: { pagination: state },
           onPaginationChange: handlePaginationChange,
         }
@@ -68,7 +71,7 @@ export function ItemList<T>({
           </div>
         )}
       </ItemGroup>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} itemLabel={itemLabel} />
     </div>
   );
 }

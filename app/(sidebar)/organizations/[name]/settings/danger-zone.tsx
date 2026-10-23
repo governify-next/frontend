@@ -49,7 +49,7 @@ export function DangerZone({ orgName }: { orgName: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ItemGroup className="gap-0">
+          <ItemGroup>
             <Item variant="outline">
               <ItemContent>
                 <ItemTitle>Delete this organization</ItemTitle>

@@ -37,6 +37,7 @@ export function OrganizationsList({
       className="w-full"
       data={organizations}
       pagination={pagination}
+      itemLabel="organizations"
       renderItem={(org) => {
         const title = org.displayName || org.name;
         return (

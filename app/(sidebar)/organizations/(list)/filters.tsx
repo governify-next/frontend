@@ -1,111 +1,59 @@
 "use client";
 
-import { useState } from "react";
-import { ButtonGroup } from "@/components/ui/button-group";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { IconSearch } from "@tabler/icons-react";
-import { FilterDropdown } from "@/components/filter/dropdown";
-import { useQueryStates } from "nuqs";
+import { debounce, useQueryStates } from "nuqs";
 import {
   ORGANIZATION_FIELDS,
   OrganizationField,
   organizationSearchParams,
 } from "./search-params";
-import { FilterSummary } from "@/components/filter/summary";
 
-export function OrganizationFilters({
-  totalItems,
-  applied,
-}: {
-  totalItems?: number;
-  applied: { q: string; field: OrganizationField };
-}) {
+export function OrganizationFilters() {
   const [{ q, field }, setParams] = useQueryStates(organizationSearchParams, {
     shallow: false,
   });
-  const [draft, setDraft] = useState(q);
-
-  const submitSearch = () => setParams({ q: draft || null, page: 1 });
-
-  const clearFilters = () => {
-    setDraft("");
-    setParams({ q: null, field: "both", page: 1 });
-  };
-
-  const getMaxLength = (field: OrganizationField) => {
-    if (field === ORGANIZATION_FIELDS[0]) return 100;
-    return 200;
-  };
 
   return (
-    <div className="flex min-w-0 flex-col gap-3">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitSearch();
-        }}
-        className="flex items-center gap-2"
-      >
-        <ButtonGroup className="w-100 min-w-0">
-          <InputGroup>
-            <InputGroupInput
-              placeholder="Search organizations..."
-              value={draft}
-              onChange={(e) =>
-                setDraft(e.target.value.slice(0, getMaxLength(field)))
-              }
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                type="submit"
-                size="icon-xs"
-                aria-label="Search"
-              >
-                <IconSearch />
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
-        </ButtonGroup>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <InputGroup className="min-w-0 sm:max-w-sm">
+        <InputGroupAddon>
+          <IconSearch />
+        </InputGroupAddon>
+        <InputGroupInput
+          placeholder="Search organizations"
+          maxLength={100}
+          value={q}
+          onChange={(e) =>
+            setParams(
+              { q: e.target.value || null, page: 1 },
+              {
+                limitUrlUpdates: e.target.value ? debounce(300) : undefined,
+              },
+            )
+          }
+        />
+      </InputGroup>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterDropdown
-            label="Type"
-            contentClassName="w-56"
-            value={field}
-            options={[
-              { value: ORGANIZATION_FIELDS[2], label: "Name or Display Name" },
-              { value: ORGANIZATION_FIELDS[3], label: "Name and Display Name" },
-              { value: ORGANIZATION_FIELDS[0], label: "Name" },
-              { value: ORGANIZATION_FIELDS[1], label: "Display Name" },
-            ]}
-            onSelect={(value) => {
-              const nextField = value as OrganizationField;
-              setDraft(draft.slice(0, getMaxLength(nextField)));
-              setParams({
-                q: q ? q.slice(0, getMaxLength(nextField)) : null,
-                field: nextField,
-                page: 1,
-              });
-            }}
-          />
-        </div>
-      </form>
-      <FilterSummary
-        totalItems={totalItems}
-        items={[
-          applied.q && {
-            label: "matching",
-            value: applied.q,
-            at: applied.field,
-          },
-        ]}
-        onClear={clearFilters}
-      />
+      <ToggleGroup
+        type="single"
+        value={field}
+        onValueChange={(value) => {
+          if (!value) return;
+          setParams({ field: value as OrganizationField, page: 1 });
+        }}
+      >
+        <ToggleGroupItem value={ORGANIZATION_FIELDS[0]}>Name</ToggleGroupItem>
+        <ToggleGroupItem value={ORGANIZATION_FIELDS[1]}>
+          Display name
+        </ToggleGroupItem>
+        <ToggleGroupItem value={ORGANIZATION_FIELDS[2]}>Both</ToggleGroupItem>
+      </ToggleGroup>
     </div>
   );
 }

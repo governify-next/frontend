@@ -85,6 +85,7 @@ export function MembersList({
       <ItemList
         className="w-full"
         data={members}
+        itemLabel="members"
         renderItem={(member) => {
           const username = member.userId.username;
           return (

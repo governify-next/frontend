@@ -25,6 +25,7 @@ export function AgreementsList({
     <ItemList
       className="w-full"
       data={collections}
+      itemLabel="agreements"
       renderItem={(collection) => {
         const title = collection.displayName || collection.name;
         const hasVersions = collection.agreementVersions.length > 0;

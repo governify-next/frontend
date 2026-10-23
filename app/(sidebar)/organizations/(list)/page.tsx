@@ -1,8 +1,6 @@
 import { PageShell } from "@/components/page-shell";
-import {
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
+import { PageHeader } from "@/components/page-header";
+import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { SystemRole } from "@/types/user.types";
 import { getCurrentUser } from "@/lib/auth/session";
 import { searchOrganizations } from "@/data/organizations/fetch";
@@ -35,12 +33,7 @@ export default async function OrganizationsPage({
   if (q) {
     if (field === "name") filters.name = q;
     else if (field === "displayName") filters.displayName = q;
-    else if (field === "and") {
-      filters.name = q;
-      filters.displayName = q;
-    } else {
-      filters.nameOrDisplayName = q;
-    }
+    else filters.nameOrDisplayName = q;
   }
 
   const user = userResult.data;
@@ -67,18 +60,19 @@ export default async function OrganizationsPage({
         </BreadcrumbItem>
       }
     >
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        <div className="flex items-start justify-between gap-2">
-          <OrganizationFilters
-            totalItems={pagination.totalItems}
-            applied={{ q, field }}
-          />
-          {isAdmin && <OrganizationsAdminActions />}
-        </div>
-        <OrganizationsList
-          organizations={organizations}
-          pagination={pagination}
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <PageHeader
+          title="Organizations"
+          description="Browse organizations and and choose one to see its details."
+          actions={isAdmin && <OrganizationsAdminActions />}
         />
+        <div className="flex flex-col gap-4">
+          <OrganizationFilters />
+          <OrganizationsList
+            organizations={organizations}
+            pagination={pagination}
+          />
+        </div>
       </div>
     </PageShell>
   );
