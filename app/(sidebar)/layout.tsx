@@ -16,7 +16,9 @@ export default function SidebarLayout({
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset className="h-svh overflow-hidden md:peer-data-[variant=inset]:h-[calc(100svh-(--spacing(4)))]">
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }
