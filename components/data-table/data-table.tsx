@@ -26,10 +26,12 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   pagination,
+  itemLabel,
 }: {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: Pagination;
+  itemLabel?: string;
 }) {
   const isManualPagination = pagination !== undefined;
   const {
@@ -52,6 +54,7 @@ export function DataTable<TData, TValue>({
       ? {
           manualPagination: true,
           pageCount,
+          rowCount: pagination.totalItems,
           state: { pagination: state },
           onPaginationChange: handlePaginationChange,
         }
@@ -112,7 +115,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} itemLabel={itemLabel} />
     </div>
   );
 }

@@ -333,7 +333,12 @@ export function UsersTable({
           </Button>
         }
       />
-      <DataTable columns={tableColumns} data={users} pagination={pagination} />
+      <DataTable
+        columns={tableColumns}
+        data={users}
+        pagination={pagination}
+        itemLabel="users"
+      />
       <ConfirmDialog
         open={userToDelete !== null}
         onOpenChange={() => {
