@@ -15,7 +15,7 @@ export default function SidebarLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar />
+      <AppSidebar variant="inset" />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );
