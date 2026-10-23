@@ -1,20 +1,32 @@
 "use client";
 import Link from "next/link";
-import { Building2, ChevronRight, SearchX, Users } from "lucide-react";
+import {
+  Building2,
+  FolderTree,
+  Network,
+  SearchX,
+  Shield,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import {
   Item,
-  ItemActions,
   ItemContent,
   ItemDescription,
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ItemList } from "@/components/item/item-list";
-import { LinkPendingIcon } from "@/components/link-pending-icon";
 import { IOrganization } from "@/types/organization";
 import { Pagination } from "@/types/pagination";
+import { pluralize } from "@/lib/utils/formatter";
+import { cn } from "@/lib/utils/cn";
 
 const getInitials = (label: string) =>
   label
@@ -24,6 +36,32 @@ const getInitials = (label: string) =>
     .map((w) => w[0])
     .join("")
     .toUpperCase();
+
+function OrganizationQuickInfo({
+  icon: Icon,
+  iconClassName,
+  count,
+  label,
+}: {
+  icon: LucideIcon;
+  iconClassName: string;
+  count: number;
+  label: string;
+}) {
+  const description = pluralize(count, label);
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="flex items-center gap-1">
+          <Icon className={cn("size-3.5", iconClassName)} />
+          <span aria-hidden>{count}</span>
+          <span className="sr-only">{description}</span>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{description}</TooltipContent>
+    </Tooltip>
+  );
+}
 
 export function OrganizationsList({
   organizations,
@@ -57,36 +95,42 @@ export function OrganizationsList({
       renderItem={(org) => {
         const title = org.displayName || org.name;
         return (
-          <Item variant="outline">
-            <ItemMedia>
-              <Avatar>
-                <AvatarFallback>{getInitials(title)}</AvatarFallback>
-              </Avatar>
-            </ItemMedia>
-            <ItemContent className="min-w-0">
-              <ItemTitle>{title}</ItemTitle>
-              {org.description && (
-                <ItemDescription className="break-words">
-                  {org.description}
-                </ItemDescription>
-              )}
-            </ItemContent>
-            <ItemActions>
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Users className="size-3.5" />
-                {org.members} members
-              </span>
-              <Button variant="ghost" size="icon" asChild>
-                <Link
-                  href={`/organizations/${org.name}`}
-                  aria-label={`View ${title}`}
-                >
-                  <LinkPendingIcon>
-                    <ChevronRight />
-                  </LinkPendingIcon>
-                </Link>
-              </Button>
-            </ItemActions>
+          <Item variant="outline" asChild>
+            <Link href={`/organizations/${org.name}`}>
+              <ItemMedia>
+                <Avatar>
+                  <AvatarFallback>{getInitials(title)}</AvatarFallback>
+                </Avatar>
+              </ItemMedia>
+              <ItemContent className="min-w-0">
+                <ItemTitle>{title}</ItemTitle>
+                {org.description && (
+                  <ItemDescription className="break-words">
+                    {org.description}
+                  </ItemDescription>
+                )}
+              </ItemContent>
+              <div className="hidden grid-cols-[repeat(3,3rem)] items-center text-xs text-muted-foreground tabular-nums @3xl/main:grid">
+                <OrganizationQuickInfo
+                  icon={Users}
+                  iconClassName="text-sky"
+                  count={org.members}
+                  label="member"
+                />
+                <OrganizationQuickInfo
+                  icon={Shield}
+                  iconClassName="text-violet"
+                  count={org.roles.length}
+                  label="role"
+                />
+                <OrganizationQuickInfo
+                  icon={Network}
+                  iconClassName="text-amber"
+                  count={org.scopes}
+                  label="scope"
+                />
+              </div>
+            </Link>
           </Item>
         );
       }}

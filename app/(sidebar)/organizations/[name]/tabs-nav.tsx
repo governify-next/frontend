@@ -3,8 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FileSignature,
-  FolderTree,
   House,
+  Network,
   Settings,
   ShieldCheck,
   Users,
@@ -28,7 +28,7 @@ export function OrganizationTabsNav({
       value: "scopes",
       label: "Scopes",
       href: `${base}/scopes`,
-      icon: FolderTree,
+      icon: Network,
     },
     {
       value: "agreements",
@@ -38,8 +38,18 @@ export function OrganizationTabsNav({
     },
   ];
   const adminTabs = [
-    { value: "members", label: "Members", href: `${base}/members`, icon: Users },
-    { value: "roles", label: "Roles", href: `${base}/roles`, icon: ShieldCheck },
+    {
+      value: "members",
+      label: "Members",
+      href: `${base}/members`,
+      icon: Users,
+    },
+    {
+      value: "roles",
+      label: "Roles",
+      href: `${base}/roles`,
+      icon: ShieldCheck,
+    },
     {
       value: "settings",
       label: "Settings",

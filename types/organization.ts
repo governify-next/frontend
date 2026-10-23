@@ -4,6 +4,7 @@ export interface IOrganization {
   description: string;
   roles: IRole[];
   members: number;
+  scopes: number;
   createdBy: string;
 }
 
