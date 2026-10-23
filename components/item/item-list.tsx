@@ -8,6 +8,13 @@ import {
   OnChangeFn,
 } from "@tanstack/react-table";
 import { ItemGroup } from "@/components/ui/item";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { cn } from "@/lib/utils/cn";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Pagination } from "@/types/pagination";
@@ -20,12 +27,14 @@ export function ItemList<T>({
   className,
   pagination,
   itemLabel,
+  empty = { title: "No results" },
 }: {
   data: T[];
   renderItem: (item: T) => React.ReactNode;
   className?: string;
   pagination?: Pagination;
   itemLabel?: string;
+  empty?: { icon?: React.ReactNode; title: string; description?: string };
 }) {
   const isManualPagination = pagination !== undefined;
   const {
@@ -66,12 +75,22 @@ export function ItemList<T>({
             <Fragment key={row.id}>{renderItem(row.original as T)}</Fragment>
           ))
         ) : (
-          <div className="flex h-24 items-center justify-center rounded-md border text-sm text-muted-foreground">
-            No results.
-          </div>
+          <Empty className="border">
+            <EmptyHeader>
+              {empty.icon && (
+                <EmptyMedia variant="icon">{empty.icon}</EmptyMedia>
+              )}
+              <EmptyTitle>{empty.title}</EmptyTitle>
+              {empty.description && (
+                <EmptyDescription>{empty.description}</EmptyDescription>
+              )}
+            </EmptyHeader>
+          </Empty>
         )}
       </ItemGroup>
-      <DataTablePagination table={table} itemLabel={itemLabel} />
+      {table.getRowCount() > 0 && (
+        <DataTablePagination table={table} itemLabel={itemLabel} />
+      )}
     </div>
   );
 }

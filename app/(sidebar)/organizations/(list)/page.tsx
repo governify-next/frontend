@@ -71,6 +71,7 @@ export default async function OrganizationsPage({
           <OrganizationsList
             organizations={organizations}
             pagination={pagination}
+            query={q}
           />
         </div>
       </div>

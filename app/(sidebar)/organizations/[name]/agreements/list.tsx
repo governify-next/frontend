@@ -26,6 +26,11 @@ export function AgreementsList({
       className="w-full"
       data={collections}
       itemLabel="agreements"
+      empty={{
+        icon: <FileText />,
+        title: "No agreements yet",
+        description: "Agreements of this organization will appear here.",
+      }}
       renderItem={(collection) => {
         const title = collection.displayName || collection.name;
         const hasVersions = collection.agreementVersions.length > 0;

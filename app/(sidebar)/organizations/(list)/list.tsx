@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ChevronRight, Users } from "lucide-react";
+import { Building2, ChevronRight, SearchX, Users } from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -28,9 +28,11 @@ const getInitials = (label: string) =>
 export function OrganizationsList({
   organizations,
   pagination,
+  query,
 }: {
   organizations: IOrganization[];
   pagination: Pagination;
+  query: string;
 }) {
   return (
     <ItemList
@@ -38,6 +40,20 @@ export function OrganizationsList({
       data={organizations}
       pagination={pagination}
       itemLabel="organizations"
+      empty={
+        query
+          ? {
+              icon: <SearchX />,
+              title: "No organizations found",
+              description: `No organizations match "${query}". Try a different search.`,
+            }
+          : {
+              icon: <Building2 />,
+              title: "No organizations yet",
+              description:
+                "Organizations you belong to or can manage will appear here.",
+            }
+      }
       renderItem={(org) => {
         const title = org.displayName || org.name;
         return (
