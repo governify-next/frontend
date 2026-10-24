@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageShell } from "@/components/page-shell";
+import { Page } from "@/components/page/page";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -48,7 +48,7 @@ export default async function OrganizationLayout({
   const isAdmin = adminResult.data.isAdmin;
 
   return (
-    <PageShell
+    <Page
       breadcrumb={
         <>
           <BreadcrumbItem className="hidden md:block">
@@ -65,6 +65,6 @@ export default async function OrganizationLayout({
     >
       <OrganizationTabsNav orgName={name} isAdmin={isAdmin} />
       {children}
-    </PageShell>
+    </Page>
   );
 }

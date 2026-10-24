@@ -5,13 +5,11 @@ import {
   IUserInfo,
   IUserPayload,
   UserStatus,
-  ICreateIUserPayload,
   IBasicUserInfo,
 } from "@/types/user.types";
 import { DataTable } from "@/components/data-table/data-table";
 import { useState } from "react";
 import {
-  createUser,
   deleteUser,
   deleteUserSessions,
   updateUser,
@@ -30,14 +28,10 @@ import {
   IconCheck,
   IconChevronDown,
   IconDotsVertical,
-  IconPlus,
 } from "@tabler/icons-react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
-import { UsersFilters } from "./filters";
-import { AppliedUserFilters } from "./search-params";
-import { CreateUserDialog } from "./add-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pagination } from "@/types/pagination";
@@ -240,12 +234,10 @@ export function UsersTable({
   users,
   pagination,
   currentUser,
-  appliedFilters,
 }: {
   users: IUserInfo[];
   pagination?: Pagination;
   currentUser: IBasicUserInfo;
-  appliedFilters: AppliedUserFilters;
 }) {
   const router = useRouter();
 
@@ -253,7 +245,6 @@ export function UsersTable({
   const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<IUserInfo | null>(null);
-  const [createOpen, setCreateOpen] = useState(false);
 
   const handleUserChange = async (userId: string, payload: IUserPayload) => {
     const result = await updateUser(userId, payload);
@@ -265,20 +256,6 @@ export function UsersTable({
 
     router.refresh();
     toast.success(updateMessage(payload));
-
-    return true;
-  };
-
-  const handleUserCreate = async (payload: ICreateIUserPayload) => {
-    const result = await createUser(payload);
-
-    if (!result.ok) {
-      toast.error(result.error);
-      return false;
-    }
-
-    router.refresh();
-    toast.success(`User created.`);
 
     return true;
   };
@@ -322,17 +299,7 @@ export function UsersTable({
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <UsersFilters
-        totalItems={pagination?.totalItems}
-        applied={appliedFilters}
-        action={
-          <Button type="button" onClick={() => setCreateOpen(true)}>
-            <IconPlus />
-            Add user
-          </Button>
-        }
-      />
+    <>
       <DataTable
         columns={tableColumns}
         data={users}
@@ -364,12 +331,6 @@ export function UsersTable({
           onUserChange={handleUserChange}
         />
       )}
-      <CreateUserDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onCreate={handleUserCreate}
-        currentUserRole={currentUser.systemRole}
-      />
-    </div>
+    </>
   );
 }

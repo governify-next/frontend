@@ -40,8 +40,6 @@ export type ICreateIUserPayload = Pick<
 
 export type UserSearchFilters = {
   usernameOrEmail?: string;
-  username?: string;
-  email?: string;
   status?: UserStatus;
   systemRole?: SystemRole;
 };

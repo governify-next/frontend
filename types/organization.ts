@@ -32,7 +32,5 @@ export interface IRole {
 export type IRolePayload = Pick<IRole, "name" | "description">;
 
 export interface IOrganizationSearchFilters {
-  name?: string;
-  displayName?: string;
   nameOrDisplayName?: string;
 }

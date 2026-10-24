@@ -1,13 +1,7 @@
-import { PageShell } from "@/components/page-shell";
-import { PageHeader } from "@/components/page-header";
-import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { SystemRole } from "@/types/user.types";
-import { getCurrentUser } from "@/lib/auth/session";
 import { searchOrganizations } from "@/data/organizations/fetch";
-import { OrganizationsList } from "./list";
-import { OrganizationsAdminActions } from "./admin-actions";
+import { OrganizationsList } from "./_components/list";
 import { ErrorPage } from "@/components/errors";
-import { OrganizationFilters } from "./filters";
+import { OrganizationFilters } from "./_components/filters";
 import { IOrganizationSearchFilters } from "@/types/organization";
 import { SearchParams } from "nuqs/server";
 import { loadOrganizationSearchParamas } from "./search-params";
@@ -17,29 +11,11 @@ export default async function OrganizationsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const userResult = await getCurrentUser();
-  if (!userResult.ok) {
-    return (
-      <ErrorPage
-        result={userResult}
-        message="Something went wrong while fetching current user."
-      />
-    );
-  }
-  const { page, limit, q, field } =
-    await loadOrganizationSearchParamas(searchParams);
+  const { page, limit, q } = await loadOrganizationSearchParamas(searchParams);
   const filters: IOrganizationSearchFilters = {};
 
-  if (q) {
-    if (field === "name") filters.name = q;
-    else if (field === "displayName") filters.displayName = q;
-    else filters.nameOrDisplayName = q;
-  }
+  if (q) filters.nameOrDisplayName = q;
 
-  const user = userResult.data;
-  const isAdmin =
-    user!.systemRole === SystemRole.ADMIN ||
-    user!.systemRole === SystemRole.SUPERADMIN;
   const result = await searchOrganizations(page, limit, filters);
   if (!result.ok) {
     return (
@@ -49,32 +25,15 @@ export default async function OrganizationsPage({
       />
     );
   }
-  const organizations = result.data;
-  const pagination = result.pagination!;
 
   return (
-    <PageShell
-      breadcrumb={
-        <BreadcrumbItem>
-          <BreadcrumbPage>Organizations</BreadcrumbPage>
-        </BreadcrumbItem>
-      }
-    >
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <PageHeader
-          title="Organizations"
-          description="Browse organizations and and choose one to see its details."
-          actions={isAdmin && <OrganizationsAdminActions />}
-        />
-        <div className="flex flex-col gap-4">
-          <OrganizationFilters />
-          <OrganizationsList
-            organizations={organizations}
-            pagination={pagination}
-            query={q}
-          />
-        </div>
-      </div>
-    </PageShell>
+    <>
+      <OrganizationFilters />
+      <OrganizationsList
+        organizations={result.data}
+        pagination={result.pagination!}
+        query={q}
+      />
+    </>
   );
 }
