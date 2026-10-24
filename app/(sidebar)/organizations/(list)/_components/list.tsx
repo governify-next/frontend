@@ -97,7 +97,7 @@ export function OrganizationsList({
         return (
           <Item variant="outline" asChild>
             <Link href={`/organizations/${org.name}`}>
-              <ItemMedia>
+              <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
                 <Avatar>
                   <AvatarFallback>{getInitials(title)}</AvatarFallback>
                 </Avatar>
