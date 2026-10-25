@@ -1,4 +1,4 @@
-import * as z from "zod";
+import { IconAt, IconMail } from "@tabler/icons-react";
 import { useAppForm } from "@/components/form";
 import {
   ICreateIUserPayload,
@@ -7,6 +7,7 @@ import {
 } from "@/types/user.types";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -16,25 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters.")
-    .max(50, "Username must be at most 50 characters."),
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters.")
-    .max(30, "Name must be at most 30 characters."),
-  surname: z
-    .string()
-    .min(2, "Surname must be at least 2 characters.")
-    .max(50, "Surname must be at most 50 characters."),
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long."),
-  systemRole: z.enum(SystemRole),
-  status: z.enum(UserStatus),
-});
+import { assignableRoleOptions } from "@/lib/utils/roles";
+import { userFormSchema } from "@/schemas/user";
 
 export function CreateUserDialog({
   open,
@@ -47,11 +31,6 @@ export function CreateUserDialog({
   onCreate: (payload: ICreateIUserPayload) => Promise<boolean>;
   currentUserRole: SystemRole;
 }) {
-  const systemRoleOptions =
-    currentUserRole === SystemRole.SUPERADMIN
-      ? Object.values(SystemRole)
-      : [SystemRole.ADMIN, SystemRole.USER];
-
   const form = useAppForm({
     defaultValues: {
       username: "",
@@ -63,7 +42,7 @@ export function CreateUserDialog({
       status: UserStatus.ACTIVE,
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: userFormSchema,
     },
     onSubmit: async ({ value }) => {
       const success = await onCreate(value);
@@ -76,62 +55,85 @@ export function CreateUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add user</DialogTitle>
           <DialogDescription>
-            Fill in the details to create a new user. Click create when
-            you&apos;re done.
+            Create a new account and choose what it can access.
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="create-user-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup className="gap-3">
-            <form.AppField name="username">
-              {(field) => <field.TextField label="Username" autoFocus />}
-            </form.AppField>
+        <DialogBody>
+          <form
+            id="create-user-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
+                <form.AppField name="name">
+                  {(field) => <field.TextField label="Name" autoFocus />}
+                </form.AppField>
 
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" />}
-            </form.AppField>
+                <form.AppField name="surname">
+                  {(field) => <field.TextField label="Surname" />}
+                </form.AppField>
+              </div>
 
-            <form.AppField name="surname">
-              {(field) => <field.TextField label="Surname" />}
-            </form.AppField>
+              <form.AppField name="username">
+                {(field) => (
+                  <field.TextField
+                    label="Username"
+                    icon={<IconAt />}
+                    placeholder="johndoe"
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="email">
-              {(field) => <field.TextField label="Email" type="email" />}
-            </form.AppField>
+              <form.AppField name="email">
+                {(field) => (
+                  <field.TextField
+                    label="Email"
+                    type="email"
+                    icon={<IconMail />}
+                    placeholder="johndoe@example.com"
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="password">
-              {(field) => <field.TextField label="Password" type="off" />}
-            </form.AppField>
+              <form.AppField name="password">
+                {(field) => (
+                  <field.PasswordField
+                    label="Password"
+                    description="Password must be at least 6 characters long."
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="systemRole">
-              {(field) => (
-                <field.SelectField
-                  label="System Role"
-                  options={systemRoleOptions}
-                />
-              )}
-            </form.AppField>
+              <form.AppField name="systemRole">
+                {(field) => (
+                  <field.ToggleGroupField
+                    label="Role"
+                    options={assignableRoleOptions(currentUserRole)}
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="status">
-              {(field) => (
-                <field.SelectField
-                  label="Status"
-                  options={Object.values(UserStatus)}
-                />
-              )}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+              <form.AppField name="status">
+                {(field) => (
+                  <field.SwitchField
+                    label="Active account"
+                    description="Disabled users can't sign in until enabled."
+                    checkedValue={UserStatus.ACTIVE}
+                    uncheckedValue={UserStatus.DISABLED}
+                  />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>

@@ -7,6 +7,9 @@ import { TextareaField } from "./textarea-field";
 import { SelectField } from "./select-field";
 import { SubmitButton } from "./submit-button";
 import { CheckboxField } from "./checkbox-field";
+import { PasswordField } from "./password-field";
+import { ToggleGroupField } from "./toggle-group-field";
+import { SwitchField } from "./switch-field";
 
 export const { useAppForm } = createFormHook({
   fieldContext,
@@ -16,6 +19,9 @@ export const { useAppForm } = createFormHook({
     TextareaField,
     SelectField,
     CheckboxField,
+    PasswordField,
+    ToggleGroupField,
+    SwitchField,
   },
   formComponents: {
     SubmitButton,

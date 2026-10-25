@@ -1,8 +1,14 @@
-import * as z from "zod";
+import { IconAt, IconMail } from "@tabler/icons-react";
 import { useAppForm } from "@/components/form";
-import { IUserInfo, IUserPayload } from "@/types/user.types";
+import {
+  IUserInfo,
+  IUserPayload,
+  SystemRole,
+  UserStatus,
+} from "@/types/user.types";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -10,43 +16,46 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FieldGroup } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
-
-const formSchema = z.object({
-  email: z.email("Invalid email address"),
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters.")
-    .max(30, "Name must be at most 30 characters."),
-  surname: z
-    .string()
-    .min(2, "Surname must be at least 2 characters.")
-    .max(50, "Surname must be at most 50 characters."),
-});
+import { assignableRoleOptions } from "@/lib/utils/roles";
+import { userFormSchema } from "@/schemas/user";
 
 export function EditUserDialog({
   user,
   open,
   onOpenChange,
   onUserChange,
+  currentUserRole,
 }: {
   user: IUserInfo;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUserChange: (userId: string, payload: IUserPayload) => Promise<boolean>;
+  currentUserRole: SystemRole;
 }) {
   const form = useAppForm({
     defaultValues: {
       email: user.email,
       name: user.name,
       surname: user.surname,
+      systemRole: user.systemRole,
+      status: user.status,
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: userFormSchema.omit({ username: true, password: true }),
     },
-    onSubmit: async ({ value }) => {
-      const success = await onUserChange(user._id, value);
+    onSubmit: async ({ value: { systemRole, status, ...value } }) => {
+      const success = await onUserChange(user._id, {
+        ...value,
+        ...(systemRole !== user.systemRole && { systemRole }),
+        ...(status !== user.status && { status }),
+      });
 
       if (!success) {
         form.reset();
@@ -59,35 +68,80 @@ export function EditUserDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit user</DialogTitle>
           <DialogDescription>
-            Make changes to the user here. Click save when you&apos;re done.
+            Update the account details and what it can access.
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="edit-user-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" autoFocus />}
-            </form.AppField>
+        <DialogBody>
+          <form
+            id="edit-user-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
+                <form.AppField name="name">
+                  {(field) => <field.TextField label="Name" autoFocus />}
+                </form.AppField>
 
-            <form.AppField name="surname">
-              {(field) => <field.TextField label="Surname" />}
-            </form.AppField>
+                <form.AppField name="surname">
+                  {(field) => <field.TextField label="Surname" />}
+                </form.AppField>
+              </div>
 
-            <form.AppField name="email">
-              {(field) => <field.TextField label="Email" type="email" />}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+              <Field>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <InputGroup data-disabled>
+                  <InputGroupAddon>
+                    <IconAt />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="username"
+                    value={user.username}
+                    disabled
+                  />
+                </InputGroup>
+              </Field>
+
+              <form.AppField name="email">
+                {(field) => (
+                  <field.TextField
+                    label="Email"
+                    type="email"
+                    icon={<IconMail />}
+                    placeholder="johndoe@example.com"
+                  />
+                )}
+              </form.AppField>
+
+              <form.AppField name="systemRole">
+                {(field) => (
+                  <field.ToggleGroupField
+                    label="Role"
+                    options={assignableRoleOptions(currentUserRole)}
+                  />
+                )}
+              </form.AppField>
+
+              <form.AppField name="status">
+                {(field) => (
+                  <field.SwitchField
+                    label="Active account"
+                    description="Disabled users can't sign in until enabled."
+                    checkedValue={UserStatus.ACTIVE}
+                    uncheckedValue={UserStatus.DISABLED}
+                  />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>

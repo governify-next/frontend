@@ -18,6 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { DataTablePagination } from "./data-table-pagination";
 import { Pagination } from "@/types/pagination";
 import { usePaginationParams } from "@/hooks/use-pagination-params";
@@ -27,11 +34,13 @@ export function DataTable<TData, TValue>({
   data,
   pagination,
   itemLabel,
+  empty = { title: "No results" },
 }: {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   pagination?: Pagination;
   itemLabel?: string;
+  empty?: { icon?: React.ReactNode; title: string; description?: string };
 }) {
   const isManualPagination = pagination !== undefined;
   const {
@@ -63,31 +72,33 @@ export function DataTable<TData, TValue>({
         }),
   });
 
+  const rows = table.getRowModel().rows;
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader className="sticky top-0 z-10 bg-muted">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+      {rows.length ? (
+        <div className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-background">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
@@ -101,21 +112,24 @@ export function DataTable<TData, TValue>({
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <Empty className="border">
+          <EmptyHeader>
+            {empty.icon && <EmptyMedia variant="icon">{empty.icon}</EmptyMedia>}
+            <EmptyTitle>{empty.title}</EmptyTitle>
+            {empty.description && (
+              <EmptyDescription>{empty.description}</EmptyDescription>
             )}
-          </TableBody>
-        </Table>
-      </div>
-      <DataTablePagination table={table} itemLabel={itemLabel} />
+          </EmptyHeader>
+        </Empty>
+      )}
+      {table.getRowCount() > 0 && (
+        <DataTablePagination table={table} itemLabel={itemLabel} />
+      )}
     </div>
   );
 }

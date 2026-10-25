@@ -23,12 +23,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { formatReadableDate } from "@/lib/utils/formatter";
 import {
-  IconCheck,
-  IconChevronDown,
-  IconDotsVertical,
+  avatarFallback,
+  formatEnumLabel,
+  formatReadableDate,
+} from "@/lib/utils/formatter";
+import { formatDistanceToNow } from "date-fns";
+import {
+  IconDots,
+  IconKey,
+  IconLogout,
+  IconPencil,
+  IconTrash,
+  IconUserCheck,
+  IconUserOff,
 } from "@tabler/icons-react";
+import { SearchX, Users } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditUserDialog } from "./edit-form";
 import { EditPasswordDialog } from "./password-form";
@@ -38,8 +55,8 @@ import { Pagination } from "@/types/pagination";
 
 const updateMessage = (payload: IUserPayload) => {
   if ("password" in payload) return "Password updated.";
-  if ("status" in payload) return "User status updated.";
-  if ("systemRole" in payload) return "User role updated.";
+  if (payload.status === UserStatus.ACTIVE) return "User enabled.";
+  if (payload.status === UserStatus.DISABLED) return "User disabled.";
   return "User updated.";
 };
 
@@ -60,139 +77,99 @@ const columns = ({
 }): ColumnDef<IUserInfo>[] => {
   return [
     {
-      accessorKey: "username",
-      header: "Username",
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "surname",
-      header: "Surname",
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
+      id: "user",
+      header: "User",
+      cell: ({ row }) => {
+        const user = row.original;
+
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarFallback>{avatarFallback(user.username)}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="flex items-center gap-2 font-medium">
+                {user.name} {user.surname}
+                {user._id === currentUser._id && (
+                  <Badge variant="outline">You</Badge>
+                )}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                @{user.username} · {user.email}
+              </span>
+            </div>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => {
-        const user = row.original;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {user.status}
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem
-                disabled={user.status === UserStatus.ACTIVE}
-                onClick={() =>
-                  onUserChange(user._id, { status: UserStatus.ACTIVE })
-                }
-              >
-                ACTIVE
-                {user.status === UserStatus.ACTIVE && (
-                  <IconCheck className="ml-auto" />
-                )}
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                disabled={user.status === UserStatus.DISABLED}
-                onClick={() =>
-                  onUserChange(user._id, { status: UserStatus.DISABLED })
-                }
-              >
-                DISABLED
-                {user.status === UserStatus.DISABLED && (
-                  <IconCheck className="ml-auto" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      cell: ({ row }) => (
+        <Badge
+          variant={
+            row.original.status === UserStatus.ACTIVE
+              ? "success"
+              : "destructive"
+          }
+        >
+          <span className="size-1.5 rounded-full bg-current" />
+          {formatEnumLabel(row.original.status)}
+        </Badge>
+      ),
     },
     {
       accessorKey: "systemRole",
-      header: "System Role",
-      cell: ({ row }) => {
-        const user = row.original;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                {user.systemRole}
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="start">
-              {currentUser.systemRole === SystemRole.SUPERADMIN && (
-                <DropdownMenuItem
-                  disabled={user.systemRole === SystemRole.SUPERADMIN}
-                  onClick={() =>
-                    onUserChange(user._id, {
-                      systemRole: SystemRole.SUPERADMIN,
-                    })
-                  }
-                >
-                  Superadmin
-                  {user.systemRole === SystemRole.SUPERADMIN && (
-                    <IconCheck className="ml-auto" />
-                  )}
-                </DropdownMenuItem>
-              )}
-
-              <DropdownMenuItem
-                disabled={user.systemRole === SystemRole.ADMIN}
-                onClick={() =>
-                  onUserChange(user._id, { systemRole: SystemRole.ADMIN })
-                }
-              >
-                Admin
-                {user.systemRole === SystemRole.ADMIN && (
-                  <IconCheck className="ml-auto" />
-                )}
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                disabled={user.systemRole === SystemRole.USER}
-                onClick={() =>
-                  onUserChange(user._id, { systemRole: SystemRole.USER })
-                }
-              >
-                User
-                {user.systemRole === SystemRole.USER && (
-                  <IconCheck className="ml-auto" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      header: "Role",
+      cell: ({ row }) => (
+        <Badge variant="muted">
+          {formatEnumLabel(row.original.systemRole)}
+        </Badge>
+      ),
     },
     {
       accessorKey: "lastLoginAt",
-      header: "Last Login",
-      cell: ({ row }) => formatReadableDate(row.original.lastLoginAt),
+      header: "Last login",
+      cell: ({ row }) => {
+        const { lastLoginAt } = row.original;
+
+        if (!lastLoginAt) {
+          return <span className="text-muted-foreground">Never</span>;
+        }
+
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                {formatDistanceToNow(new Date(lastLoginAt), {
+                  addSuffix: true,
+                })}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{formatReadableDate(lastLoginAt)}</TooltipContent>
+          </Tooltip>
+        );
+      },
     },
-    {
-      accessorKey: "createdBy",
-      header: "Created By",
-      cell: ({ row }) => row.original.createdBy ?? "unknown",
-    },
+    ...(currentUser.systemRole === SystemRole.SUPERADMIN
+      ? [
+          {
+            accessorKey: "createdBy",
+            header: "Created by",
+            cell: ({ row }) =>
+              row.original.createdBy ?? (
+                <span className="text-muted-foreground">—</span>
+              ),
+          } satisfies ColumnDef<IUserInfo>,
+        ]
+      : []),
     {
       id: "actions",
       cell: ({ row }) => {
         const user = row.original;
+
+        if (user._id === currentUser._id) return null;
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -201,25 +178,48 @@ const columns = ({
                 className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
                 size="icon"
               >
-                <IconDotsVertical />
+                <IconDots />
                 <span className="sr-only">Open menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onSelect={() => onEditUser(user)}>
+                <IconPencil />
                 Edit user
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
-                Remove sessions
-              </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEditUserPassword(user)}>
+                <IconKey />
                 Change password
               </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
+                <IconLogout />
+                Remove sessions
+              </DropdownMenuItem>
+              {user.status === UserStatus.ACTIVE ? (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    onUserChange(user._id, { status: UserStatus.DISABLED })
+                  }
+                >
+                  <IconUserOff />
+                  Disable user
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onSelect={() =>
+                    onUserChange(user._id, { status: UserStatus.ACTIVE })
+                  }
+                >
+                  <IconUserCheck />
+                  Enable user
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
                 onSelect={() => onDeleteUserRequest(user._id)}
               >
+                <IconTrash />
                 Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -234,10 +234,14 @@ export function UsersTable({
   users,
   pagination,
   currentUser,
+  query,
+  filtered,
 }: {
   users: IUserInfo[];
   pagination?: Pagination;
   currentUser: IBasicUserInfo;
+  query: string;
+  filtered: boolean;
 }) {
   const router = useRouter();
 
@@ -305,6 +309,21 @@ export function UsersTable({
         data={users}
         pagination={pagination}
         itemLabel="users"
+        empty={
+          filtered
+            ? {
+                icon: <SearchX />,
+                title: "No users found",
+                description: query
+                  ? `No users match "${query}". Try a different search.`
+                  : "No users match the selected filters. Try adjusting them.",
+              }
+            : {
+                icon: <Users />,
+                title: "No users yet",
+                description: "Users you create will appear here.",
+              }
+        }
       />
       <ConfirmDialog
         open={userToDelete !== null}
@@ -321,6 +340,7 @@ export function UsersTable({
           open={true}
           onOpenChange={() => setUserToEdit(null)}
           onUserChange={handleUserChange}
+          currentUserRole={currentUser.systemRole}
         />
       )}
       {userToChangePassword && (

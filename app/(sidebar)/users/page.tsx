@@ -50,6 +50,8 @@ export default async function UsersPage({
         users={usersResult.data}
         pagination={usersResult.pagination}
         currentUser={currentUserResult.data}
+        query={q}
+        filtered={Boolean(q || status || systemRole)}
       />
     </>
   );

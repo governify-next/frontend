@@ -6,6 +6,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import type { Option } from "@/types/option";
 
 export function FilterDropdown<T extends string>({
   allLabel,
@@ -16,7 +17,7 @@ export function FilterDropdown<T extends string>({
 }: {
   allLabel: string;
   value: T | null;
-  options: { value: T; label: string }[];
+  options: Option<T>[];
   onSelect: (value: T | null) => void;
   contentClassName?: string;
 }) {

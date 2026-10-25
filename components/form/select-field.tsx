@@ -9,13 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Option } from "@/types/option";
 
 export function SelectField({
   label,
   options,
 }: {
   label: string;
-  options: readonly string[];
+  options: Option[];
 }) {
   const field = useFieldContext<string>();
 
@@ -31,8 +32,12 @@ export function SelectField({
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
             </SelectItem>
           ))}
         </SelectContent>

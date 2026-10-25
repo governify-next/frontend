@@ -1,8 +1,10 @@
+import { IconBuilding, IconHash } from "@tabler/icons-react";
 import { useAppForm } from "@/components/form";
 import { IOrganizationPayload } from "@/types/organization";
 import { organizationFormSchema } from "@/schemas/organization";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -46,36 +48,55 @@ export function CreateOrganizationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add organization</DialogTitle>
           <DialogDescription>
-            Fill in the details to create a new organization. Click create when
-            you&apos;re done.
+            Register a new organization and describe what it does.
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="create-organization-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup className="gap-3">
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" autoFocus />}
-            </form.AppField>
+        <DialogBody>
+          <form
+            id="create-organization-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <form.AppField name="name">
+                {(field) => (
+                  <field.TextField
+                    label="Name"
+                    icon={<IconHash />}
+                    placeholder="universidad-sevilla"
+                    autoFocus
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="displayName">
-              {(field) => <field.TextField label="Display name" />}
-            </form.AppField>
+              <form.AppField name="displayName">
+                {(field) => (
+                  <field.TextField
+                    label="Display name"
+                    icon={<IconBuilding />}
+                    placeholder="Universidad de Sevilla"
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="description">
-              {(field) => <field.TextareaField label="Description" />}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+              <form.AppField name="description">
+                {(field) => (
+                  <field.TextareaField
+                    label="Description"
+                    placeholder="What does this organization do?"
+                  />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>

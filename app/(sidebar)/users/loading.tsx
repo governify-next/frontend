@@ -5,7 +5,7 @@ export default function UsersLoading() {
   return (
     <>
       <Skeleton className="h-9 w-full lg:max-w-sm" />
-      <DataTableSkeleton />
+      <DataTableSkeleton columns={6} />
     </>
   );
 }
