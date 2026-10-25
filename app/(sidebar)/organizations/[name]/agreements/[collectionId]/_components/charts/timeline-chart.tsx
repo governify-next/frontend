@@ -49,7 +49,7 @@ import type { Result } from "@/lib/utils/fetcher";
 import {
   breakOnUnderscore,
   EXPAND_DATE_TIME_FORMAT,
-  formatComplianceStatus,
+  formatEnumLabel,
   tokenizeExpression,
 } from "@/lib/utils/formatter";
 import type { IComplianceState } from "@/types/compliance";
@@ -370,7 +370,7 @@ function PointPopover({
         </div>
         <PointRow label="Value">{point.value}</PointRow>
         <PointRow label="Status">
-          {formatComplianceStatus(point.complianceStatus)}
+          {formatEnumLabel(point.complianceStatus)}
         </PointRow>
         <PointRow label="Type">
           {point.consolidated ? "Consolidated" : "Evolutive"}
@@ -613,7 +613,7 @@ function EvidencesPopover({
                     : "muted"
               }
             >
-              {formatComplianceStatus(result.data.complianceStatus)}
+              {formatEnumLabel(result.data.complianceStatus)}
             </Badge>
           )}
         </div>

@@ -110,7 +110,7 @@ export function OrganizationsList({
                   </ItemDescription>
                 )}
               </ItemContent>
-              <div className="hidden grid-cols-[repeat(3,minmax(2rem,auto))] items-center gap-x-2 text-xs text-muted-foreground tabular-nums @3xl/main:grid">
+              <div className="hidden grid-cols-[repeat(3,minmax(2rem,auto))] items-center gap-x-2 text-xs text-muted-foreground tabular-nums @lg/main:grid">
                 <OrganizationQuickInfo
                   icon={Users}
                   iconClassName="text-sky"
