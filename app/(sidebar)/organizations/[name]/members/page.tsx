@@ -2,10 +2,8 @@ import {
   getOrganization,
   getOrganizationMembers,
 } from "@/data/organizations/fetch";
-import { MembersAdminActions } from "./admin-actions";
 import { MembersList } from "./list";
 import { ErrorPage } from "@/components/errors";
-import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationMembersPage({
   params,
@@ -32,16 +30,10 @@ export default async function OrganizationMembersPage({
   const roles = organizationResult.data.roles;
 
   return (
-    <PageContent
-      title="Members"
-      description="Manage who belongs to the organization and the role each member has."
-      actions={<MembersAdminActions orgName={orgName} />}
-    >
-      <MembersList
-        members={members}
-        organization={organizationResult.data}
-        roles={roles}
-      />
-    </PageContent>
+    <MembersList
+      members={members}
+      organization={organizationResult.data}
+      roles={roles}
+    />
   );
 }
