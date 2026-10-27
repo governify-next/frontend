@@ -1,42 +1,40 @@
 import {
+  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { DropdownMenu } from "../ui/dropdown-menu";
 import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import type { Option } from "@/types/option";
 
-export function FilterDropdown({
-  label,
+export function FilterDropdown<T extends string>({
+  allLabel,
   value,
   options,
   onSelect,
-  clearable = false,
   contentClassName,
 }: {
-  label: string;
-  value: string | null;
-  options: { value: string; label: string }[];
-  onSelect: (value: string | null) => void;
-  clearable?: boolean;
+  allLabel: string;
+  value: T | null;
+  options: Option<T>[];
+  onSelect: (value: T | null) => void;
   contentClassName?: string;
 }) {
-  const items = clearable
-    ? [{ value: null, label: "All" }, ...options]
-    : options;
+  const items = [{ value: null, label: allLabel }, ...options];
+  const current = items.find((item) => item.value === value) ?? items[0];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          {label}
+          {current.label}
           <IconChevronDown />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className={contentClassName}>
         {items.map((item) => {
-          const selected = item.value === value;
+          const selected = item === current;
 
           return (
             <DropdownMenuItem

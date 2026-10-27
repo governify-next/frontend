@@ -1,4 +1,4 @@
-import type { ComplianceStatus } from "@/types/compliance";
+import type { Option } from "@/types/option";
 
 export const EXPAND_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 export const COMPACT_DATE_TIME_FORMAT = "MMM d HH:mm";
@@ -6,6 +6,9 @@ export const COMPACT_DATE_TIME_FORMAT = "MMM d HH:mm";
 export const avatarFallback = (text: string) => {
   return text.trim().charAt(0).toUpperCase() || "U";
 };
+
+export const pluralize = (count: number, word: string) =>
+  `${count} ${count === 1 ? word : `${word}s`}`;
 
 export const formatReadableDate = (
   date?: Date | null,
@@ -25,8 +28,16 @@ export const formatReadableDate = (
   }).format(new Date(date));
 };
 
-export const formatComplianceStatus = (status: ComplianceStatus) =>
-  status.charAt(0) + status.slice(1).toLowerCase().replace("_", " ");
+export const formatEnumLabel = (value: string) =>
+  value.charAt(0) + value.slice(1).toLowerCase().replaceAll("_", " ");
+
+export const enumOptions = <T extends string>(
+  enumObject: Record<string, T>,
+): Option<T>[] =>
+  Object.values(enumObject).map((value) => ({
+    value,
+    label: formatEnumLabel(value),
+  }));
 
 export const breakOnUnderscore = (text: string) =>
   text.replaceAll("_", "_\u200B");

@@ -6,6 +6,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils/cn";
 import { geistMono, geistSans } from "@/lib/fonts";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Inter } from "next/font/google";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: bootEnv.FRONTEND_APP_NAME,
@@ -18,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geistSans.variable)}>
+    <html lang="en" className={cn( geistSans.variable, "font-sans", inter.variable)}>
       <body className={`${geistMono.variable} antialiased`}>
         <TooltipProvider>
           <NuqsAdapter>{children}</NuqsAdapter>

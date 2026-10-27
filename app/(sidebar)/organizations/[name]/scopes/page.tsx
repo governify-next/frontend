@@ -1,6 +1,7 @@
 import { getScopes } from "@/data/scopes/fetch";
 import { ErrorPage } from "@/components/errors";
 import { ScopesExplorer } from "./explorer";
+import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationScopesPage({
   params,
@@ -20,5 +21,12 @@ export default async function OrganizationScopesPage({
     );
   }
 
-  return <ScopesExplorer orgName={orgName} tree={result.data} />;
+  return (
+    <PageContent
+      title="Scopes"
+      description="Browse and organize the folder structure of the organization."
+    >
+      <ScopesExplorer orgName={orgName} tree={result.data} />
+    </PageContent>
+  );
 }

@@ -1,8 +1,8 @@
-import * as z from "zod";
 import { useAppForm } from "@/components/form";
 import { IUserInfo, IUserPayload } from "@/types/user.types";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-
-const formSchema = z.object({
-  password: z.string().min(6, "Password must be at least 6 characters long."),
-});
+import { userFormSchema } from "@/schemas/user";
 
 export function EditPasswordDialog({
   user,
@@ -33,7 +30,7 @@ export function EditPasswordDialog({
       password: "",
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: userFormSchema.pick({ password: true }),
     },
     onSubmit: async ({ value }) => {
       const success = await onUserChange(user._id, value);
@@ -47,28 +44,33 @@ export function EditPasswordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Edit user password</DialogTitle>
+          <DialogTitle>Change password</DialogTitle>
           <DialogDescription>
-            Make changes to the user password here. Click save when you&apos;re
-            done.
+            Set a new password for @{user.username}.
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="change-password-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="password">
-              {(field) => (
-                <field.TextField label="Password" type="off" autoFocus />
-              )}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+        <DialogBody>
+          <form
+            id="change-password-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <form.AppField name="password">
+                {(field) => (
+                  <field.PasswordField
+                    label="Password"
+                    description="Password must be at least 6 characters long."
+                    autoFocus
+                  />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>

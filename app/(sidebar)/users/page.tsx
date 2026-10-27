@@ -1,11 +1,7 @@
-import { PageShell } from "@/components/page-shell";
-import {
-  BreadcrumbItem,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
 import { searchUsers } from "@/data/users/fetch";
-import { SystemRole, UserSearchFilters, UserStatus } from "@/types/user.types";
-import { UsersTable } from "./table";
+import { UserSearchFilters } from "@/types/user.types";
+import { UsersTable } from "./_components/table";
+import { UsersFilters } from "./_components/filters";
 import { ErrorPage } from "@/components/errors";
 import { SearchParams } from "nuqs";
 import { loadUserSearchParams } from "./search-params";
@@ -16,17 +12,13 @@ export default async function UsersPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const { q, field, status, systemRole, page, limit } =
+  const { q, status, systemRole, page, limit } =
     await loadUserSearchParams(searchParams);
 
   const filters: UserSearchFilters = {};
-  if (q) {
-    if (field === "username") filters.username = q;
-    else if (field === "email") filters.email = q;
-    else filters.usernameOrEmail = q;
-  }
-  if (status) filters.status = status as UserStatus;
-  if (systemRole) filters.systemRole = systemRole as SystemRole;
+  if (q) filters.usernameOrEmail = q;
+  if (status) filters.status = status;
+  if (systemRole) filters.systemRole = systemRole;
 
   const [currentUserResult, usersResult] = await Promise.all([
     getCurrentUser(),
@@ -51,24 +43,16 @@ export default async function UsersPage({
     );
   }
 
-  const currentUser = currentUserResult.data;
-  const users = usersResult.data;
-  const pagination = usersResult.pagination;
-
   return (
-    <PageShell
-      breadcrumb={
-        <BreadcrumbItem>
-          <BreadcrumbPage>Users</BreadcrumbPage>
-        </BreadcrumbItem>
-      }
-    >
+    <>
+      <UsersFilters />
       <UsersTable
-        users={users}
-        pagination={pagination}
-        currentUser={currentUser}
-        appliedFilters={{ q, field, status, systemRole }}
+        users={usersResult.data}
+        pagination={usersResult.pagination}
+        currentUser={currentUserResult.data}
+        query={q}
+        filtered={Boolean(q || status || systemRole)}
       />
-    </PageShell>
+    </>
   );
 }

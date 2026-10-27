@@ -10,13 +10,15 @@ export default function SidebarLayout({
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--sidebar-width": "calc(var(--spacing) * 64)",
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset className="h-svh overflow-hidden md:peer-data-[variant=inset]:h-[calc(100svh-(--spacing(4)))]">
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }

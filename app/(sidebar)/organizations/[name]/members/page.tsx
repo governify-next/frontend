@@ -5,6 +5,7 @@ import {
 import { MembersAdminActions } from "./admin-actions";
 import { MembersList } from "./list";
 import { ErrorPage } from "@/components/errors";
+import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationMembersPage({
   params,
@@ -31,15 +32,16 @@ export default async function OrganizationMembersPage({
   const roles = organizationResult.data.roles;
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 pt-4">
-      <div className="text-end gap-2">
-        <MembersAdminActions orgName={orgName} />
-      </div>
+    <PageContent
+      title="Members"
+      description="Manage who belongs to the organization and the role each member has."
+      actions={<MembersAdminActions orgName={orgName} />}
+    >
       <MembersList
         members={members}
         organization={organizationResult.data}
         roles={roles}
       />
-    </div>
+    </PageContent>
   );
 }

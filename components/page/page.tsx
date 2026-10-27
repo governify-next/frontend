@@ -1,20 +1,25 @@
-import {
-  Breadcrumb,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils/cn";
 
-export function PageShell({
+export function Page({
   breadcrumb,
+  subheader,
   children,
 }: {
   breadcrumb: React.ReactNode;
+  subheader?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
+      <header
+        className={cn(
+          "flex h-12 shrink-0 items-center gap-2",
+          !subheader && "border-b",
+        )}
+      >
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator
@@ -26,9 +31,13 @@ export function PageShell({
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col">
+      {subheader}
+      <div
+        data-slot="page-content"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+      >
         <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
+          <div className="flex flex-col gap-4 pt-4 pb-4 md:gap-6 md:pt-6 md:pb-6">
             <div className="px-4 lg:px-6">{children}</div>
           </div>
         </div>

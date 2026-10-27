@@ -2,6 +2,7 @@ import { RolesList } from "./list";
 import { ErrorPage } from "@/components/errors";
 import { getOrganization } from "@/data/organizations/fetch";
 import { AddRole } from "./header-nav";
+import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationRolesPage({
   params,
@@ -25,9 +26,12 @@ export default async function OrganizationRolesPage({
   const roles = result.data.roles;
 
   return (
-    <div className="mx-auto max-w-7xl pt-4 flex flex-col gap-4">
-      <AddRole orgName={orgName} />
+    <PageContent
+      title="Roles"
+      description="Define the roles that can be assigned to the organization members."
+      actions={<AddRole orgName={orgName} />}
+    >
       <RolesList orgName={orgName} roles={roles} />
-    </div>
+    </PageContent>
   );
 }

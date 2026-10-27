@@ -27,11 +27,9 @@ export function AddRole({ orgName }: { orgName: string }) {
 
   return (
     <>
-      <div className="text-end">
-        <Button onClick={() => setCreateOpen(true)}>
-          <IconPlus /> Add role
-        </Button>
-      </div>
+      <Button onClick={() => setCreateOpen(true)}>
+        <IconPlus /> Add role
+      </Button>
       <AddRoleDialog
         open={createOpen}
         onOpenChange={setCreateOpen}

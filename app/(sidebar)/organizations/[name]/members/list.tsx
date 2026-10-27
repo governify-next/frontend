@@ -85,11 +85,12 @@ export function MembersList({
       <ItemList
         className="w-full"
         data={members}
+        itemLabel="members"
         renderItem={(member) => {
           const username = member.userId.username;
           return (
             <Item variant="outline">
-              <ItemMedia>
+              <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
                 <Avatar>
                   <AvatarFallback>{avatarFallback(username)}</AvatarFallback>
                 </Avatar>

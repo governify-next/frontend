@@ -49,7 +49,7 @@ import type { Result } from "@/lib/utils/fetcher";
 import {
   breakOnUnderscore,
   EXPAND_DATE_TIME_FORMAT,
-  formatComplianceStatus,
+  formatEnumLabel,
   tokenizeExpression,
 } from "@/lib/utils/formatter";
 import type { IComplianceState } from "@/types/compliance";
@@ -370,7 +370,7 @@ function PointPopover({
         </div>
         <PointRow label="Value">{point.value}</PointRow>
         <PointRow label="Status">
-          {formatComplianceStatus(point.complianceStatus)}
+          {formatEnumLabel(point.complianceStatus)}
         </PointRow>
         <PointRow label="Type">
           {point.consolidated ? "Consolidated" : "Evolutive"}
@@ -451,15 +451,15 @@ function EvidencesPopover({
   }, [member.stateId, getState]);
 
   useLayoutEffect(() => {
-    if (!anchorRef.current) return;
+    const container = anchorRef.current?.closest("[data-slot=page-content]");
+    if (!anchorRef.current || !container) return;
     const cardBottom =
-      anchorRef.current.getBoundingClientRect().bottom + // chart bottom position relative to the current window
-      window.scrollY - // sum y scrolled space to transform to the absolute position
+      anchorRef.current.getBoundingClientRect().bottom - // chart bottom position relative to the current window
+      container.getBoundingClientRect().top + // transform to the position relative to the scroll container
+      container.scrollTop - // sum y scrolled space to transform to the absolute position
       BOTTOM_LEGEND_OFFSET + // remove the legend space
       460; // approximate value of the loaded basic card with open metric
-    setSide(
-      cardBottom <= document.documentElement.scrollHeight ? "bottom" : "top",
-    );
+    setSide(cardBottom <= container.scrollHeight ? "bottom" : "top");
   }, []);
 
   return (
@@ -613,7 +613,7 @@ function EvidencesPopover({
                     : "muted"
               }
             >
-              {formatComplianceStatus(result.data.complianceStatus)}
+              {formatEnumLabel(result.data.complianceStatus)}
             </Badge>
           )}
         </div>
