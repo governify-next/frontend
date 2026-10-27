@@ -159,7 +159,9 @@ const columns = ({
             accessorKey: "createdBy",
             header: "Created by",
             cell: ({ row }) =>
-              row.original.createdBy ?? (
+              row.original.createdBy ? (
+                `@${row.original.createdBy.username}`
+              ) : (
                 <span className="text-muted-foreground">—</span>
               ),
           } satisfies ColumnDef<IUserInfo>,
