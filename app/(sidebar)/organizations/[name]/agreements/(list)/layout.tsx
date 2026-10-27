@@ -8,7 +8,7 @@ export default function OrganizationAgreementsLayout({
   return (
     <PageContent
       title="Agreements"
-      description="Review the organization agreements and their versions."
+      description="Browse organization agreements and dive into its versions."
     >
       {children}
     </PageContent>

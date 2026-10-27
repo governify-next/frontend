@@ -62,12 +62,20 @@ export default async function AgreementDetailPage({
       candidate.versionNumber > max.versionNumber ? candidate : max,
     );
 
-  const stateTasksResult = await getStateTasksForAgreementVersion(
-    orgName,
-    collection.scopeId,
-    collection._id,
-    version.versionNumber,
-  );
+  const [stateTasksResult, agreementFullVersionResult] = await Promise.all([
+    getStateTasksForAgreementVersion(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ),
+    getAgreementVersionByCollection(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ),
+  ]);
 
   if (!stateTasksResult.ok) {
     return (
@@ -89,13 +97,6 @@ export default async function AgreementDetailPage({
   };
 
   const calculationState = getCalculationState(stateTasksResult.data);
-
-  const agreementFullVersionResult = await getAgreementVersionByCollection(
-    orgName,
-    collection.scopeId,
-    collection._id,
-    version.versionNumber,
-  );
 
   if (!agreementFullVersionResult.ok) {
     return (

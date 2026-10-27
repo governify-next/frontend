@@ -74,7 +74,7 @@ export function AgreementsList({
                     : "Automatic monitoring inactive"}
                 </span>
               </ItemContent>
-              <div className="hidden text-xs text-muted-foreground @lg/main:block">
+              <div className="hidden text-xs text-muted-foreground @sm/main:block">
                 {collection.auditableVersionNumber !== null && (
                   <Badge variant="muted">
                     v{collection.auditableVersionNumber}
