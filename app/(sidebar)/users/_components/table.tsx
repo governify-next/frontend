@@ -62,14 +62,16 @@ const updateMessage = (payload: IUserPayload) => {
 
 const columns = ({
   onUserChange,
-  onDeleteUserSessions,
+  onDeleteUserSessionsRequest,
+  onDisableUserRequest,
   onDeleteUserRequest,
   onEditUser,
   onEditUserPassword,
   currentUser,
 }: {
   onUserChange: (userId: string, payload: IUserPayload) => void;
-  onDeleteUserSessions: (userId: string) => void;
+  onDeleteUserSessionsRequest: (userId: string) => void;
+  onDisableUserRequest: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
   onEditUser: (user: IUserInfo) => void;
   onEditUserPassword: (user: IUserInfo) => void;
@@ -191,15 +193,15 @@ const columns = ({
                 <IconKey />
                 Change password
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
+              <DropdownMenuItem
+                onSelect={() => onDeleteUserSessionsRequest(user._id)}
+              >
                 <IconLogout />
                 Remove sessions
               </DropdownMenuItem>
               {user.status === UserStatus.ACTIVE ? (
                 <DropdownMenuItem
-                  onSelect={() =>
-                    onUserChange(user._id, { status: UserStatus.DISABLED })
-                  }
+                  onSelect={() => onDisableUserRequest(user._id)}
                 >
                   <IconUserOff />
                   Disable user
@@ -246,6 +248,10 @@ export function UsersTable({
   const router = useRouter();
 
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [userToDisable, setUserToDisable] = useState<string | null>(null);
+  const [userToRemoveSessions, setUserToRemoveSessions] = useState<
+    string | null
+  >(null);
   const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<IUserInfo | null>(null);
@@ -264,14 +270,23 @@ export function UsersTable({
     return true;
   };
 
-  const handleUserDeleteSessions = async (userId: string) => {
-    const result = await deleteUserSessions(userId);
+  const handleUserDisable = async () => {
+    const disabled = await handleUserChange(userToDisable!, {
+      status: UserStatus.DISABLED,
+    });
+
+    if (disabled) setUserToDisable(null);
+  };
+
+  const handleUserDeleteSessions = async () => {
+    const result = await deleteUserSessions(userToRemoveSessions!);
 
     if (!result.ok) {
       toast.error(result.error);
       return;
     }
 
+    setUserToRemoveSessions(null);
     const deletedSessions = result.data.deletedSessions;
     deletedSessions === 0
       ? toast.info("No active sessions to remove.")
@@ -295,7 +310,8 @@ export function UsersTable({
 
   const tableColumns = columns({
     onUserChange: handleUserChange,
-    onDeleteUserSessions: handleUserDeleteSessions,
+    onDeleteUserSessionsRequest: setUserToRemoveSessions,
+    onDisableUserRequest: setUserToDisable,
     onDeleteUserRequest: setUserToDelete,
     onEditUser: setUserToEdit,
     onEditUserPassword: setUserToChangePassword,
@@ -333,6 +349,28 @@ export function UsersTable({
         title="Delete User?"
         description="This will permanently delete this user in the system."
         onConfirm={handleUserDelete}
+      />
+      <ConfirmDialog
+        open={userToRemoveSessions !== null}
+        onOpenChange={() => {
+          setUserToRemoveSessions(null);
+        }}
+        title="Remove Sessions?"
+        description="This will sign this user out of all active sessions."
+        icon={<IconLogout />}
+        confirmText="Remove"
+        onConfirm={handleUserDeleteSessions}
+      />
+      <ConfirmDialog
+        open={userToDisable !== null}
+        onOpenChange={() => {
+          setUserToDisable(null);
+        }}
+        title="Disable User?"
+        description="This user will not be able to sign in until enabled again."
+        icon={<IconUserOff />}
+        confirmText="Disable"
+        onConfirm={handleUserDisable}
       />
       {userToEdit && (
         <EditUserDialog
