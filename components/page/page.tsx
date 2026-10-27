@@ -1,17 +1,25 @@
 import { Breadcrumb, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils/cn";
 
 export function Page({
   breadcrumb,
+  subheader,
   children,
 }: {
   breadcrumb: React.ReactNode;
+  subheader?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <header className="flex h-12 shrink-0 items-center gap-2 border-b">
+      <header
+        className={cn(
+          "flex h-12 shrink-0 items-center gap-2",
+          !subheader && "border-b",
+        )}
+      >
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator
@@ -23,6 +31,7 @@ export function Page({
           </Breadcrumb>
         </div>
       </header>
+      {subheader}
       <div
         data-slot="page-content"
         className="flex min-h-0 flex-1 flex-col overflow-y-auto"

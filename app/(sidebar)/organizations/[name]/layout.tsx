@@ -62,8 +62,8 @@ export default async function OrganizationLayout({
           </BreadcrumbItem>
         </>
       }
+      subheader={<OrganizationTabsNav orgName={name} isAdmin={isAdmin} />}
     >
-      <OrganizationTabsNav orgName={name} isAdmin={isAdmin} />
       {children}
     </Page>
   );

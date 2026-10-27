@@ -1,5 +1,7 @@
 import { Suspense } from "react";
-import { ListPage } from "@/components/page/list-page";
+import { Page } from "@/components/page/page";
+import { PageContent } from "@/components/page/page-content";
+import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth/session";
 import { UsersAdminActions } from "./_components/admin-actions";
@@ -17,16 +19,24 @@ export default function UsersLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ListPage
-      title="Users"
-      description="Manage who has access to the platform, adjusting their details, roles and status."
-      actions={
-        <Suspense fallback={<Skeleton className="h-9 w-26" />}>
-          <UsersActions />
-        </Suspense>
+    <Page
+      breadcrumb={
+        <BreadcrumbItem>
+          <BreadcrumbPage>Users</BreadcrumbPage>
+        </BreadcrumbItem>
       }
     >
-      {children}
-    </ListPage>
+      <PageContent
+        title="Users"
+        description="Manage who has access to the platform, adjusting their details, roles and status."
+        actions={
+          <Suspense fallback={<Skeleton className="h-9 w-26" />}>
+            <UsersActions />
+          </Suspense>
+        }
+      >
+        {children}
+      </PageContent>
+    </Page>
   );
 }

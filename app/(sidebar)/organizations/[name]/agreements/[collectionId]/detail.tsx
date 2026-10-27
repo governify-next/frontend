@@ -67,7 +67,7 @@ export function AgreementDetail({
       : undefined;
 
   return (
-    <div className="flex w-full flex-col gap-4 pt-4">
+    <div className="flex w-full flex-col gap-4">
       <AgreementHeader
         orgName={orgName}
         range={range}

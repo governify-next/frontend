@@ -1,5 +1,7 @@
 import { Suspense } from "react";
-import { ListPage } from "@/components/page/list-page";
+import { Page } from "@/components/page/page";
+import { PageContent } from "@/components/page/page-content";
+import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth/session";
 import { SystemRole } from "@/types/user.types";
@@ -20,16 +22,24 @@ export default function OrganizationsListLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ListPage
-      title="Organizations"
-      description="Browse organizations and choose one to see its details."
-      actions={
-        <Suspense fallback={<Skeleton className="h-9 w-38" />}>
-          <OrganizationsActions />
-        </Suspense>
+    <Page
+      breadcrumb={
+        <BreadcrumbItem>
+          <BreadcrumbPage>Organizations</BreadcrumbPage>
+        </BreadcrumbItem>
       }
     >
-      {children}
-    </ListPage>
+      <PageContent
+        title="Organizations"
+        description="Browse organizations and choose one to see its details."
+        actions={
+          <Suspense fallback={<Skeleton className="h-9 w-38" />}>
+            <OrganizationsActions />
+          </Suspense>
+        }
+      >
+        {children}
+      </PageContent>
+    </Page>
   );
 }

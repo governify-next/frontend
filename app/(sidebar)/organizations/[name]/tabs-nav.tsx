@@ -67,23 +67,26 @@ export function OrganizationTabsNav({
       ?.value ?? "overview";
 
   return (
-    <Tabs value={active} className="w-full">
+    <Tabs
+      value={active}
+      className="@container/tabs shrink-0 border-b px-4"
+    >
       <TabsList
         variant="line"
-        className="w-full gap-2 @3xl/main:w-fit @3xl/main:gap-6"
+        className="w-full gap-2 p-0 group-data-horizontal/tabs:h-10 @3xl/tabs:-ml-1.5 @3xl/tabs:w-fit @3xl/tabs:gap-6"
       >
         {baseTabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className="text-base"
+            className="h-full text-base after:bg-primary group-data-horizontal/tabs:after:-bottom-px"
             asChild
           >
             <Link href={tab.href}>
               <tab.icon />
               <span
                 className={cn(
-                  tab.value !== active && "sr-only @3xl/main:not-sr-only",
+                  tab.value !== active && "sr-only @3xl/tabs:not-sr-only",
                 )}
               >
                 {tab.label}
