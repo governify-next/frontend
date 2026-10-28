@@ -89,7 +89,7 @@ const columns = ({
             <Avatar>
               <AvatarFallback>{avatarFallback(user.username)}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <span className="flex items-center gap-2 font-medium">
                 {user.name} {user.surname}
                 {user._id === currentUser._id && (

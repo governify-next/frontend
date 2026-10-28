@@ -11,6 +11,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -70,55 +71,64 @@ export function RolesList({
         className="w-full"
         data={roles}
         itemLabel="roles"
-        renderItem={(role) => (
-          <Item
-            variant="outline"
-            className="relative overflow-hidden pl-5 hover:bg-muted/50"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-y-0 left-0 w-1"
-              style={{ backgroundColor: role.color }}
-            />
-            <ItemContent className="min-w-0">
-              <ItemTitle>{role.name}</ItemTitle>
-              {role.description && (
-                <ItemDescription className="break-words">
-                  {role.description}
-                </ItemDescription>
-              )}
-            </ItemContent>
-            <ItemActions className="gap-1">
-              <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
-                <Users className="size-3.5 text-sky" />
-                <span aria-hidden>{role.members}</span>
-                <span className="sr-only">
-                  {pluralize(role.members, "member")}
-                </span>
-              </span>
-              <Separator
-                orientation="vertical"
-                className="mx-2 data-vertical:h-5 data-vertical:self-center"
+        renderItem={(role) => {
+          const isAdmin = role.name === "admin";
+
+          return (
+            <Item
+              variant="outline"
+              className="relative overflow-hidden pl-5 hover:bg-muted/50"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-y-0 left-0 w-1"
+                style={{ backgroundColor: role.color }}
               />
-              <Button
-                variant="warning"
-                size="icon-sm"
-                aria-label={`Edit role ${role.name}`}
-                onClick={() => setRoleToEdit(role)}
-              >
-                <Pencil />
-              </Button>
-              <Button
-                variant="destructive"
-                size="icon-sm"
-                aria-label={`Delete role ${role.name}`}
-                onClick={() => setRoleToDelete(role.name)}
-              >
-                <Trash2 />
-              </Button>
-            </ItemActions>
-          </Item>
-        )}
+              <ItemContent className="min-w-0">
+                <ItemTitle>
+                  {role.name}
+                  {isAdmin && <Badge variant="outline">Default</Badge>}
+                </ItemTitle>
+                {role.description && (
+                  <ItemDescription className="break-words">
+                    {role.description}
+                  </ItemDescription>
+                )}
+              </ItemContent>
+              <ItemActions className="gap-1">
+                <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
+                  <Users className="size-3.5 text-sky" />
+                  <span aria-hidden>{role.members}</span>
+                  <span className="sr-only">
+                    {pluralize(role.members, "member")}
+                  </span>
+                </span>
+                <Separator
+                  orientation="vertical"
+                  className="mx-2 data-vertical:h-5 data-vertical:self-center"
+                />
+                <Button
+                  variant="warning"
+                  size="icon-sm"
+                  aria-label={`Edit role ${role.name}`}
+                  disabled={isAdmin}
+                  onClick={() => setRoleToEdit(role)}
+                >
+                  <Pencil />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon-sm"
+                  aria-label={`Delete role ${role.name}`}
+                  disabled={isAdmin}
+                  onClick={() => setRoleToDelete(role.name)}
+                >
+                  <Trash2 />
+                </Button>
+              </ItemActions>
+            </Item>
+          );
+        }}
       />
       <ConfirmDialog
         open={roleToDelete !== null}
