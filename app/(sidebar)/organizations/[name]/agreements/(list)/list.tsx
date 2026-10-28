@@ -64,7 +64,7 @@ export function AgreementsList({
                   {collection.displayName || collection.name}
                 </ItemTitle>
                 {collection.description && (
-                  <ItemDescription className="line-clamp-1">
+                  <ItemDescription className="break-words">
                     {collection.description}
                   </ItemDescription>
                 )}

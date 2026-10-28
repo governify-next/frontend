@@ -80,7 +80,7 @@ export function MemberRolesPicker({
       <PopoverContent align="end" className="w-56 p-0">
         <Command>
           <CommandInput placeholder="Search roles..." />
-          <CommandList>
+          <CommandList className="[scrollbar-width:thin]!">
             <CommandEmpty>No roles found.</CommandEmpty>
             <CommandGroup>
               {roles.map((role) => (
@@ -98,7 +98,7 @@ export function MemberRolesPicker({
                     checked={selectedRoles.includes(role.name)}
                     aria-hidden
                     tabIndex={-1}
-                    className="pointer-events-none"
+                    className="pointer-events-none [&_svg]:text-primary-foreground!"
                   />
                   <span
                     aria-hidden
