@@ -1,9 +1,9 @@
-import { MembersList } from "./list";
 import { ErrorPage } from "@/components/errors";
 import {
   getOrganization,
   getOrganizationMembers,
 } from "@/data/organizations/fetch";
+import { MembersList } from "./_components/list";
 
 export default async function OrganizationMembersPage({
   params,

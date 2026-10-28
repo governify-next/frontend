@@ -1,4 +1,4 @@
-import { RolesList } from "./list";
+import { RolesList } from "./_components/list";
 import { ErrorPage } from "@/components/errors";
 import { getOrganization } from "@/data/organizations/fetch";
 

@@ -1,5 +1,5 @@
 import { PageContent } from "@/components/page/page-content";
-import { RolesAdminActions } from "./admin-actions";
+import { RolesAdminActions } from "./_components/admin-actions";
 
 export default async function OrganizationRolesLayout({
   children,

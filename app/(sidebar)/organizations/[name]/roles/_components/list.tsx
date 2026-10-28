@@ -75,10 +75,7 @@ export function RolesList({
           const isAdmin = role.name === "admin";
 
           return (
-            <Item
-              variant="outline"
-              className="relative overflow-hidden pl-5 hover:bg-muted/50"
-            >
+            <Item variant="outline" className="relative overflow-hidden pl-5">
               <span
                 aria-hidden
                 className="absolute inset-y-0 left-0 w-1"

@@ -1,5 +1,5 @@
 import { PageContent } from "@/components/page/page-content";
-import { MembersAdminActions } from "./admin-actions";
+import { MembersAdminActions } from "./_components/admin-actions";
 
 export default async function OrganizationMembersLayout({
   children,
