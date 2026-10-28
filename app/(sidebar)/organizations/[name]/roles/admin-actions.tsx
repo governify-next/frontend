@@ -1,18 +1,18 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { AddRoleDialog } from "./add-form";
-import { IRolePayload } from "@/types/organization";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { IconPlus } from "@tabler/icons-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { addOrganizationRole } from "@/data/organizations/actions";
+import { IRolePayload } from "@/types/organization";
+import { AddRoleDialog } from "./add-form";
 
-export function AddRole({ orgName }: { orgName: string }) {
+export function RolesAdminActions({ orgName }: { orgName: string }) {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const handleCreateRole = async (payload: IRolePayload) => {
+  const handleRoleCreate = async (payload: IRolePayload) => {
     const result = await addOrganizationRole(orgName, payload);
 
     if (!result.ok) {
@@ -28,12 +28,13 @@ export function AddRole({ orgName }: { orgName: string }) {
   return (
     <>
       <Button onClick={() => setCreateOpen(true)}>
-        <IconPlus /> Add role
+        <IconPlus />
+        Add role
       </Button>
       <AddRoleDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        onCreate={handleCreateRole}
+        onCreate={handleRoleCreate}
       />
     </>
   );

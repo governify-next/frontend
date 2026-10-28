@@ -1,30 +1,26 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Pencil, Trash2, Users } from "lucide-react";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
-  ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ItemList } from "@/components/item/item-list";
+import { IRole, IRolePayload } from "@/types/organization";
+import { pluralize } from "@/lib/utils/formatter";
 import {
   deleteOrganizationRole,
   updateOrganizationRole,
 } from "@/data/organizations/actions";
-import { IRole, IRolePayload } from "@/types/organization";
-import { MoreVertical } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 import { EditRoleDialog } from "./edit-form";
 
 export function RolesList({
@@ -32,31 +28,32 @@ export function RolesList({
   roles,
 }: {
   orgName: string;
-  roles: IRole[];
+  roles: (IRole & { members: number })[];
 }) {
   const router = useRouter();
   const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
   const [roleToEdit, setRoleToEdit] = useState<IRolePayload | null>(null);
 
-  const handleDeleteRole = async (roleName: string) => {
-    const result = await deleteOrganizationRole(orgName, roleName);
+  const handleRoleDelete = async () => {
+    const result = await deleteOrganizationRole(orgName, roleToDelete!);
 
     if (!result.ok) {
       toast.error(result.error);
       return;
     }
 
-    toast.success("Role deleted.");
     setRoleToDelete(null);
     router.refresh();
+    toast.success("Role deleted.");
   };
 
-  const handleEditRole = async (payload: IRolePayload) => {
+  const handleRoleEdit = async (payload: IRolePayload) => {
     const result = await updateOrganizationRole(
       orgName,
       roleToEdit!.name,
       payload,
     );
+
     if (!result.ok) {
       toast.error(result.error);
       return false;
@@ -69,56 +66,73 @@ export function RolesList({
 
   return (
     <>
-      <ItemGroup>
-        {roles.map((role) => (
-          <Item key={role._id} variant="outline">
-            <ItemContent>
+      <ItemList
+        className="w-full"
+        data={roles}
+        itemLabel="roles"
+        renderItem={(role) => (
+          <Item
+            variant="outline"
+            className="relative overflow-hidden pl-5 hover:bg-muted/50"
+          >
+            <span
+              aria-hidden
+              className="absolute inset-y-0 left-0 w-1"
+              style={{ backgroundColor: role.color }}
+            />
+            <ItemContent className="min-w-0">
               <ItemTitle>{role.name}</ItemTitle>
-              <ItemDescription>{role.description}</ItemDescription>
+              {role.description && (
+                <ItemDescription className="break-words">
+                  {role.description}
+                </ItemDescription>
+              )}
             </ItemContent>
-            <ItemActions>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Role options">
-                    <MoreVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onSelect={() =>
-                      setRoleToEdit({
-                        name: role.name,
-                        description: role.description,
-                      })
-                    }
-                  >
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onSelect={() => setRoleToDelete(role.name)}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <ItemActions className="gap-1">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
+                <Users className="size-3.5 text-sky" />
+                <span aria-hidden>{role.members}</span>
+                <span className="sr-only">
+                  {pluralize(role.members, "member")}
+                </span>
+              </span>
+              <Separator
+                orientation="vertical"
+                className="mx-2 data-vertical:h-5 data-vertical:self-center"
+              />
+              <Button
+                variant="warning"
+                size="icon-sm"
+                aria-label={`Edit role ${role.name}`}
+                onClick={() => setRoleToEdit(role)}
+              >
+                <Pencil />
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon-sm"
+                aria-label={`Delete role ${role.name}`}
+                onClick={() => setRoleToDelete(role.name)}
+              >
+                <Trash2 />
+              </Button>
             </ItemActions>
           </Item>
-        ))}
-      </ItemGroup>
+        )}
+      />
       <ConfirmDialog
         open={roleToDelete !== null}
         onOpenChange={() => setRoleToDelete(null)}
         title="Delete role?"
         description="This will remove this role from the organization."
-        onConfirm={() => handleDeleteRole(roleToDelete!)}
+        onConfirm={handleRoleDelete}
       />
       {roleToEdit && (
         <EditRoleDialog
           role={roleToEdit}
           open={true}
           onOpenChange={() => setRoleToEdit(null)}
-          onRoleChange={handleEditRole}
+          onRoleChange={handleRoleEdit}
         />
       )}
     </>

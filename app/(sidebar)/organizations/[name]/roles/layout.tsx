@@ -1,5 +1,5 @@
 import { PageContent } from "@/components/page/page-content";
-import { AddRole } from "./header-nav";
+import { RolesAdminActions } from "./admin-actions";
 
 export default async function OrganizationRolesLayout({
   children,
@@ -13,8 +13,8 @@ export default async function OrganizationRolesLayout({
   return (
     <PageContent
       title="Roles"
-      description="Define the roles that can be assigned to the organization members."
-      actions={<AddRole orgName={decodeURIComponent(name)} />}
+      description="Create and manage the roles you can assign to organization members."
+      actions={<RolesAdminActions orgName={decodeURIComponent(name)} />}
     >
       {children}
     </PageContent>
