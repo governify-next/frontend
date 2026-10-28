@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FileSignature,
+  FileText,
   House,
   Network,
   Settings,
@@ -34,7 +34,7 @@ export function OrganizationTabsNav({
       value: "agreements",
       label: "Agreements",
       href: `${base}/agreements`,
-      icon: FileSignature,
+      icon: FileText,
     },
   ];
   const adminTabs = [

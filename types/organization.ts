@@ -5,6 +5,7 @@ export interface IOrganization {
   roles: (IRole & { members: number })[];
   members: number;
   scopes: number;
+  collections: number;
   createdBy: string;
 }
 

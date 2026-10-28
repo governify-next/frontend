@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {
   Building2,
-  FolderTree,
+  FileText,
   Network,
   SearchX,
   Shield,
@@ -25,7 +25,7 @@ import {
 import { ItemList } from "@/components/item/item-list";
 import { IOrganization } from "@/types/organization";
 import { Pagination } from "@/types/pagination";
-import { pluralize } from "@/lib/utils/formatter";
+import { formatCompactNumber, pluralize } from "@/lib/utils/formatter";
 import { cn } from "@/lib/utils/cn";
 
 const getInitials = (label: string) =>
@@ -52,9 +52,9 @@ function OrganizationQuickInfo({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="flex items-center gap-1">
+        <span className="flex w-full items-center justify-center gap-1 py-1.5 @2xl/main:w-16">
           <Icon className={cn("size-3.5", iconClassName)} />
-          <span aria-hidden>{count}</span>
+          <span aria-hidden>{formatCompactNumber(count)}</span>
           <span className="sr-only">{description}</span>
         </span>
       </TooltipTrigger>
@@ -110,7 +110,7 @@ export function OrganizationsList({
                   </ItemDescription>
                 )}
               </ItemContent>
-              <div className="hidden grid-cols-[repeat(3,minmax(2rem,auto))] items-center gap-x-2 text-xs text-muted-foreground tabular-nums @sm/main:grid">
+              <div className="grid w-full grid-cols-4 divide-x rounded-md border text-xs text-muted-foreground tabular-nums @2xl/main:w-auto">
                 <OrganizationQuickInfo
                   icon={Users}
                   iconClassName="text-sky"
@@ -128,6 +128,12 @@ export function OrganizationsList({
                   iconClassName="text-amber"
                   count={org.scopes}
                   label="scope"
+                />
+                <OrganizationQuickInfo
+                  icon={FileText}
+                  iconClassName="text-green"
+                  count={org.collections}
+                  label="agreement collection"
                 />
               </div>
             </Link>

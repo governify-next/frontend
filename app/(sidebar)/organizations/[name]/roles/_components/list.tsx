@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item/item-list";
 import { IRole, IRolePayload } from "@/types/organization";
-import { pluralize } from "@/lib/utils/formatter";
+import { formatCompactNumber, pluralize } from "@/lib/utils/formatter";
 import {
   deleteOrganizationRole,
   updateOrganizationRole,
@@ -95,7 +95,7 @@ export function RolesList({
               <ItemActions className="gap-1">
                 <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                   <Users className="size-3.5 text-sky" />
-                  <span aria-hidden>{role.members}</span>
+                  <span aria-hidden>{formatCompactNumber(role.members)}</span>
                   <span className="sr-only">
                     {pluralize(role.members, "member")}
                   </span>
