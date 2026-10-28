@@ -1,4 +1,4 @@
-import { IconAt, IconMail } from "@tabler/icons-react";
+import { AtSign, Mail } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import {
   ICreateIUserPayload,
@@ -86,7 +86,7 @@ export function CreateUserDialog({
                 {(field) => (
                   <field.TextField
                     label="Username"
-                    icon={<IconAt />}
+                    icon={<AtSign />}
                     placeholder="johndoe"
                   />
                 )}
@@ -97,7 +97,7 @@ export function CreateUserDialog({
                   <field.TextField
                     label="Email"
                     type="email"
-                    icon={<IconMail />}
+                    icon={<Mail />}
                     placeholder="johndoe@example.com"
                   />
                 )}

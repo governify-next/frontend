@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FileSignature,
+  FileText,
   House,
   Network,
   Settings,
-  ShieldCheck,
+  Shield,
   Users,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,7 +34,7 @@ export function OrganizationTabsNav({
       value: "agreements",
       label: "Agreements",
       href: `${base}/agreements`,
-      icon: FileSignature,
+      icon: FileText,
     },
   ];
   const adminTabs = [
@@ -48,7 +48,7 @@ export function OrganizationTabsNav({
       value: "roles",
       label: "Roles",
       href: `${base}/roles`,
-      icon: ShieldCheck,
+      icon: Shield,
     },
     {
       value: "settings",

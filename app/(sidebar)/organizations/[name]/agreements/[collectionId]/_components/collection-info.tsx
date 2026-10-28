@@ -1,7 +1,6 @@
 "use client";
 
-import { IconEdit } from "@tabler/icons-react";
-import { Info } from "lucide-react";
+import { Info, SquarePen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +35,7 @@ export function AgreementCollectionInfo({
               collection.name.toUpperCase()}
           </span>
           <Button variant="primarySoft" size="icon-sm" onClick={onEdit}>
-            <IconEdit />
+            <SquarePen />
           </Button>
         </div>
         <span className="text-sm text-muted-foreground">

@@ -22,7 +22,7 @@ export interface IUserInfo extends IBasicUserInfo {
   surname: string;
   status: UserStatus;
   lastLoginAt?: Date;
-  createdBy?: string;
+  createdBy?: Pick<IBasicUserInfo, "_id" | "username"> | null;
 }
 
 // User payload for user table

@@ -1,11 +1,9 @@
+import { ErrorPage } from "@/components/errors";
 import {
   getOrganization,
   getOrganizationMembers,
 } from "@/data/organizations/fetch";
-import { MembersAdminActions } from "./admin-actions";
-import { MembersList } from "./list";
-import { ErrorPage } from "@/components/errors";
-import { PageContent } from "@/components/page/page-content";
+import { MembersList } from "./_components/list";
 
 export default async function OrganizationMembersPage({
   params,
@@ -23,25 +21,18 @@ export default async function OrganizationMembersPage({
   const ERROR_MESSAGE =
     "Something went wrong while fetching organization members.";
 
-  if (!membersResult.ok)
+  if (!membersResult.ok) {
     return <ErrorPage result={membersResult} message={ERROR_MESSAGE} />;
-  if (!organizationResult.ok)
-    return <ErrorPage result={organizationResult} message={ERROR_MESSAGE} />;
+  }
 
-  const members = membersResult.data;
-  const roles = organizationResult.data.roles;
+  if (!organizationResult.ok) {
+    return <ErrorPage result={organizationResult} message={ERROR_MESSAGE} />;
+  }
 
   return (
-    <PageContent
-      title="Members"
-      description="Manage who belongs to the organization and the role each member has."
-      actions={<MembersAdminActions orgName={orgName} />}
-    >
-      <MembersList
-        members={members}
-        organization={organizationResult.data}
-        roles={roles}
-      />
-    </PageContent>
+    <MembersList
+      members={membersResult.data}
+      organization={organizationResult.data}
+    />
   );
 }

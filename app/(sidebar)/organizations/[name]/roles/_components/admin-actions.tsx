@@ -1,18 +1,19 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconPlus } from "@tabler/icons-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { addOrganizationMember } from "@/data/organizations/actions";
-import { AddMemberDialog } from "./add-form";
+import { addOrganizationRole } from "@/data/organizations/actions";
+import { IRolePayload } from "@/types/organization";
+import { AddRoleDialog } from "./add-form";
 
-export function MembersAdminActions({ orgName }: { orgName: string }) {
+export function RolesAdminActions({ orgName }: { orgName: string }) {
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const handleMemberAdd = async (payload: { username: string }) => {
-    const result = await addOrganizationMember(orgName, payload);
+  const handleRoleCreate = async (payload: IRolePayload) => {
+    const result = await addOrganizationRole(orgName, payload);
 
     if (!result.ok) {
       toast.error(result.error);
@@ -20,20 +21,20 @@ export function MembersAdminActions({ orgName }: { orgName: string }) {
     }
 
     router.refresh();
-    toast.success("Member added.");
+    toast.success("Role created.");
     return true;
   };
 
   return (
     <>
       <Button onClick={() => setCreateOpen(true)}>
-        <IconPlus />
-        Add member
+        <Plus />
+        Add role
       </Button>
-      <AddMemberDialog
+      <AddRoleDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        onCreate={handleMemberAdd}
+        onCreate={handleRoleCreate}
       />
     </>
   );

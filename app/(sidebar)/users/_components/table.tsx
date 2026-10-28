@@ -30,15 +30,16 @@ import {
 } from "@/lib/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import {
-  IconDots,
-  IconKey,
-  IconLogout,
-  IconPencil,
-  IconTrash,
-  IconUserCheck,
-  IconUserOff,
-} from "@tabler/icons-react";
-import { SearchX, Users } from "lucide-react";
+  Ellipsis,
+  Key,
+  LogOut,
+  Pencil,
+  SearchX,
+  Trash2,
+  UserCheck,
+  Users,
+  UserX,
+} from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -62,14 +63,16 @@ const updateMessage = (payload: IUserPayload) => {
 
 const columns = ({
   onUserChange,
-  onDeleteUserSessions,
+  onDeleteUserSessionsRequest,
+  onDisableUserRequest,
   onDeleteUserRequest,
   onEditUser,
   onEditUserPassword,
   currentUser,
 }: {
   onUserChange: (userId: string, payload: IUserPayload) => void;
-  onDeleteUserSessions: (userId: string) => void;
+  onDeleteUserSessionsRequest: (userId: string) => void;
+  onDisableUserRequest: (userId: string) => void;
   onDeleteUserRequest: (userId: string) => void;
   onEditUser: (user: IUserInfo) => void;
   onEditUserPassword: (user: IUserInfo) => void;
@@ -87,7 +90,7 @@ const columns = ({
             <Avatar>
               <AvatarFallback>{avatarFallback(user.username)}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <span className="flex items-center gap-2 font-medium">
                 {user.name} {user.surname}
                 {user._id === currentUser._id && (
@@ -157,7 +160,9 @@ const columns = ({
             accessorKey: "createdBy",
             header: "Created by",
             cell: ({ row }) =>
-              row.original.createdBy ?? (
+              row.original.createdBy ? (
+                `@${row.original.createdBy.username}`
+              ) : (
                 <span className="text-muted-foreground">—</span>
               ),
           } satisfies ColumnDef<IUserInfo>,
@@ -178,30 +183,30 @@ const columns = ({
                 className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
                 size="icon"
               >
-                <IconDots />
+                <Ellipsis />
                 <span className="sr-only">Open menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onSelect={() => onEditUser(user)}>
-                <IconPencil />
+                <Pencil />
                 Edit user
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEditUserPassword(user)}>
-                <IconKey />
+                <Key />
                 Change password
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onDeleteUserSessions(user._id)}>
-                <IconLogout />
+              <DropdownMenuItem
+                onSelect={() => onDeleteUserSessionsRequest(user._id)}
+              >
+                <LogOut />
                 Remove sessions
               </DropdownMenuItem>
               {user.status === UserStatus.ACTIVE ? (
                 <DropdownMenuItem
-                  onSelect={() =>
-                    onUserChange(user._id, { status: UserStatus.DISABLED })
-                  }
+                  onSelect={() => onDisableUserRequest(user._id)}
                 >
-                  <IconUserOff />
+                  <UserX />
                   Disable user
                 </DropdownMenuItem>
               ) : (
@@ -210,7 +215,7 @@ const columns = ({
                     onUserChange(user._id, { status: UserStatus.ACTIVE })
                   }
                 >
-                  <IconUserCheck />
+                  <UserCheck />
                   Enable user
                 </DropdownMenuItem>
               )}
@@ -219,7 +224,7 @@ const columns = ({
                 variant="destructive"
                 onSelect={() => onDeleteUserRequest(user._id)}
               >
-                <IconTrash />
+                <Trash2 />
                 Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -246,6 +251,10 @@ export function UsersTable({
   const router = useRouter();
 
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [userToDisable, setUserToDisable] = useState<string | null>(null);
+  const [userToRemoveSessions, setUserToRemoveSessions] = useState<
+    string | null
+  >(null);
   const [userToEdit, setUserToEdit] = useState<IUserInfo | null>(null);
   const [userToChangePassword, setUserToChangePassword] =
     useState<IUserInfo | null>(null);
@@ -264,14 +273,23 @@ export function UsersTable({
     return true;
   };
 
-  const handleUserDeleteSessions = async (userId: string) => {
-    const result = await deleteUserSessions(userId);
+  const handleUserDisable = async () => {
+    const disabled = await handleUserChange(userToDisable!, {
+      status: UserStatus.DISABLED,
+    });
+
+    if (disabled) setUserToDisable(null);
+  };
+
+  const handleUserDeleteSessions = async () => {
+    const result = await deleteUserSessions(userToRemoveSessions!);
 
     if (!result.ok) {
       toast.error(result.error);
       return;
     }
 
+    setUserToRemoveSessions(null);
     const deletedSessions = result.data.deletedSessions;
     deletedSessions === 0
       ? toast.info("No active sessions to remove.")
@@ -295,7 +313,8 @@ export function UsersTable({
 
   const tableColumns = columns({
     onUserChange: handleUserChange,
-    onDeleteUserSessions: handleUserDeleteSessions,
+    onDeleteUserSessionsRequest: setUserToRemoveSessions,
+    onDisableUserRequest: setUserToDisable,
     onDeleteUserRequest: setUserToDelete,
     onEditUser: setUserToEdit,
     onEditUserPassword: setUserToChangePassword,
@@ -333,6 +352,28 @@ export function UsersTable({
         title="Delete User?"
         description="This will permanently delete this user in the system."
         onConfirm={handleUserDelete}
+      />
+      <ConfirmDialog
+        open={userToRemoveSessions !== null}
+        onOpenChange={() => {
+          setUserToRemoveSessions(null);
+        }}
+        title="Remove Sessions?"
+        description="This will sign this user out of all active sessions."
+        icon={<LogOut />}
+        confirmText="Remove"
+        onConfirm={handleUserDeleteSessions}
+      />
+      <ConfirmDialog
+        open={userToDisable !== null}
+        onOpenChange={() => {
+          setUserToDisable(null);
+        }}
+        title="Disable User?"
+        description="This user will not be able to sign in until enabled again."
+        icon={<UserX />}
+        confirmText="Disable"
+        onConfirm={handleUserDisable}
       />
       {userToEdit && (
         <EditUserDialog

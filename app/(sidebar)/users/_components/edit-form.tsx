@@ -1,4 +1,4 @@
-import { IconAt, IconMail } from "@tabler/icons-react";
+import { AtSign, Mail } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import {
   IUserInfo,
@@ -99,7 +99,7 @@ export function EditUserDialog({
                 <FieldLabel htmlFor="username">Username</FieldLabel>
                 <InputGroup data-disabled>
                   <InputGroupAddon>
-                    <IconAt />
+                    <AtSign />
                   </InputGroupAddon>
                   <InputGroupInput
                     id="username"
@@ -114,7 +114,7 @@ export function EditUserDialog({
                   <field.TextField
                     label="Email"
                     type="email"
-                    icon={<IconMail />}
+                    icon={<Mail />}
                     placeholder="johndoe@example.com"
                   />
                 )}
