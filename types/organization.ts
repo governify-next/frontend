@@ -19,9 +19,12 @@ export interface IMembership {
     username: string;
     name: string;
     surname: string;
+    email: string;
   };
   roles: IRole[];
 }
+
+export type IMembershipPayload = Pick<IMembership["userId"], "username">;
 
 export interface IRole {
   _id: string;

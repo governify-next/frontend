@@ -13,7 +13,7 @@ export default async function OrganizationMembersLayout({
   return (
     <PageContent
       title="Members"
-      description="Manage who belongs to the organization and the role each member has."
+      description="Browse the members of the organization and the roles they have."
       actions={<MembersAdminActions orgName={decodeURIComponent(name)} />}
     >
       {children}

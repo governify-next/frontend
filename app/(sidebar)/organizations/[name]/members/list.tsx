@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { MoreVertical } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -13,39 +13,77 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item/item-list";
 import { IMembership, IOrganization, IRole } from "@/types/organization";
-import { avatarFallback } from "@/lib/utils/formatter";
+import { avatarFallback, pluralize } from "@/lib/utils/formatter";
 import {
   removeOrganizationMember,
   updateOrganizationMemberRoles,
 } from "@/data/organizations/actions";
-import { ChangeRoleDialog } from "./change-role";
+import { MemberRolesPicker } from "./roles-picker";
+
+function RoleBadge({ role }: { role: IRole }) {
+  return (
+    <Badge variant="muted">
+      <span
+        aria-hidden
+        className="size-1.5 rounded-full"
+        style={{ backgroundColor: role.color }}
+      />
+      {role.name}
+    </Badge>
+  );
+}
+
+function MemberRolesBadges({ roles }: { roles: IRole[] }) {
+  if (roles.length === 0) {
+    return <span className="text-xs text-muted-foreground">No roles</span>;
+  }
+
+  const hiddenRoles = roles.slice(3);
+
+  return (
+    <>
+      {roles.slice(0, 3).map((role) => (
+        <RoleBadge key={role._id} role={role} />
+      ))}
+      {hiddenRoles.length > 0 && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge variant="muted" tabIndex={0}>
+              <span aria-hidden>+{hiddenRoles.length}</span>
+              <span className="sr-only">
+                {pluralize(hiddenRoles.length, "more role")}
+              </span>
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            {hiddenRoles.map((role) => role.name).join(", ")}
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </>
+  );
+}
 
 export function MembersList({
   members,
   organization,
-  roles,
 }: {
   members: IMembership[];
   organization: IOrganization;
-  roles: IRole[];
 }) {
   const router = useRouter();
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
-  const [memberToChangeRole, setMemberToChangeRole] = useState<{
-    userId: string;
-    username: string;
-    currentRoles: IRole[];
-  } | null>(null);
 
   const handleMemberRemove = async () => {
     const result = await removeOrganizationMember(
@@ -63,21 +101,24 @@ export function MembersList({
     toast.success("Member removed.");
   };
 
-  const handleChangeRole = async (newRolesNames: string[]) => {
+  const handleMemberRolesChange = async (
+    username: string,
+    rolesNames: string[],
+  ) => {
     const result = await updateOrganizationMemberRoles(
       organization.name,
-      memberToChangeRole!.username!,
-      newRolesNames,
+      username,
+      rolesNames,
     );
 
     if (!result.ok) {
-      toast.error("Failed to change role. Please try again.");
-      return;
+      toast.error(result.error);
+      return false;
     }
 
-    setMemberToChangeRole(null);
     router.refresh();
-    toast.success("Roles changed.");
+    toast.success("Roles updated.");
+    return true;
   };
 
   return (
@@ -88,6 +129,7 @@ export function MembersList({
         itemLabel="members"
         renderItem={(member) => {
           const username = member.userId.username;
+
           return (
             <Item variant="outline">
               <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
@@ -95,53 +137,58 @@ export function MembersList({
                   <AvatarFallback>{avatarFallback(username)}</AvatarFallback>
                 </Avatar>
               </ItemMedia>
-              <ItemContent>
+              <ItemContent className="min-w-0">
                 <ItemTitle>
                   {member.userId.name} {member.userId.surname}
                 </ItemTitle>
-                <ItemDescription>{username}</ItemDescription>
+                <ItemDescription>
+                  @{username} · {member.userId.email}
+                </ItemDescription>
               </ItemContent>
-              <ItemActions>
-                <span className="text-xs text-muted-foreground capitalize">
-                  {member.roles[0]?.name}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {member.roles.length} roles
-                </span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Member options"
-                    >
-                      <MoreVertical />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem
-                      onSelect={() =>
-                        setMemberToChangeRole({
-                          userId: member.userId._id,
-                          username: member.userId.username,
-                          currentRoles: member.roles,
-                        })
-                      }
-                    >
-                      Change role
-                    </DropdownMenuItem>
-                    {organization.createdBy !== member.userId._id && (
-                      <>
-                        <DropdownMenuItem
+              <ItemActions className="gap-1">
+                <div className="hidden items-center gap-1 @sm/main:flex">
+                  <MemberRolesBadges roles={member.roles} />
+                </div>
+                <Separator
+                  orientation="vertical"
+                  className="mx-2 hidden data-vertical:h-5 data-vertical:self-center @sm/main:block"
+                />
+                <MemberRolesPicker
+                  member={member}
+                  roles={organization.roles}
+                  organizationCreatorId={organization.createdBy}
+                  onRolesChange={(rolesNames) =>
+                    handleMemberRolesChange(username, rolesNames)
+                  }
+                />
+                {organization.createdBy === member.userId._id ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span tabIndex={0}>
+                        <Button
                           variant="destructive"
-                          onSelect={() => setMemberToRemove(username)}
+                          size="icon-sm"
+                          aria-label={`Remove member ${username}`}
+                          disabled
                         >
-                          Remove user
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                          <Trash2 />
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      The organization creator can&apos;t be removed
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    variant="destructive"
+                    size="icon-sm"
+                    aria-label={`Remove member ${username}`}
+                    onClick={() => setMemberToRemove(username)}
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
               </ItemActions>
             </Item>
           );
@@ -154,17 +201,6 @@ export function MembersList({
         description="This will remove this user from the organization."
         onConfirm={handleMemberRemove}
       />
-      {memberToChangeRole && (
-        <ChangeRoleDialog
-          open={true}
-          onOpenChange={() => setMemberToChangeRole(null)}
-          memberToChangeRole={memberToChangeRole}
-          organizationCreatorId={organization.createdBy}
-          currentRoles={memberToChangeRole.currentRoles}
-          roles={roles}
-          onSave={handleChangeRole}
-        />
-      )}
     </>
   );
 }
