@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconPlus } from "@tabler/icons-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { addOrganizationMember } from "@/data/organizations/actions";
@@ -28,7 +28,7 @@ export function MembersAdminActions({ orgName }: { orgName: string }) {
   return (
     <>
       <Button onClick={() => setCreateOpen(true)}>
-        <IconPlus />
+        <Plus />
         Add member
       </Button>
       <AddMemberDialog

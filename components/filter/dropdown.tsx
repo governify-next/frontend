@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import { Check, ChevronDown } from "lucide-react";
 import type { Option } from "@/types/option";
 
 export function FilterDropdown<T extends string>({
@@ -29,7 +29,7 @@ export function FilterDropdown<T extends string>({
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           {current.label}
-          <IconChevronDown />
+          <ChevronDown />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className={contentClassName}>
@@ -43,7 +43,7 @@ export function FilterDropdown<T extends string>({
               onClick={() => onSelect(item.value)}
             >
               {item.label}
-              {selected && <IconCheck className="ml-auto" />}
+              {selected && <Check className="ml-auto" />}
             </DropdownMenuItem>
           );
         })}

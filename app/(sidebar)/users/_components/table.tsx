@@ -30,15 +30,16 @@ import {
 } from "@/lib/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import {
-  IconDots,
-  IconKey,
-  IconLogout,
-  IconPencil,
-  IconTrash,
-  IconUserCheck,
-  IconUserOff,
-} from "@tabler/icons-react";
-import { SearchX, Users } from "lucide-react";
+  Ellipsis,
+  Key,
+  LogOut,
+  Pencil,
+  SearchX,
+  Trash2,
+  UserCheck,
+  Users,
+  UserX,
+} from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -182,30 +183,30 @@ const columns = ({
                 className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
                 size="icon"
               >
-                <IconDots />
+                <Ellipsis />
                 <span className="sr-only">Open menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onSelect={() => onEditUser(user)}>
-                <IconPencil />
+                <Pencil />
                 Edit user
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEditUserPassword(user)}>
-                <IconKey />
+                <Key />
                 Change password
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => onDeleteUserSessionsRequest(user._id)}
               >
-                <IconLogout />
+                <LogOut />
                 Remove sessions
               </DropdownMenuItem>
               {user.status === UserStatus.ACTIVE ? (
                 <DropdownMenuItem
                   onSelect={() => onDisableUserRequest(user._id)}
                 >
-                  <IconUserOff />
+                  <UserX />
                   Disable user
                 </DropdownMenuItem>
               ) : (
@@ -214,7 +215,7 @@ const columns = ({
                     onUserChange(user._id, { status: UserStatus.ACTIVE })
                   }
                 >
-                  <IconUserCheck />
+                  <UserCheck />
                   Enable user
                 </DropdownMenuItem>
               )}
@@ -223,7 +224,7 @@ const columns = ({
                 variant="destructive"
                 onSelect={() => onDeleteUserRequest(user._id)}
               >
-                <IconTrash />
+                <Trash2 />
                 Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -359,7 +360,7 @@ export function UsersTable({
         }}
         title="Remove Sessions?"
         description="This will sign this user out of all active sessions."
-        icon={<IconLogout />}
+        icon={<LogOut />}
         confirmText="Remove"
         onConfirm={handleUserDeleteSessions}
       />
@@ -370,7 +371,7 @@ export function UsersTable({
         }}
         title="Disable User?"
         description="This user will not be able to sign in until enabled again."
-        icon={<IconUserOff />}
+        icon={<UserX />}
         confirmText="Disable"
         onConfirm={handleUserDisable}
       />

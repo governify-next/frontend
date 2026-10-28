@@ -1,4 +1,4 @@
-import { IconAt } from "@tabler/icons-react";
+import { AtSign } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import { IMembershipPayload } from "@/types/organization";
 import { membershipFormSchema } from "@/schemas/organization";
@@ -63,7 +63,7 @@ export function AddMemberDialog({
                 {(field) => (
                   <field.TextField
                     label="Username"
-                    icon={<IconAt />}
+                    icon={<AtSign />}
                     placeholder="johndoe"
                     autoFocus
                   />

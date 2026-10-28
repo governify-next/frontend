@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IconShield } from "@tabler/icons-react";
+import { Shield } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import { IRolePayload } from "@/types/organization";
 import { roleFormSchema } from "@/schemas/organization";
@@ -81,7 +81,7 @@ function AddRoleForm({
               {(field) => (
                 <field.TextField
                   label="Name"
-                  icon={<IconShield />}
+                  icon={<Shield />}
                   placeholder="auditor"
                   autoFocus
                 />

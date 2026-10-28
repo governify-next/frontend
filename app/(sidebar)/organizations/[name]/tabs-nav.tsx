@@ -6,7 +6,7 @@ import {
   House,
   Network,
   Settings,
-  ShieldCheck,
+  Shield,
   Users,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -48,7 +48,7 @@ export function OrganizationTabsNav({
       value: "roles",
       label: "Roles",
       href: `${base}/roles`,
-      icon: ShieldCheck,
+      icon: Shield,
     },
     {
       value: "settings",

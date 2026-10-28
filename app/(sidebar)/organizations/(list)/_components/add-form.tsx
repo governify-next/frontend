@@ -1,4 +1,4 @@
-import { IconBuilding, IconHash } from "@tabler/icons-react";
+import { Building2, Hash } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import { IOrganizationPayload } from "@/types/organization";
 import { organizationFormSchema } from "@/schemas/organization";
@@ -69,7 +69,7 @@ export function CreateOrganizationDialog({
                 {(field) => (
                   <field.TextField
                     label="Name"
-                    icon={<IconHash />}
+                    icon={<Hash />}
                     placeholder="universidad-sevilla"
                     autoFocus
                   />
@@ -80,7 +80,7 @@ export function CreateOrganizationDialog({
                 {(field) => (
                   <field.TextField
                     label="Display name"
-                    icon={<IconBuilding />}
+                    icon={<Building2 />}
                     placeholder="Universidad de Sevilla"
                   />
                 )}

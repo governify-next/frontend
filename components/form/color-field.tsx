@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { IconCheck, IconRefresh } from "@tabler/icons-react";
+import { Check, RefreshCw } from "lucide-react";
 import { useFieldContext } from "./context";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
@@ -68,7 +68,7 @@ export function ColorField({ label }: { label: string }) {
                 aria-label="Generate random color"
                 onClick={generateColor}
               >
-                <IconRefresh />
+                <RefreshCw />
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
@@ -106,7 +106,7 @@ export function ColorField({ label }: { label: string }) {
                 onClick={() => field.handleChange(hex)}
               >
                 {field.state.value === hex && (
-                  <IconCheck className="size-3.5" />
+                  <Check className="size-3.5" />
                 )}
               </button>
             ))}
