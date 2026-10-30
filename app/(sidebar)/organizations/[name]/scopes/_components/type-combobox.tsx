@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Tag } from "lucide-react";
 import { useFieldContext } from "@/components/form/context";
 import { cn } from "@/lib/utils/cn";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -63,8 +63,13 @@ export function TypeCombobox({
             aria-invalid={isInvalid}
             className="w-full justify-between font-normal"
           >
-            <span className="truncate">
-              {value || "Select or create a type..."}
+            <span className="flex min-w-0 items-center gap-2">
+              <Tag className="text-muted-foreground" />
+              <span
+                className={cn("truncate", !value && "text-muted-foreground")}
+              >
+                {value || "Select or create a type..."}
+              </span>
             </span>
             <ChevronsUpDown className="opacity-50" />
           </Button>

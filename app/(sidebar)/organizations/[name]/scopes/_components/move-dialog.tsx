@@ -14,8 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FolderIcon } from "./folder-icon";
 import { indexScopeTree, ScopeBreadcrumb } from "./breadcrumb";
+import { FolderIcon } from "./folder-icon";
 
 export function MoveScopeDialog({
   scope,
@@ -111,8 +111,8 @@ export function MoveScopeDialog({
                   }
                 }}
                 className={cn(
-                  "flex cursor-pointer items-center gap-2 rounded-md p-2 hover:bg-accent",
-                  selectedId === row._id && "bg-accent",
+                  "flex cursor-pointer items-center gap-2 rounded-md p-2 outline-none transition-colors duration-100 hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  selectedId === row._id && "bg-accent hover:bg-accent",
                 )}
               >
                 <FolderIcon className="w-6 shrink-0" />

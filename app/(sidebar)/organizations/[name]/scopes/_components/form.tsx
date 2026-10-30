@@ -1,5 +1,6 @@
 "use client";
 
+import { Folder } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import { IScopePayload } from "@/types/scope";
 import { scopeBasicsSchema } from "@/schemas/scope";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -59,36 +61,49 @@ export function ScopeFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85dvh] flex-col sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <form
-          id="scope-form"
-          className="-m-1 flex flex-col gap-3 overflow-y-auto p-1"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup className="gap-3">
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" autoFocus />}
-            </form.AppField>
+        <DialogBody>
+          <form
+            id="scope-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <form.AppField name="name">
+                {(field) => (
+                  <field.TextField
+                    label="Name"
+                    icon={<Folder />}
+                    placeholder="Software Group"
+                    autoFocus
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="description">
-              {(field) => <field.TextareaField label="Description" />}
-            </form.AppField>
+              <form.AppField name="description">
+                {(field) => (
+                  <field.TextareaField
+                    label="Description"
+                    placeholder="What does this folder contain?"
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="type">
-              {() => (
-                <TypeCombobox label="Type" existingTypes={existingTypes} />
-              )}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+              <form.AppField name="type">
+                {() => (
+                  <TypeCombobox label="Type" existingTypes={existingTypes} />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>
