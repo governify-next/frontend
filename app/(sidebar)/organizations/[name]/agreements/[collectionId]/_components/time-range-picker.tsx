@@ -3,7 +3,7 @@
 import { TransitionStartFunction, useState } from "react";
 import { useQueryStates } from "nuqs";
 import { format, sub } from "date-fns";
-import { IconChevronDown } from "@tabler/icons-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -68,7 +68,7 @@ export function TimeRangePicker({
             {format(current.from, EXPAND_DATE_TIME_FORMAT)} to{" "}
             {format(current.to, EXPAND_DATE_TIME_FORMAT)}
           </span>
-          <IconChevronDown />
+          <ChevronDown />
         </Button>
       </PopoverTrigger>
       <PopoverContent

@@ -1,6 +1,10 @@
+import { Shield } from "lucide-react";
 import { useAppForm } from "@/components/form";
+import { IRolePayload } from "@/types/organization";
+import { roleFormSchema } from "@/schemas/organization";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -10,8 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { IRolePayload } from "@/types/organization";
-import { roleFormSchema } from "@/schemas/organization";
 
 export function EditRoleDialog({
   role,
@@ -28,6 +30,7 @@ export function EditRoleDialog({
     defaultValues: {
       name: role.name,
       description: role.description,
+      color: role.color,
     },
     validators: {
       onSubmit: roleFormSchema,
@@ -42,31 +45,48 @@ export function EditRoleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit role</DialogTitle>
           <DialogDescription>
-            Make changes to the role here. Click save when you&apos;re done.
+            Update the role name, its color and what it is meant for.
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="edit-role-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" autoFocus />}
-            </form.AppField>
+        <DialogBody>
+          <form
+            id="edit-role-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <form.AppField name="name">
+                {(field) => (
+                  <field.TextField
+                    label="Name"
+                    icon={<Shield />}
+                    placeholder="auditor"
+                    autoFocus
+                  />
+                )}
+              </form.AppField>
 
-            <form.AppField name="description">
-              {(field) => <field.TextareaField label="Description" />}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+              <form.AppField name="description">
+                {(field) => (
+                  <field.TextareaField
+                    label="Description"
+                    placeholder="What can members with this role do?"
+                  />
+                )}
+              </form.AppField>
+              <form.AppField name="color">
+                {(field) => <field.ColorField label="Color" />}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>

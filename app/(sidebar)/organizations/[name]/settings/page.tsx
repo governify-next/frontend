@@ -7,7 +7,6 @@ import { DangerZone } from "./danger-zone";
 import { ErrorPage } from "@/components/errors";
 import { isUserAdminOfOrganization } from "@/data/organizations/actions";
 import InviteZone from "./invite-zone";
-import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationSettingsPage({
   params,
@@ -60,16 +59,10 @@ export default async function OrganizationSettingsPage({
   const token = tokenResult.ok ? tokenResult.data : null;
 
   return (
-    <PageContent
-      title="Settings"
-      description="Update the organization details, manage invitations or delete it."
-      className="max-w-2xl"
-    >
-      <div className="flex flex-col gap-6">
-        <UpdateOrganizationForm organization={organization} />
-        <InviteZone organization={organization} token={token} />
-        <DangerZone orgName={organization.name} />
-      </div>
-    </PageContent>
+    <div className="flex flex-col gap-6">
+      <UpdateOrganizationForm organization={organization} />
+      <InviteZone organization={organization} token={token} />
+      <DangerZone orgName={organization.name} />
+    </div>
   );
 }

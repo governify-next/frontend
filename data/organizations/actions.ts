@@ -3,6 +3,7 @@
 import { bootEnv } from "../../lib/bootConfig";
 import {
   IMembership,
+  IMembershipPayload,
   IOrganization,
   IOrganizationPayload,
   IRole,
@@ -20,7 +21,7 @@ export const createOrganization = async (payload: IOrganizationPayload) => {
 
 export const addOrganizationMember = async (
   orgName: string,
-  payload: { username: string },
+  payload: IMembershipPayload,
 ) => {
   return apiFetcher<IMembership>(
     `${bootEnv.SCOPE_SERVICE_URL}/api/v1/organizations/${orgName}/members`,

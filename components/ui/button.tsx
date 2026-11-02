@@ -17,6 +17,8 @@ const buttonVariants = cva(
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        warning:
+          "bg-amber/10 text-amber hover:bg-amber/20 focus-visible:border-amber/40 focus-visible:ring-amber/20 dark:bg-amber/20 dark:hover:bg-amber/30 dark:focus-visible:ring-amber/40",
         primarySoft:
           "border border-primary/25 bg-primary/5 text-primary shadow-none hover:border-primary/40 hover:bg-primary/15 focus-visible:border-primary/40 focus-visible:ring-primary/20 dark:bg-primary/10 dark:hover:bg-primary/20",
         link: "text-primary underline-offset-4 hover:underline",

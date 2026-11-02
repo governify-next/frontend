@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ComponentProps } from "react";
-import { IconEye, IconEyeOff, IconRefresh } from "@tabler/icons-react";
+import { Eye, EyeOff, RefreshCw } from "lucide-react";
 import { useFieldContext } from "./context";
 import {
   Field,
@@ -43,7 +43,7 @@ export function PasswordField({
             setVisible(true);
           }}
         >
-          <IconRefresh />
+          <RefreshCw />
           Generate
         </Button>
       </div>
@@ -65,7 +65,7 @@ export function PasswordField({
             aria-label={visible ? "Hide password" : "Show password"}
             onClick={() => setVisible(!visible)}
           >
-            {visible ? <IconEye /> : <IconEyeOff />}
+            {visible ? <Eye /> : <EyeOff />}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

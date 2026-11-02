@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconPlus } from "@tabler/icons-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createOrganization } from "@/data/organizations/actions";
@@ -29,7 +29,7 @@ export function OrganizationsAdminActions() {
   return (
     <>
       <Button onClick={() => setCreateOpen(true)}>
-        <IconPlus />
+        <Plus />
         Add organization
       </Button>
       <CreateOrganizationDialog

@@ -10,6 +10,7 @@ import { CheckboxField } from "./checkbox-field";
 import { PasswordField } from "./password-field";
 import { ToggleGroupField } from "./toggle-group-field";
 import { SwitchField } from "./switch-field";
+import { ColorField } from "./color-field";
 
 export const { useAppForm } = createFormHook({
   fieldContext,
@@ -22,6 +23,7 @@ export const { useAppForm } = createFormHook({
     PasswordField,
     ToggleGroupField,
     SwitchField,
+    ColorField,
   },
   formComponents: {
     SubmitButton,

@@ -1,7 +1,10 @@
-import * as z from "zod";
+import { AtSign } from "lucide-react";
 import { useAppForm } from "@/components/form";
+import { IMembershipPayload } from "@/types/organization";
+import { membershipFormSchema } from "@/schemas/organization";
 import {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -12,13 +15,6 @@ import {
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters.")
-    .max(50, "Username must be at most 50 characters."),
-});
-
 export function AddMemberDialog({
   open,
   onOpenChange,
@@ -26,17 +22,17 @@ export function AddMemberDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (payload: { username: string }) => Promise<boolean>;
+  onCreate: (payload: IMembershipPayload) => Promise<boolean>;
 }) {
   const form = useAppForm({
     defaultValues: {
       username: "",
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: membershipFormSchema,
     },
     onSubmit: async ({ value }) => {
-      const success = await onCreate({ username: value.username });
+      const success = await onCreate(value);
       if (success) {
         form.reset();
         onOpenChange(false);
@@ -54,23 +50,34 @@ export function AddMemberDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          id="add-member-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <FieldGroup className="gap-3">
-            <form.AppField name="username">
-              {(field) => <field.TextField label="Username" autoFocus />}
-            </form.AppField>
-          </FieldGroup>
-        </form>
+        <DialogBody>
+          <form
+            id="add-member-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-5">
+              <form.AppField name="username">
+                {(field) => (
+                  <field.TextField
+                    label="Username"
+                    icon={<AtSign />}
+                    placeholder="johndoe"
+                    autoFocus
+                  />
+                )}
+              </form.AppField>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" onClick={() => form.reset()}>
+              Cancel
+            </Button>
           </DialogClose>
           <form.AppForm>
             <form.SubmitButton label="Add member" formId="add-member-form" />

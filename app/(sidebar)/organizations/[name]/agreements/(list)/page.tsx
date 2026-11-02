@@ -1,7 +1,6 @@
 import { getAgreementCollections } from "@/data/agreements/fetch";
 import { ErrorPage } from "@/components/errors";
 import { AgreementsList } from "./list";
-import { PageContent } from "@/components/page/page-content";
 
 export default async function OrganizationAgreementsPage({
   params,
@@ -21,12 +20,5 @@ export default async function OrganizationAgreementsPage({
     );
   }
 
-  return (
-    <PageContent
-      title="Agreements"
-      description="Review the organization agreements and their versions."
-    >
-      <AgreementsList orgName={orgName} collections={result.data} />
-    </PageContent>
-  );
+  return <AgreementsList orgName={orgName} collections={result.data} />;
 }

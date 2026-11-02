@@ -10,6 +10,12 @@ export const avatarFallback = (text: string) => {
 export const pluralize = (count: number, word: string) =>
   `${count} ${count === 1 ? word : `${word}s`}`;
 
+export const formatCompactNumber = (value: number) =>
+  new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumSignificantDigits: 3,
+  }).format(value);
+
 export const formatReadableDate = (
   date?: Date | null,
   timeZone?: string,

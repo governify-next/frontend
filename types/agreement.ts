@@ -8,6 +8,11 @@ export interface IWindow {
 
 export interface IGuarantee {
   name: string;
+  info: {
+    title: string;
+    description: string;
+    example: string;
+  };
   numericExpression: string;
   comparator: string;
   threshold: number;

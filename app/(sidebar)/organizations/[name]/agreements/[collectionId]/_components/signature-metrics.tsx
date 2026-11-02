@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import { Check, ChevronDown } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export function SignatureMetrics({
             </span>
             <Badge variant="muted">{metrics.length}</Badge>
             <Separator className="shrink" />
-            <IconChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
           </button>
         </CollapsibleTrigger>
         {signatures.length > 1 && open && (
@@ -72,7 +72,7 @@ export function SignatureMetrics({
             <DropdownMenuTrigger asChild>
               <Button variant="primarySoft" size="sm">
                 <span># {selectedSignature?.visualizationConfig.label}</span>
-                <IconChevronDown />
+                <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-auto">
@@ -88,7 +88,7 @@ export function SignatureMetrics({
                     }
                   >
                     # {signature.visualizationConfig.label}
-                    <span>{isCurrent && <IconCheck />}</span>
+                    <span>{isCurrent && <Check />}</span>
                   </DropdownMenuItem>
                 );
               })}
@@ -197,7 +197,7 @@ function MetricCard({
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="-ml-2 self-start">
               More details
-              <IconChevronDown />
+              <ChevronDown />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-3">

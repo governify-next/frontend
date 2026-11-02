@@ -8,7 +8,7 @@ import { IComplianceData } from "@/types/compliance";
 import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const getAgreementCollections = async (orgName: string) => {
-  return await apiFetcher<IAgreementCollection[]>(
+  return await apiFetcher<(IAgreementCollection & { autoTracking: boolean })[]>(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/agreementCollections`,
     { method: "GET" },
   );

@@ -4,8 +4,13 @@ import { TransitionStartFunction, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryStates } from "nuqs";
-import { ChevronLeft, RefreshCw, ZoomOut } from "lucide-react";
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  RefreshCw,
+  ZoomOut,
+} from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -116,7 +121,7 @@ export function AgreementHeader({
                 disabled={isNavigating}
               >
                 {refresh}
-                <IconChevronDown />
+                <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -130,7 +135,7 @@ export function AgreementHeader({
                     onClick={() => setSearchParams({ refresh: option })}
                   >
                     {option}
-                    {selected && <IconCheck className="ml-auto" />}
+                    {selected && <Check className="ml-auto" />}
                   </DropdownMenuItem>
                 );
               })}

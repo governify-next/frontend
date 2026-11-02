@@ -11,6 +11,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -100,16 +102,20 @@ function SidebarUserSectionSkeleton() {
   return (
     <>
       <SidebarContent>
-        <SidebarMenu className="gap-2 p-2">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <SidebarMenuItem key={index}>
-              <div className="flex items-center gap-2 px-2 py-1.5">
-                <Skeleton className="size-4 shrink-0 rounded" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {Array.from({ length: 2 }).map((_, index) => (
+                <SidebarMenuItem key={index}>
+                  <div className="flex h-9 items-center gap-2 p-2">
+                    <Skeleton className="size-5 shrink-0 rounded-md" />
+                    <Skeleton className="h-5 w-28" />
+                  </div>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

@@ -70,8 +70,10 @@ export function AgreementVersionSignatures({
         );
         return (
           <AccordionItem key={guaranteeName} value={guaranteeName}>
-            <AccordionTrigger className="flex items-center py-5">
-              <span className="flex-1">{breakOnUnderscore(guaranteeName)}</span>
+            <AccordionTrigger className="flex items-center py-4 text-base">
+              <span className="flex-1">
+                {firstSignature.guarantee.info.title}
+              </span>
               <div className="flex items-center gap-2 pr-2 hidden @lg/main:flex">
                 <Badge variant="secondary">
                   {formatComparator(firstSignature.guarantee.comparator)}{" "}
@@ -130,6 +132,10 @@ function GuaranteeDetails({
   const [metricsOpen, setMetricsOpen] = useState(false);
   return (
     <>
+      <GuaranteeInfo
+        info={signatures[0].guarantee.info}
+        guaranteeName={guaranteeName}
+      />
       <SignatureObjective
         guarantee={signatures[0].guarantee}
         comparator={comparator}
@@ -160,6 +166,34 @@ function GuaranteeDetails({
         }}
       />
     </>
+  );
+}
+
+function GuaranteeInfo({
+  info,
+  guaranteeName,
+}: {
+  info: IGuarantee["info"];
+  guaranteeName: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1 border-l-2 pl-3 text-sm">
+      {info.description && (
+        <p>
+          <span className="text-muted-foreground">Description:</span>{" "}
+          {info.description}
+        </p>
+      )}
+      {info.example && (
+        <p>
+          <span className="text-muted-foreground">Example:</span> {info.example}
+        </p>
+      )}
+      <p>
+        <span className="text-muted-foreground">Identifier:</span>{" "}
+        {breakOnUnderscore(guaranteeName)}
+      </p>
+    </div>
   );
 }
 

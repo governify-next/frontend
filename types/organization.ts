@@ -2,9 +2,10 @@ export interface IOrganization {
   name: string;
   displayName?: string;
   description: string;
-  roles: IRole[];
+  roles: (IRole & { members: number })[];
   members: number;
   scopes: number;
+  collections: number;
   createdBy: string;
 }
 
@@ -19,17 +20,21 @@ export interface IMembership {
     username: string;
     name: string;
     surname: string;
+    email: string;
   };
   roles: IRole[];
 }
+
+export type IMembershipPayload = Pick<IMembership["userId"], "username">;
 
 export interface IRole {
   _id: string;
   name: string;
   description: string;
+  color: string;
 }
 
-export type IRolePayload = Pick<IRole, "name" | "description">;
+export type IRolePayload = Pick<IRole, "name" | "description" | "color">;
 
 export interface IOrganizationSearchFilters {
   nameOrDisplayName?: string;

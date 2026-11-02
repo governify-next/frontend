@@ -40,7 +40,7 @@ export function ComplianceGauge({
               fontSize: 12,
               fontFamily: geistSans.style.fontFamily,
             },
-            data: [{ value, name: label }],
+            data: [{ value: value ?? 0, name: label }],
           },
           {
             ...gaugeBase,

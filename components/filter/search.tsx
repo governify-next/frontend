@@ -1,6 +1,6 @@
 "use client";
 
-import { IconSearch } from "@tabler/icons-react";
+import { Search } from "lucide-react";
 import { debounce, parseAsString, useQueryStates } from "nuqs";
 import { cn } from "cn";
 import { paginationSearchParams } from "@/lib/search/pagination";
@@ -27,7 +27,7 @@ export function SearchFilter({
   return (
     <InputGroup className={cn("min-w-0", className)}>
       <InputGroupAddon>
-        <IconSearch />
+        <Search />
       </InputGroupAddon>
       <InputGroupInput
         placeholder={placeholder}

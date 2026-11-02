@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { HEX_COLOR } from "@/lib/utils/color";
 
 export const organizationFormSchema = z.object({
   name: z
@@ -27,4 +28,17 @@ export const roleFormSchema = z.object({
     .string()
     .min(3, "Role description must be at least 3 characters.")
     .max(500, "Role description must be at most 500 characters."),
+  color: z
+    .string()
+    .regex(HEX_COLOR, "Color must be a hex color with the format #rrggbb.")
+    .refine((v) => !["#ffffff", "#000000"].includes(v), {
+      message: "Pure white and pure black are not allowed.",
+    }),
+});
+
+export const membershipFormSchema = z.object({
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters.")
+    .max(50, "Username must be at most 50 characters."),
 });

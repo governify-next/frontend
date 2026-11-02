@@ -1,11 +1,13 @@
 "use client";
 
 import { useQueryStates } from "nuqs";
-import { IconCheck, IconChevronDown, IconRepeatOff } from "@tabler/icons-react";
 import {
   ArrowRight,
   Ban,
+  CalendarOff,
   CalendarSync,
+  Check,
+  ChevronDown,
   Globe,
   Minus,
   PlayIcon,
@@ -170,7 +172,7 @@ export function AgreementVersionInfo({
                 <Button variant="outline" className="grow">
                   Version {version.versionNumber}
                   {isActive && <Badge variant="secondary">Active</Badge>}
-                  <IconChevronDown />
+                  <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-auto">
@@ -198,7 +200,7 @@ export function AgreementVersionInfo({
                         {candidate.versionNumber === activeNumber && (
                           <Badge variant="secondary">Active</Badge>
                         )}
-                        {isCurrent && <IconCheck />}
+                        {isCurrent && <Check />}
                       </span>
                     </DropdownMenuItem>
                   );
@@ -247,7 +249,7 @@ export function AgreementVersionInfo({
                 className="col-start-2"
                 onClick={() => handleToggle(false)}
               >
-                <IconRepeatOff />
+                <CalendarOff />
                 Stop tracking
               </Button>
             )}
