@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -62,7 +63,8 @@ export function DangerZone({ orgName }: { orgName: string }) {
                   variant="destructive"
                   onClick={() => setConfirmOpen(true)}
                 >
-                  Delete organization
+                  <Trash2 />
+                  Delete
                 </Button>
               </ItemActions>
             </Item>
@@ -74,7 +76,7 @@ export function DangerZone({ orgName }: { orgName: string }) {
         open={confirmOpen}
         onOpenChange={() => setConfirmOpen(false)}
         title="Delete organization?"
-        description={`This will permanently delete the organization and all its data.`}
+        description="This will permanently delete the organization and all its data."
         onConfirm={handleDelete}
       />
     </>

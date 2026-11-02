@@ -1,12 +1,12 @@
+import { ErrorPage } from "@/components/errors";
 import {
   getOrganization,
   getOrganizationInviteToken,
 } from "@/data/organizations/fetch";
-import { UpdateOrganizationForm } from "./update-form";
-import { DangerZone } from "./danger-zone";
-import { ErrorPage } from "@/components/errors";
 import { isUserAdminOfOrganization } from "@/data/organizations/actions";
-import InviteZone from "./invite-zone";
+import { InviteZone } from "./_components/invite-zone";
+import { DangerZone } from "./_components/danger-zone";
+import { OrganizationDetails } from "./_components/details";
 
 export default async function OrganizationSettingsPage({
   params,
@@ -47,7 +47,7 @@ export default async function OrganizationSettingsPage({
           error: "Insufficient permissions",
           status: 403,
         }}
-        message="Something went wrong while checking if user is admin of organization."
+        message="You need admin permissions to manage this organization's settings."
       />
     );
   }
@@ -60,7 +60,7 @@ export default async function OrganizationSettingsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <UpdateOrganizationForm organization={organization} />
+      <OrganizationDetails organization={organization} />
       <InviteZone organization={organization} token={token} />
       <DangerZone orgName={organization.name} />
     </div>

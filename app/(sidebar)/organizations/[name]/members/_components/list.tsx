@@ -12,7 +12,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/avatar/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -24,7 +24,7 @@ import {
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item/item-list";
 import { IMembership, IOrganization, IRole } from "@/types/organization";
-import { avatarFallback, pluralize } from "@/lib/utils/formatter";
+import { pluralize } from "@/lib/utils/formatter";
 import { cn } from "@/lib/utils/cn";
 import {
   removeOrganizationMember,
@@ -168,9 +168,7 @@ export function MembersList({
           return (
             <Item variant="outline">
               <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
-                <Avatar>
-                  <AvatarFallback>{avatarFallback(username)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar name={username} />
               </ItemMedia>
               <ItemContent className="min-w-0">
                 <ItemTitle>

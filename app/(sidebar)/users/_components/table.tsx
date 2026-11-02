@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
-  avatarFallback,
   formatEnumLabel,
   formatReadableDate,
 } from "@/lib/utils/formatter";
@@ -40,7 +39,7 @@ import {
   Users,
   UserX,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/avatar/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -87,9 +86,7 @@ const columns = ({
 
         return (
           <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarFallback>{avatarFallback(user.username)}</AvatarFallback>
-            </Avatar>
+            <UserAvatar name={user.username} />
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-2 font-medium">
                 {user.name} {user.surname}

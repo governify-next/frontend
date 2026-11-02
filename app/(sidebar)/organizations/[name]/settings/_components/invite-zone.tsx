@@ -1,21 +1,22 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Eye, RefreshCcw } from "lucide-react";
+import { IOrganization } from "@/types/organization";
+import { generateOrganizationInviteToken } from "@/data/organizations/actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { generateOrganizationInviteToken } from "@/data/organizations/actions";
-import { IOrganization } from "@/types/organization";
-import { RefreshCcw } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
-export default function InviteZone({
+export function InviteZone({
   organization,
   token,
 }: {
@@ -40,27 +41,28 @@ export default function InviteZone({
     }
     setLink(`${window.location.origin}/invites/${inviteToken}`);
   };
+
   return (
     <>
       <Card>
         <CardHeader>
           <CardTitle>Invite zone</CardTitle>
-          <div className="flex items-center justify-between">
-            <CardDescription>
-              Create an invitation link so that new users can register and
-              automatically join this organization.
-            </CardDescription>
-            {!link && (
-              <Button variant="outline" onClick={() => handleShowLink()}>
-                Show link
-              </Button>
-            )}
-            {link && (
+          <CardDescription>
+            Create an invitation link so that new users can register and
+            automatically join this organization.
+          </CardDescription>
+          <CardAction className="self-center">
+            {link ? (
               <Button variant="outline" onClick={() => setConfirmOpen(true)}>
                 Regenerate link
               </Button>
+            ) : (
+              <Button variant="outline" onClick={() => handleShowLink()}>
+                <Eye />
+                Show link
+              </Button>
             )}
-          </div>
+          </CardAction>
         </CardHeader>
         {link && (
           <CardContent>
@@ -74,7 +76,7 @@ export default function InviteZone({
         open={confirmOpen}
         onOpenChange={() => setConfirmOpen(false)}
         title="Regenerate invitation link?"
-        description={`This will invalidate the previous invitation link.`}
+        description="This will invalidate the previous invitation link."
         onConfirm={() => handleShowLink(true)}
         icon={<RefreshCcw />}
         confirmText="Confirm"
