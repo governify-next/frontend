@@ -2,9 +2,12 @@ import {
   getAgreementCollection,
   getAgreementVersionByCollection,
   getAgreementVersionComplianceData,
+  getCollectionPermissions,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
 import { getAgreementVersionState } from "@/data/agreements/actions";
+import { getOrganization } from "@/data/organizations/fetch";
+import { isUserAdminOfOrganization } from "@/data/organizations/actions";
 import { ErrorPage } from "@/components/errors";
 import { AgreementDetail } from "./detail";
 import { loadAgreementVersionSearchParams } from "./search-params";
@@ -30,7 +33,13 @@ export default async function AgreementDetailPage({
     `/organizations/${name}/agreements/${collectionId}`,
   );
 
-  const collectionResult = await getAgreementCollection(orgName, collectionId);
+  const [collectionResult, organizationResult, adminResult] = await Promise.all(
+    [
+      getAgreementCollection(orgName, collectionId),
+      getOrganization(orgName),
+      isUserAdminOfOrganization(orgName),
+    ],
+  );
 
   if (!collectionResult.ok) {
     return (
@@ -62,20 +71,24 @@ export default async function AgreementDetailPage({
       candidate.versionNumber > max.versionNumber ? candidate : max,
     );
 
-  const [stateTasksResult, agreementFullVersionResult] = await Promise.all([
-    getStateTasksForAgreementVersion(
-      orgName,
-      collection.scopeId,
-      collection._id,
-      version.versionNumber,
-    ),
-    getAgreementVersionByCollection(
-      orgName,
-      collection.scopeId,
-      collection._id,
-      version.versionNumber,
-    ),
-  ]);
+  const [stateTasksResult, agreementFullVersionResult, permissionsResult] =
+    await Promise.all([
+      getStateTasksForAgreementVersion(
+        orgName,
+        collection.scopeId,
+        collection._id,
+        version.versionNumber,
+      ),
+      getAgreementVersionByCollection(
+        orgName,
+        collection.scopeId,
+        collection._id,
+        version.versionNumber,
+      ),
+      adminResult.ok && adminResult.data.isAdmin
+        ? getCollectionPermissions(orgName, collection._id)
+        : null,
+    ]);
 
   if (!stateTasksResult.ok) {
     return (
@@ -133,6 +146,8 @@ export default async function AgreementDetailPage({
         collection._id,
         version.versionNumber,
       )}
+      roles={organizationResult.ok ? organizationResult.data.roles : []}
+      permissions={permissionsResult?.ok ? permissionsResult.data : null}
     />
   );
 }

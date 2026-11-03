@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryStates } from "nuqs";
 import {
+  Activity,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -75,6 +76,7 @@ export function AgreementHeader({
             className: "flex-1 @3xl/main:flex-none",
           })}
         >
+          <Activity />
           Evolutive points
           <Switch
             checked={showEvolutivePoints}

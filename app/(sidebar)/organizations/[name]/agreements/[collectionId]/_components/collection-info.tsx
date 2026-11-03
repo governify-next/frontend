@@ -3,12 +3,14 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Hash, SquarePen, Type } from "lucide-react";
+import { Hash, Pencil, Type } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import {
   IAgreementCollection,
   IAgreementCollectionPayload,
+  ICollectionPermissions,
 } from "@/types/agreement";
+import { IRole } from "@/types/organization";
 import { collectionFormSchema } from "@/schemas/collection";
 import { updateAgreementCollection } from "@/data/agreements/actions";
 import { Button } from "@/components/ui/button";
@@ -21,13 +23,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
+import { CollectionPermissionsDialog } from "./permissions-dialog";
 
 export function AgreementCollectionDetails({
   orgName,
   collection,
+  roles,
+  permissions,
 }: {
   orgName: string;
   collection: IAgreementCollection;
+  roles: IRole[];
+  permissions: ICollectionPermissions | null;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -67,22 +74,29 @@ export function AgreementCollectionDetails({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-2">
         <span className="font-semibold text-2xl">
           {(collection.displayName || collection.name).toUpperCase()}
         </span>
-        <Button
-          variant="primarySoft"
-          size="icon-sm"
-          onClick={() => setEditing(true)}
-        >
-          <SquarePen />
+        <span className="text-sm text-muted-foreground">
+          {collection.description}
+        </span>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        {permissions && (
+          <CollectionPermissionsDialog
+            orgName={orgName}
+            collectionId={collection._id}
+            roles={roles}
+            permissions={permissions}
+          />
+        )}
+        <Button onClick={() => setEditing(true)}>
+          <Pencil />
+          Edit details
         </Button>
       </div>
-      <span className="text-sm text-muted-foreground">
-        {collection.description}
-      </span>
     </div>
   );
 }

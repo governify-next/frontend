@@ -6,7 +6,9 @@ import {
   CalculationState,
   IAgreementCollection,
   IAgreementVersion,
+  ICollectionPermissions,
 } from "@/types/agreement";
+import { IRole } from "@/types/organization";
 import { Result } from "@/lib/utils/fetcher";
 import { getValidityEnd } from "@/lib/utils/validity";
 import { IComplianceData, IComplianceState } from "@/types/compliance";
@@ -23,6 +25,8 @@ export function AgreementDetail({
   range,
   compliance,
   getState,
+  roles,
+  permissions,
 }: {
   orgName: string;
   collection: IAgreementCollection;
@@ -31,6 +35,8 @@ export function AgreementDetail({
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  roles: IRole[];
+  permissions: ICollectionPermissions | null;
 }) {
   const [isNavigating, startTransition] = useTransition();
   const [, setSearchParams] = useQueryStates(agreementVersionSearchParams);
@@ -77,7 +83,12 @@ export function AgreementDetail({
       />
 
       <div className="flex flex-col gap-4 md:px-3">
-        <AgreementCollectionDetails orgName={orgName} collection={collection} />
+        <AgreementCollectionDetails
+          orgName={orgName}
+          collection={collection}
+          roles={roles}
+          permissions={permissions}
+        />
 
         <AgreementVersionInfo
           collection={collection}

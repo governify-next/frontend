@@ -71,6 +71,17 @@ export interface IAgreementCollection {
   agreementVersions: IAgreementVersion[];
 }
 
+export type ICollectionPermissions = Record<
+  | "collection:view"
+  | "collection:auto-tracking"
+  | "collection:track-period"
+  | "version:terminate"
+  | "collection:edit"
+  | "collection:view-evolutive"
+  | "collection:delete",
+  string[]
+>;
+
 export interface ITask {
   _id: string;
   script: string;

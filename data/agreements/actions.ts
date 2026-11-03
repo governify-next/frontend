@@ -5,6 +5,7 @@ import { apiFetcher, type Result } from "@/lib/utils/fetcher";
 import {
   IAgreementCollection,
   IAgreementCollectionPayload,
+  ICollectionPermissions,
   ITask,
 } from "@/types/agreement";
 import { IComplianceState } from "@/types/compliance";
@@ -49,7 +50,6 @@ export const updateAgreementCollection = async (
       body: {
         ...payload,
         fields: [],
-        permissions: [],
         auditableVersionNumber: auditableVersion,
       },
     },
@@ -98,5 +98,16 @@ export const getAgreementVersionState = async (
   return await apiFetcher<IComplianceState>(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/states/${encodeURIComponent(stateId)}`,
     { method: "GET" },
+  );
+};
+
+export const updateCollectionPermissions = async (
+  orgName: string,
+  collectionId: string,
+  permissions: ICollectionPermissions,
+) => {
+  return await apiFetcher<ICollectionPermissions>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/agreementCollections/${encodeURIComponent(collectionId)}/permissions`,
+    { method: "PUT", body: permissions },
   );
 };
