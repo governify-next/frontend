@@ -14,7 +14,10 @@ import {
   ShieldCheck,
   Trash2,
 } from "lucide-react";
-import { ICollectionPermissions } from "@/types/agreement";
+import {
+  CollectionPermission,
+  ICollectionPermissions,
+} from "@/types/agreement";
 import { IRole } from "@/types/organization";
 import { updateCollectionPermissions } from "@/data/agreements/actions";
 import { sameItems, toggleItem } from "@/lib/utils/array";
@@ -47,50 +50,48 @@ import { RoleBadge } from "@/components/role/role-badge";
 import { RolesPicker } from "@/components/role/roles-picker";
 
 const permissionCatalog: Record<
-  keyof ICollectionPermissions,
+  CollectionPermission,
   { label: string; description: string; icon: React.ReactNode }
 > = {
-  "collection:view": {
+  [CollectionPermission.VIEW]: {
     label: "View agreement",
     description: "View the agreement and go into its details.",
     icon: <Eye />,
   },
-  "collection:edit": {
+  [CollectionPermission.EDIT]: {
     label: "Edit agreement",
     description: "Change the agreement information.",
     icon: <Pencil />,
   },
-  "collection:auto-tracking": {
+  [CollectionPermission.AUTO_TRACKING]: {
     label: "Toggle tracking",
     description:
       "Start or stop the automatic tracking of an agreement version.",
     icon: <CalendarSync />,
   },
-  "collection:track-period": {
+  [CollectionPermission.TRACK_PERIOD]: {
     label: "Track period",
     description: "Collect data from a past period.",
     icon: <PlayIcon />,
   },
-  "collection:view-evolutive": {
+  [CollectionPermission.VIEW_EVOLUTIVE]: {
     label: "View evolutive points",
     description: "Show the evolutive points in the agreement charts.",
     icon: <Activity />,
   },
-  "version:terminate": {
+  [CollectionPermission.TERMINATE_VERSION]: {
     label: "Terminate version",
     description: "End the active version of the agreement.",
     icon: <PowerOff />,
   },
-  "collection:delete": {
+  [CollectionPermission.DELETE]: {
     label: "Delete collection",
     description: "Remove the collection and all its versions.",
     icon: <Trash2 />,
   },
 };
 
-const permissionKeys = Object.keys(
-  permissionCatalog,
-) as (keyof ICollectionPermissions)[];
+const permissionKeys = Object.keys(permissionCatalog) as CollectionPermission[];
 
 export function CollectionPermissionsDialog({
   orgName,
@@ -126,7 +127,7 @@ export function CollectionPermissionsDialog({
     setOpen(next);
   };
 
-  const toggleRole = (key: keyof ICollectionPermissions, roleId: string) =>
+  const toggleRole = (key: CollectionPermission, roleId: string) =>
     setDraft((current) => ({
       ...current,
       [key]: toggleItem(current[key], roleId),

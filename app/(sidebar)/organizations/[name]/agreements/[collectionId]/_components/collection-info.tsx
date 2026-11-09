@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import { Hash, Pencil, Type } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import {
+  CollectionPermission,
   IAgreementCollection,
+  IAgreementCollectionWithActions,
   IAgreementCollectionPayload,
   ICollectionPermissions,
 } from "@/types/agreement";
@@ -32,7 +34,7 @@ export function AgreementCollectionDetails({
   permissions,
 }: {
   orgName: string;
-  collection: IAgreementCollection;
+  collection: IAgreementCollectionWithActions;
   roles: IRole[];
   permissions: ICollectionPermissions | null;
 }) {
@@ -92,10 +94,12 @@ export function AgreementCollectionDetails({
             permissions={permissions}
           />
         )}
-        <Button onClick={() => setEditing(true)}>
-          <Pencil />
-          Edit details
-        </Button>
+        {collection.allowedActions[CollectionPermission.EDIT] && (
+          <Button onClick={() => setEditing(true)}>
+            <Pencil />
+            Edit details
+          </Button>
+        )}
       </div>
     </div>
   );

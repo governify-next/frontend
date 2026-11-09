@@ -4,7 +4,8 @@ import { useState, useTransition } from "react";
 import { useQueryStates } from "nuqs";
 import {
   CalculationState,
-  IAgreementCollection,
+  CollectionPermission,
+  IAgreementCollectionWithActions,
   IAgreementVersion,
   ICollectionPermissions,
 } from "@/types/agreement";
@@ -29,7 +30,7 @@ export function AgreementDetail({
   permissions,
 }: {
   orgName: string;
-  collection: IAgreementCollection;
+  collection: IAgreementCollectionWithActions;
   calculationState: CalculationState;
   version: IAgreementVersion;
   range: { from: Date; to: Date };
@@ -77,6 +78,9 @@ export function AgreementDetail({
           initial: new Date(version.contract.validity.initial),
           end: getValidityEnd(version.contract.validity),
         }}
+        canViewEvolutive={
+          collection.allowedActions[CollectionPermission.VIEW_EVOLUTIVE]
+        }
         isNavigating={isNavigating}
         startTransition={startTransition}
         onZoomOut={onZoomOut}

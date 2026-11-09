@@ -34,6 +34,7 @@ export function AgreementHeader({
   orgName,
   range,
   validity,
+  canViewEvolutive,
   isNavigating,
   startTransition,
   onZoomOut,
@@ -41,6 +42,7 @@ export function AgreementHeader({
   orgName: string;
   range: { from: Date; to: Date };
   validity: { initial: Date; end: Date };
+  canViewEvolutive: boolean;
   isNavigating: boolean;
   startTransition: TransitionStartFunction;
   onZoomOut?: () => void;
@@ -70,22 +72,24 @@ export function AgreementHeader({
             </span>
           </Link>
         </Button>
-        <Label
-          className={buttonVariants({
-            variant: "outline",
-            className: "flex-1 @3xl/main:flex-none",
-          })}
-        >
-          <Activity />
-          Evolutive points
-          <Switch
-            checked={showEvolutivePoints}
-            disabled={isNavigating}
-            onCheckedChange={(checked) =>
-              setSearchParams({ showEvolutivePoints: checked })
-            }
-          />
-        </Label>
+        {canViewEvolutive && (
+          <Label
+            className={buttonVariants({
+              variant: "outline",
+              className: "flex-1 @3xl/main:flex-none",
+            })}
+          >
+            <Activity />
+            Evolutive points
+            <Switch
+              checked={showEvolutivePoints}
+              disabled={isNavigating}
+              onCheckedChange={(checked) =>
+                setSearchParams({ showEvolutivePoints: checked })
+              }
+            />
+          </Label>
+        )}
       </div>
       <div className="flex flex-col gap-2 @3xl/main:ml-auto @3xl/main:flex-row @3xl/main:items-center">
         <ButtonGroup className="w-full @3xl/main:w-fit">

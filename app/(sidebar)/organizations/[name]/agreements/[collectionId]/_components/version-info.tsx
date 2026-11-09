@@ -31,7 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   CalculationState,
-  IAgreementCollection,
+  CollectionPermission,
+  IAgreementCollectionWithActions,
   IAgreementVersion,
   ISignature,
 } from "@/types/agreement";
@@ -66,7 +67,7 @@ export function AgreementVersionInfo({
   startTransition,
   onZoom,
 }: {
-  collection: IAgreementCollection;
+  collection: IAgreementCollectionWithActions;
   version: IAgreementVersion;
   orgName: string;
   calculationState: CalculationState;
@@ -82,6 +83,7 @@ export function AgreementVersionInfo({
   const [openTerminateDialog, setOpenTerminateDialog] = useState(false);
   const [openFetchStatesDialog, setOpenFetchStatesDialog] = useState(false);
 
+  const { allowedActions } = collection;
   const versions = collection.agreementVersions;
   const activeNumber = collection.auditableVersionNumber;
   const isActive = version.versionNumber === activeNumber;
@@ -232,7 +234,8 @@ export function AgreementVersionInfo({
                 </span>
               </div>
             )}
-            {enabledToggle &&
+            {allowedActions[CollectionPermission.AUTO_TRACKING] &&
+              enabledToggle &&
               calculationState === CalculationState.NO_TASKS && (
                 <Button
                   variant="outline"
@@ -243,34 +246,38 @@ export function AgreementVersionInfo({
                   Start tracking
                 </Button>
               )}
-            {enableRunningOptions && (
+            {allowedActions[CollectionPermission.AUTO_TRACKING] &&
+              enableRunningOptions && (
+                <Button
+                  variant="outline"
+                  className="col-start-2"
+                  onClick={() => handleToggle(false)}
+                >
+                  <CalendarOff />
+                  Stop tracking
+                </Button>
+              )}
+            {allowedActions[CollectionPermission.TRACK_PERIOD] && (
               <Button
                 variant="outline"
                 className="col-start-2"
-                onClick={() => handleToggle(false)}
+                onClick={() => setOpenFetchStatesDialog(true)}
               >
-                <CalendarOff />
-                Stop tracking
+                <PlayIcon />
+                Track period
               </Button>
             )}
-            <Button
-              variant="outline"
-              className="col-start-2"
-              onClick={() => setOpenFetchStatesDialog(true)}
-            >
-              <PlayIcon />
-              Track period
-            </Button>
-            {isActive && (
-              <Button
-                variant="destructive"
-                className="col-start-1 row-start-2"
-                onClick={() => setOpenTerminateDialog(true)}
-              >
-                <PowerOff className="size-4" />
-                <span>Terminate version</span>
-              </Button>
-            )}
+            {allowedActions[CollectionPermission.TERMINATE_VERSION] &&
+              isActive && (
+                <Button
+                  variant="destructive"
+                  className="col-start-1 row-start-2"
+                  onClick={() => setOpenTerminateDialog(true)}
+                >
+                  <PowerOff className="size-4" />
+                  <span>Terminate version</span>
+                </Button>
+              )}
           </div>
         </CardHeader>
         <CardContent className="border-b pb-(--card-spacing)">
