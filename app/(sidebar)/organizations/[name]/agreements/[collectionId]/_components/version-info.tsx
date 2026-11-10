@@ -31,7 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   CalculationState,
-  IAgreementCollection,
+  CollectionPermission,
+  IAgreementCollectionWithActions,
   IAgreementVersion,
   ISignature,
 } from "@/types/agreement";
@@ -41,6 +42,7 @@ import {
   generateStatesForVersion,
   terminateAgreementVersion,
   toggleAutomaticTrackingForVersion,
+  toggleStateSyncForVersion,
 } from "@/data/agreements/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -66,7 +68,7 @@ export function AgreementVersionInfo({
   startTransition,
   onZoom,
 }: {
-  collection: IAgreementCollection;
+  collection: IAgreementCollectionWithActions;
   version: IAgreementVersion;
   orgName: string;
   calculationState: CalculationState;
@@ -82,6 +84,7 @@ export function AgreementVersionInfo({
   const [openTerminateDialog, setOpenTerminateDialog] = useState(false);
   const [openFetchStatesDialog, setOpenFetchStatesDialog] = useState(false);
 
+  const { allowedActions } = collection;
   const versions = collection.agreementVersions;
   const activeNumber = collection.auditableVersionNumber;
   const isActive = version.versionNumber === activeNumber;
@@ -91,7 +94,7 @@ export function AgreementVersionInfo({
 
   const enabledToggle = end > new Date();
 
-  const handleToggle = async (start: boolean, refresh = true) => {
+  const handleToggle = async (start: boolean) => {
     const result = await toggleAutomaticTrackingForVersion(
       start,
       orgName,
@@ -104,19 +107,13 @@ export function AgreementVersionInfo({
         `Failed to ${start ? "start" : "stop"} tracking. Please try again.`,
       );
       router.refresh();
-      return false;
+      return;
     }
-    if (refresh) {
-      router.refresh();
-      toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
-    }
-    return true;
+    router.refresh();
+    toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
   };
 
   const handleTerminateVersion = async () => {
-    // Ensure calculations are stopped
-    if (!(await handleToggle(false, false))) return;
-
     const result = await terminateAgreementVersion(
       orgName,
       collection.scopeId,
@@ -126,6 +123,13 @@ export function AgreementVersionInfo({
       toast.error("Failed to terminate the active version. Please try again.");
       return;
     }
+    await toggleStateSyncForVersion(
+      false,
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    );
     toast.success(`Version ${version.versionNumber} terminated successfully.`);
     router.refresh();
   };
@@ -232,7 +236,8 @@ export function AgreementVersionInfo({
                 </span>
               </div>
             )}
-            {enabledToggle &&
+            {allowedActions[CollectionPermission.AUTO_TRACKING] &&
+              enabledToggle &&
               calculationState === CalculationState.NO_TASKS && (
                 <Button
                   variant="outline"
@@ -243,34 +248,38 @@ export function AgreementVersionInfo({
                   Start tracking
                 </Button>
               )}
-            {enableRunningOptions && (
+            {allowedActions[CollectionPermission.AUTO_TRACKING] &&
+              enableRunningOptions && (
+                <Button
+                  variant="outline"
+                  className="col-start-2"
+                  onClick={() => handleToggle(false)}
+                >
+                  <CalendarOff />
+                  Stop tracking
+                </Button>
+              )}
+            {allowedActions[CollectionPermission.TRACK_PERIOD] && (
               <Button
                 variant="outline"
                 className="col-start-2"
-                onClick={() => handleToggle(false)}
+                onClick={() => setOpenFetchStatesDialog(true)}
               >
-                <CalendarOff />
-                Stop tracking
+                <PlayIcon />
+                Track period
               </Button>
             )}
-            <Button
-              variant="outline"
-              className="col-start-2"
-              onClick={() => setOpenFetchStatesDialog(true)}
-            >
-              <PlayIcon />
-              Track period
-            </Button>
-            {isActive && (
-              <Button
-                variant="destructive"
-                className="col-start-1 row-start-2"
-                onClick={() => setOpenTerminateDialog(true)}
-              >
-                <PowerOff className="size-4" />
-                <span>Terminate version</span>
-              </Button>
-            )}
+            {allowedActions[CollectionPermission.TERMINATE_VERSION] &&
+              isActive && (
+                <Button
+                  variant="destructive"
+                  className="col-start-1 row-start-2"
+                  onClick={() => setOpenTerminateDialog(true)}
+                >
+                  <PowerOff className="size-4" />
+                  <span>Terminate version</span>
+                </Button>
+              )}
           </div>
         </CardHeader>
         <CardContent className="border-b pb-(--card-spacing)">

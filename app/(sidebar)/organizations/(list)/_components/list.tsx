@@ -16,7 +16,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { OrganizationAvatar } from "@/components/avatar/organization-avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -27,15 +27,6 @@ import { IOrganization } from "@/types/organization";
 import { Pagination } from "@/types/pagination";
 import { formatCompactNumber, pluralize } from "@/lib/utils/formatter";
 import { cn } from "@/lib/utils/cn";
-
-const getInitials = (label: string) =>
-  label
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
 
 function OrganizationQuickInfo({
   icon: Icon,
@@ -98,9 +89,7 @@ export function OrganizationsList({
           <Item variant="outline" asChild>
             <Link href={`/organizations/${org.name}`}>
               <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
-                <Avatar>
-                  <AvatarFallback>{getInitials(title)}</AvatarFallback>
-                </Avatar>
+                <OrganizationAvatar label={title} />
               </ItemMedia>
               <ItemContent className="min-w-0">
                 <ItemTitle>{title}</ItemTitle>

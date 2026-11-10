@@ -1,14 +1,17 @@
 import { bootEnv } from "../../lib/bootConfig";
 import {
-  IAgreementCollection,
+  IAgreementCollectionWithActions,
   IAgreementVersion,
+  ICollectionPermissions,
   ITask,
 } from "@/types/agreement";
 import { IComplianceData } from "@/types/compliance";
 import { apiFetcher } from "../../lib/utils/fetcher";
 
 export const getAgreementCollections = async (orgName: string) => {
-  return await apiFetcher<(IAgreementCollection & { autoTracking: boolean })[]>(
+  return await apiFetcher<
+    (IAgreementCollectionWithActions & { autoTracking: boolean })[]
+  >(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/agreementCollections`,
     { method: "GET" },
   );
@@ -18,7 +21,7 @@ export const getAgreementCollection = async (
   orgName: string,
   agColId: string,
 ) => {
-  return await apiFetcher<IAgreementCollection>(
+  return await apiFetcher<IAgreementCollectionWithActions>(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${orgName}/agreementCollections/${agColId}`,
     { method: "GET" },
   );
@@ -66,6 +69,16 @@ export const getAgreementVersionComplianceData = async (
   });
   return await apiFetcher<IComplianceData>(
     `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}/data?${range}`,
+    { method: "GET" },
+  );
+};
+
+export const getCollectionPermissions = async (
+  orgName: string,
+  agColId: string,
+) => {
+  return await apiFetcher<ICollectionPermissions>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/agreementCollections/${encodeURIComponent(agColId)}/permissions`,
     { method: "GET" },
   );
 };

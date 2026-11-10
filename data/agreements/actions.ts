@@ -5,9 +5,23 @@ import { apiFetcher, type Result } from "@/lib/utils/fetcher";
 import {
   IAgreementCollection,
   IAgreementCollectionPayload,
+  ICollectionPermissions,
   ITask,
 } from "@/types/agreement";
 import { IComplianceState } from "@/types/compliance";
+
+export const toggleStateSyncForVersion = async (
+  enabled: boolean,
+  orgName: string,
+  scopeId: string,
+  collectionId: string,
+  versionNumber: number,
+) => {
+  return await apiFetcher<Record<string, unknown>>(
+    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/influx/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states/sync?enabled=${enabled}`,
+    { method: "POST", body: { interval: 1_200_000, lookbackMs: 3_600_000 } },
+  );
+};
 
 export const toggleAutomaticTrackingForVersion = async (
   enabled: boolean,
@@ -16,9 +30,12 @@ export const toggleAutomaticTrackingForVersion = async (
   collectionId: string,
   versionNumber: number,
 ): Promise<Result<ITask[]>> => {
-  const syncResult = await apiFetcher<Record<string, unknown>>(
-    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/influx/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states/sync?enabled=${enabled}`,
-    { method: "POST", body: { interval: 1_200_000, lookbackMs: 3_600_000 } },
+  const syncResult = await toggleStateSyncForVersion(
+    enabled,
+    orgName,
+    scopeId,
+    collectionId,
+    versionNumber,
   );
   const tasksUrl = `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states`;
   const consolidatedResult = await apiFetcher<ITask[]>(
@@ -33,7 +50,10 @@ export const toggleAutomaticTrackingForVersion = async (
   if (!syncResult.ok) return syncResult;
   if (!consolidatedResult.ok) return consolidatedResult;
   if (!evolutiveResult.ok) return evolutiveResult;
-  return { ok: true, data: [...consolidatedResult.data, ...evolutiveResult.data] };
+  return {
+    ok: true,
+    data: [...consolidatedResult.data, ...evolutiveResult.data],
+  };
 };
 
 export const updateAgreementCollection = async (
@@ -49,7 +69,6 @@ export const updateAgreementCollection = async (
       body: {
         ...payload,
         fields: [],
-        permissions: [],
         auditableVersionNumber: auditableVersion,
       },
     },
@@ -98,5 +117,16 @@ export const getAgreementVersionState = async (
   return await apiFetcher<IComplianceState>(
     `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/states/${encodeURIComponent(stateId)}`,
     { method: "GET" },
+  );
+};
+
+export const updateCollectionPermissions = async (
+  orgName: string,
+  collectionId: string,
+  permissions: ICollectionPermissions,
+) => {
+  return await apiFetcher<ICollectionPermissions>(
+    `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/agreementCollections/${encodeURIComponent(collectionId)}/permissions`,
+    { method: "PUT", body: permissions },
   );
 };

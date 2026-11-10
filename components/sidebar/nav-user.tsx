@@ -3,7 +3,7 @@
 import { EllipsisVertical, LogOut } from "lucide-react";
 import { logoutAction } from "@/data/auth/actions";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/avatar/user-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { IBasicUserInfo } from "@/types/user.types";
-import { avatarFallback } from "@/lib/utils/formatter";
 
 export function NavUser({ user }: { user: IBasicUserInfo }) {
   const { isMobile } = useSidebar();
@@ -33,12 +32,7 @@ export function NavUser({ user }: { user: IBasicUserInfo }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {avatarFallback(user.name)}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar name={user.name} src={user.avatar} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -54,12 +48,7 @@ export function NavUser({ user }: { user: IBasicUserInfo }) {
           >
             <DropdownMenuLabel className="p-0 font-normal text-foreground">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {avatarFallback(user.name)}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar name={user.name} src={user.avatar} />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>

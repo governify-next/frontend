@@ -29,7 +29,7 @@ export const agreementVersionSearchParams = {
   version: parseAsInteger,
   from: parseAsIsoDateTime,
   to: parseAsIsoDateTime,
-  showEvolutivePoints: parseAsBoolean.withDefault(true),
+  showEvolutivePoints: parseAsBoolean.withDefault(false),
   refresh: parseAsStringLiteral(REFRESH_OPTIONS).withDefault("15m"),
 };
 const loadSearchParams = createLoader(agreementVersionSearchParams);

@@ -9,7 +9,6 @@ export default function OrganizationSettingsLayout({
     <PageContent
       title="Settings"
       description="Update the organization details, manage invitations or delete it."
-      className="max-w-2xl"
     >
       {children}
     </PageContent>

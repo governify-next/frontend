@@ -4,17 +4,17 @@ import { useState, useTransition } from "react";
 import { useQueryStates } from "nuqs";
 import {
   CalculationState,
-  IAgreementCollection,
+  CollectionPermission,
+  IAgreementCollectionWithActions,
   IAgreementVersion,
+  ICollectionPermissions,
 } from "@/types/agreement";
+import { IRole } from "@/types/organization";
 import { Result } from "@/lib/utils/fetcher";
 import { getValidityEnd } from "@/lib/utils/validity";
 import { IComplianceData, IComplianceState } from "@/types/compliance";
 import { AgreementHeader } from "./_components/agreement-header";
-import {
-  AgreementCollectionEditCard,
-  AgreementCollectionInfo,
-} from "./_components/collection-info";
+import { AgreementCollectionDetails } from "./_components/collection-info";
 import { AgreementVersionInfo } from "./_components/version-info";
 import { agreementVersionSearchParams } from "./search-params";
 
@@ -26,16 +26,19 @@ export function AgreementDetail({
   range,
   compliance,
   getState,
+  roles,
+  permissions,
 }: {
   orgName: string;
-  collection: IAgreementCollection;
+  collection: IAgreementCollectionWithActions;
   calculationState: CalculationState;
   version: IAgreementVersion;
   range: { from: Date; to: Date };
   compliance: Promise<Result<IComplianceData>>;
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
+  roles: IRole[];
+  permissions: ICollectionPermissions | null;
 }) {
-  const [editOpen, setEditOpen] = useState(false);
   const [isNavigating, startTransition] = useTransition();
   const [, setSearchParams] = useQueryStates(agreementVersionSearchParams);
   const [zooms, setZooms] = useState<
@@ -75,25 +78,21 @@ export function AgreementDetail({
           initial: new Date(version.contract.validity.initial),
           end: getValidityEnd(version.contract.validity),
         }}
+        canViewEvolutive={
+          collection.allowedActions[CollectionPermission.VIEW_EVOLUTIVE]
+        }
         isNavigating={isNavigating}
         startTransition={startTransition}
         onZoomOut={onZoomOut}
       />
 
       <div className="flex flex-col gap-4 md:px-3">
-        {!editOpen && (
-          <AgreementCollectionInfo
-            collection={collection}
-            onEdit={() => setEditOpen(true)}
-          />
-        )}
-        {editOpen && (
-          <AgreementCollectionEditCard
-            orgName={orgName}
-            collection={collection}
-            onOpenChange={setEditOpen}
-          />
-        )}
+        <AgreementCollectionDetails
+          orgName={orgName}
+          collection={collection}
+          roles={roles}
+          permissions={permissions}
+        />
 
         <AgreementVersionInfo
           collection={collection}

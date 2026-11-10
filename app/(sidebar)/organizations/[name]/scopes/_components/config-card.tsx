@@ -76,14 +76,14 @@ export function ScopeConfigCard({
           </CardContent>
           <CardFooter className="justify-end">
             {rows.length === 0 ? (
-              <Button onClick={() => setMode("add")}>
+              <Button variant="outline" onClick={() => setMode("add")}>
                 <Plus />
                 Add configuration
               </Button>
             ) : (
-              <Button onClick={() => setMode("edit")}>
+              <Button variant="outline" onClick={() => setMode("edit")}>
                 <Pencil />
-                Edit
+                Edit configuration
               </Button>
             )}
           </CardFooter>
@@ -159,7 +159,10 @@ function ConfigEditForm({
           Cancel
         </Button>
         <form.AppForm>
-          <form.SubmitButton label="Save" formId="scope-config-form" />
+          <form.SubmitButton
+            label="Save configuration"
+            formId="scope-config-form"
+          />
         </form.AppForm>
       </CardFooter>
     </>

@@ -12,7 +12,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/avatar/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -24,13 +24,13 @@ import {
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ItemList } from "@/components/item/item-list";
 import { IMembership, IOrganization, IRole } from "@/types/organization";
-import { avatarFallback, pluralize } from "@/lib/utils/formatter";
-import { cn } from "@/lib/utils/cn";
+import { pluralize } from "@/lib/utils/formatter";
 import {
   removeOrganizationMember,
   updateOrganizationMemberRoles,
 } from "@/data/organizations/actions";
-import { MemberRolesPicker } from "./roles-picker";
+import { RoleBadge } from "@/components/role/role-badge";
+import { MemberRolesPicker } from "./member-roles-picker";
 
 const rolesVisibility = [
   { role: "", overflow: "@2xl/main:hidden" },
@@ -43,19 +43,6 @@ const rolesVisibility = [
     overflow: "hidden @3xl/main:inline-flex",
   },
 ];
-
-function RoleBadge({ role, className }: { role: IRole; className: string }) {
-  return (
-    <Badge
-      variant="tinted"
-      className={cn("capitalize", className)}
-      style={{ color: role.color }}
-    >
-      <span aria-hidden className="size-1.5 rounded-full bg-current" />
-      {role.name}
-    </Badge>
-  );
-}
 
 function HiddenRolesBadge({
   roles,
@@ -168,9 +155,7 @@ export function MembersList({
           return (
             <Item variant="outline">
               <ItemMedia className="group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center">
-                <Avatar>
-                  <AvatarFallback>{avatarFallback(username)}</AvatarFallback>
-                </Avatar>
+                <UserAvatar name={username} />
               </ItemMedia>
               <ItemContent className="min-w-0">
                 <ItemTitle>

@@ -1,4 +1,4 @@
-import { Building2, Hash } from "lucide-react";
+import { Hash, Type } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import { IOrganizationPayload } from "@/types/organization";
 import { organizationFormSchema } from "@/schemas/organization";
@@ -80,7 +80,7 @@ export function CreateOrganizationDialog({
                 {(field) => (
                   <field.TextField
                     label="Display name"
-                    icon={<Building2 />}
+                    icon={<Type />}
                     placeholder="Universidad de Sevilla"
                   />
                 )}

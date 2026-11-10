@@ -1,6 +1,6 @@
 import { getScopes } from "@/data/scopes/fetch";
 import { ErrorPage } from "@/components/errors";
-import { ScopesExplorer } from "./explorer";
+import { ScopesExplorer } from "./_components/explorer";
 
 export default async function OrganizationScopesPage({
   params,
