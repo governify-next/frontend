@@ -42,6 +42,7 @@ import {
   generateStatesForVersion,
   terminateAgreementVersion,
   toggleAutomaticTrackingForVersion,
+  toggleStateSyncForVersion,
 } from "@/data/agreements/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -93,7 +94,7 @@ export function AgreementVersionInfo({
 
   const enabledToggle = end > new Date();
 
-  const handleToggle = async (start: boolean, refresh = true) => {
+  const handleToggle = async (start: boolean) => {
     const result = await toggleAutomaticTrackingForVersion(
       start,
       orgName,
@@ -106,19 +107,13 @@ export function AgreementVersionInfo({
         `Failed to ${start ? "start" : "stop"} tracking. Please try again.`,
       );
       router.refresh();
-      return false;
+      return;
     }
-    if (refresh) {
-      router.refresh();
-      toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
-    }
-    return true;
+    router.refresh();
+    toast.success(`Tracking ${start ? "started" : "stopped"} successfully.`);
   };
 
   const handleTerminateVersion = async () => {
-    // Ensure calculations are stopped
-    if (!(await handleToggle(false, false))) return;
-
     const result = await terminateAgreementVersion(
       orgName,
       collection.scopeId,
@@ -128,6 +123,13 @@ export function AgreementVersionInfo({
       toast.error("Failed to terminate the active version. Please try again.");
       return;
     }
+    await toggleStateSyncForVersion(
+      false,
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    );
     toast.success(`Version ${version.versionNumber} terminated successfully.`);
     router.refresh();
   };
