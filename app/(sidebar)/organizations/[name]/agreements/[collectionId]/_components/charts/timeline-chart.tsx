@@ -549,11 +549,13 @@ function EvidencesPopover({
                     ) : (
                       metric.evidences.map((evidence, index) => {
                         // TODO: may require changes to handle other type of evidences
-                        const { url, content } = evidence as {
+                        const { url, web_url, webUrl, content } = evidence as {
                           url?: string;
+                          web_url?: string;
+                          webUrl?: string;
                           content?: { url?: string };
                         };
-                        const href = url ?? content?.url;
+                        const href = url ?? web_url ?? webUrl ?? content?.url;
                         return (
                           <div key={index} className="flex flex-col gap-1">
                             <div className="flex items-baseline gap-2">
