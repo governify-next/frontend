@@ -549,12 +549,14 @@ function EvidencesPopover({
                     ) : (
                       metric.evidences.map((evidence, index) => {
                         // TODO: may require changes to handle other type of evidences
-                        const { url, web_url, webUrl, content } = evidence as {
-                          url?: string;
-                          web_url?: string;
-                          webUrl?: string;
-                          content?: { url?: string };
-                        };
+                        const { url, web_url, webUrl, title, content } =
+                          evidence as {
+                            url?: string;
+                            web_url?: string;
+                            webUrl?: string;
+                            title?: string;
+                            content?: { url?: string; title?: string };
+                          };
                         const href = url ?? web_url ?? webUrl ?? content?.url;
                         return (
                           <div key={index} className="flex flex-col gap-1">
@@ -565,7 +567,7 @@ function EvidencesPopover({
                                   asChild
                                   variant="link"
                                   size="xs"
-                                  className="h-auto p-0"
+                                  className="h-auto shrink p-0 text-left whitespace-normal"
                                 >
                                   <a
                                     href={href}
@@ -573,7 +575,7 @@ function EvidencesPopover({
                                     rel="noopener noreferrer"
                                     aria-label={`Open ${href}`}
                                   >
-                                    Open URL
+                                    {title ?? content?.title ?? "Open URL"}
                                     <ExternalLink />
                                   </a>
                                 </Button>
