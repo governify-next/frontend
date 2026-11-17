@@ -10,7 +10,13 @@ import {
 } from "react";
 import ReactECharts from "echarts-for-react";
 import { format, roundToNearestMinutes } from "date-fns";
-import { ChevronRight, ExternalLink, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  ExternalLink,
+  X,
+} from "lucide-react";
 import type {
   DefaultLabelFormatterCallbackParams,
   ECElementEvent,
@@ -25,6 +31,11 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Popover,
   PopoverAnchor,
@@ -549,15 +560,20 @@ function EvidencesPopover({
                     ) : (
                       metric.evidences.map((evidence, index) => {
                         // TODO: may require changes to handle other type of evidences
-                        const { url, web_url, webUrl, content } = evidence as {
-                          url?: string;
-                          web_url?: string;
-                          webUrl?: string;
-                          content?: { url?: string };
-                        };
+                        const { url, web_url, webUrl, title, content } =
+                          evidence as {
+                            url?: string;
+                            web_url?: string;
+                            webUrl?: string;
+                            title?: string;
+                            content?: { url?: string; title?: string };
+                          };
                         const href = url ?? web_url ?? webUrl ?? content?.url;
                         return (
-                          <div key={index} className="flex flex-col gap-1">
+                          <Collapsible
+                            key={index}
+                            className="flex flex-col gap-1"
+                          >
                             <div className="flex items-baseline gap-2">
                               <span>{index + 1}.</span>
                               {href && (
@@ -565,7 +581,7 @@ function EvidencesPopover({
                                   asChild
                                   variant="link"
                                   size="xs"
-                                  className="h-auto p-0"
+                                  className="h-auto shrink p-0 text-left whitespace-normal"
                                 >
                                   <a
                                     href={href}
@@ -573,16 +589,29 @@ function EvidencesPopover({
                                     rel="noopener noreferrer"
                                     aria-label={`Open ${href}`}
                                   >
-                                    Open URL
+                                    {title ?? content?.title ?? "Open URL"}
                                     <ExternalLink />
                                   </a>
                                 </Button>
                               )}
+                              <CollapsibleTrigger asChild>
+                                <Button
+                                  variant="link"
+                                  size="xs"
+                                  className="ml-auto h-auto p-0 text-muted-foreground"
+                                >
+                                  Details
+                                  <ChevronDown className="group-data-[state=open]/button:hidden" />
+                                  <ChevronUp className="hidden group-data-[state=open]/button:inline" />
+                                </Button>
+                              </CollapsibleTrigger>
                             </div>
-                            <pre className="rounded-md bg-muted p-2 font-mono text-xs break-all whitespace-pre-wrap">
-                              {JSON.stringify(evidence, null, 2)}
-                            </pre>
-                          </div>
+                            <CollapsibleContent>
+                              <pre className="rounded-md bg-muted p-2 font-mono text-xs break-all whitespace-pre-wrap">
+                                {JSON.stringify(evidence, null, 2)}
+                              </pre>
+                            </CollapsibleContent>
+                          </Collapsible>
                         );
                       })
                     )}
