@@ -1,14 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FileText,
-  House,
-  Network,
-  Settings,
-  Shield,
-  Users,
-} from "lucide-react";
+import { FileText, Network, Settings, Shield, Users } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils/cn";
 
@@ -23,7 +16,6 @@ export function OrganizationTabsNav({
   const base = `/organizations/${orgName}`;
 
   const baseTabs = [
-    { value: "overview", label: "Home", href: base, icon: House },
     {
       value: "scopes",
       label: "Scopes",
@@ -63,8 +55,8 @@ export function OrganizationTabsNav({
   }
 
   const active =
-    baseTabs.find((tab) => tab.href !== base && pathname.startsWith(tab.href))
-      ?.value ?? "overview";
+    baseTabs.find((tab) => pathname.startsWith(tab.href))?.value ??
+    "agreements";
 
   return (
     <Tabs
