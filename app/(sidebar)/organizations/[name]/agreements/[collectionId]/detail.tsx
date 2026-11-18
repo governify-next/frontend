@@ -28,6 +28,7 @@ export function AgreementDetail({
   getState,
   roles,
   permissions,
+  grafanaUrl,
 }: {
   orgName: string;
   collection: IAgreementCollectionWithActions;
@@ -38,6 +39,7 @@ export function AgreementDetail({
   getState: (stateId: string) => Promise<Result<IComplianceState>>;
   roles: IRole[];
   permissions: ICollectionPermissions | null;
+  grafanaUrl: string | null;
 }) {
   const [isNavigating, startTransition] = useTransition();
   const [, setSearchParams] = useQueryStates(agreementVersionSearchParams);
@@ -92,6 +94,7 @@ export function AgreementDetail({
           collection={collection}
           roles={roles}
           permissions={permissions}
+          grafanaUrl={grafanaUrl}
         />
 
         <AgreementVersionInfo

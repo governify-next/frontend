@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Hash, Pencil, Type } from "lucide-react";
+import { ExternalLink, Hash, Pencil, Type } from "lucide-react";
 import { useAppForm } from "@/components/form";
 import {
   CollectionPermission,
@@ -32,11 +32,13 @@ export function AgreementCollectionDetails({
   collection,
   roles,
   permissions,
+  grafanaUrl,
 }: {
   orgName: string;
   collection: IAgreementCollectionWithActions;
   roles: IRole[];
   permissions: ICollectionPermissions | null;
+  grafanaUrl: string | null;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -93,6 +95,19 @@ export function AgreementCollectionDetails({
             roles={roles}
             permissions={permissions}
           />
+        )}
+        {grafanaUrl ? (
+          <Button variant="outline" asChild>
+            <a href={grafanaUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink />
+              Grafana
+            </a>
+          </Button>
+        ) : (
+          <Button variant="outline" disabled>
+            <ExternalLink />
+            Grafana
+          </Button>
         )}
         {collection.allowedActions[CollectionPermission.EDIT] && (
           <Button onClick={() => setEditing(true)}>
