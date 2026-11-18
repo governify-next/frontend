@@ -79,7 +79,7 @@ export const getAgreementVersionGrafanaDashboard = async (
   agColId: string,
   agVersionNumber: number,
 ) => {
-  return await apiFetcher<{ grafanaUid: string; grafanaUrl: string }>(
+  return await apiFetcher<{ grafanaUrl: string }>(
     `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}`,
     { method: "GET" },
   );
