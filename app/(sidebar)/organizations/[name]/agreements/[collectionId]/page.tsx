@@ -2,6 +2,7 @@ import {
   getAgreementCollection,
   getAgreementVersionByCollection,
   getAgreementVersionComplianceData,
+  getAgreementVersionGrafanaDashboard,
   getCollectionPermissions,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
@@ -71,24 +72,34 @@ export default async function AgreementDetailPage({
       candidate.versionNumber > max.versionNumber ? candidate : max,
     );
 
-  const [stateTasksResult, agreementFullVersionResult, permissionsResult] =
-    await Promise.all([
-      getStateTasksForAgreementVersion(
-        orgName,
-        collection.scopeId,
-        collection._id,
-        version.versionNumber,
-      ),
-      getAgreementVersionByCollection(
-        orgName,
-        collection.scopeId,
-        collection._id,
-        version.versionNumber,
-      ),
-      adminResult.ok && adminResult.data.isAdmin
-        ? getCollectionPermissions(orgName, collection._id)
-        : null,
-    ]);
+  const [
+    stateTasksResult,
+    agreementFullVersionResult,
+    permissionsResult,
+    grafanaDashboardResult,
+  ] = await Promise.all([
+    getStateTasksForAgreementVersion(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ),
+    getAgreementVersionByCollection(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ),
+    adminResult.ok && adminResult.data.isAdmin
+      ? getCollectionPermissions(orgName, collection._id)
+      : null,
+    getAgreementVersionGrafanaDashboard(
+      orgName,
+      collection.scopeId,
+      collection._id,
+      version.versionNumber,
+    ),
+  ]);
 
   if (!stateTasksResult.ok) {
     return (
@@ -148,6 +159,11 @@ export default async function AgreementDetailPage({
       )}
       roles={organizationResult.ok ? organizationResult.data.roles : []}
       permissions={permissionsResult?.ok ? permissionsResult.data : null}
+      grafanaUrl={
+        grafanaDashboardResult.ok
+          ? grafanaDashboardResult.data.grafanaUrl
+          : null
+      }
     />
   );
 }

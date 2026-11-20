@@ -73,6 +73,18 @@ export const getAgreementVersionComplianceData = async (
   );
 };
 
+export const getAgreementVersionGrafanaDashboard = async (
+  orgName: string,
+  scopeId: string,
+  agColId: string,
+  agVersionNumber: number,
+) => {
+  return await apiFetcher<{ grafanaUrl: string }>(
+    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}`,
+    { method: "GET" },
+  );
+};
+
 export const getCollectionPermissions = async (
   orgName: string,
   agColId: string,
