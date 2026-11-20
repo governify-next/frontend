@@ -42,7 +42,6 @@ import {
   generateStatesForVersion,
   terminateAgreementVersion,
   toggleAutomaticTrackingForVersion,
-  toggleStateSyncForVersion,
 } from "@/data/agreements/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -123,13 +122,6 @@ export function AgreementVersionInfo({
       toast.error("Failed to terminate the active version. Please try again.");
       return;
     }
-    await toggleStateSyncForVersion(
-      false,
-      orgName,
-      collection.scopeId,
-      collection._id,
-      version.versionNumber,
-    );
     toast.success(`Version ${version.versionNumber} terminated successfully.`);
     router.refresh();
   };
