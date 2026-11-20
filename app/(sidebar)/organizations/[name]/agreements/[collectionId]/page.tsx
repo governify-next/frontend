@@ -1,8 +1,8 @@
 import {
   getAgreementCollection,
   getAgreementVersionByCollection,
-  getAgreementVersionComplianceData,
   getAgreementVersionGrafanaDashboard,
+  getAgreementVersionCompliance,
   getCollectionPermissions,
   getStateTasksForAgreementVersion,
 } from "@/data/agreements/fetch";
@@ -133,11 +133,8 @@ export default async function AgreementDetailPage({
 
   const range = from && to ? { from, to } : getDefaultComplianceRange();
 
-  const compliance = getAgreementVersionComplianceData(
-    orgName,
-    collection.scopeId,
-    collection._id,
-    version.versionNumber,
+  const compliance = getAgreementVersionCompliance(
+    agreementFullVersionResult.data.contract.signatures,
     range.from,
     range.to,
   );

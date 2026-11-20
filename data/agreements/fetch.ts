@@ -3,10 +3,11 @@ import {
   IAgreementCollectionWithActions,
   IAgreementVersion,
   ICollectionPermissions,
+  ISignature,
   ITask,
 } from "@/types/agreement";
-import { IComplianceData } from "@/types/compliance";
-import { apiFetcher } from "../../lib/utils/fetcher";
+import { IComplianceData, ISignatureCompliance } from "@/types/compliance";
+import { apiFetcher, Result } from "../../lib/utils/fetcher";
 import { influxFetcher } from "@/lib/influx";
 import { signatureComplianceQuery, signatureStatesQuery } from "./queries";
 import { toCompliancePoint, toSignatureCompliance } from "./mappers";
@@ -58,25 +59,7 @@ export const getAgreementVersionByCollection = async (
   );
 };
 
-export const getAgreementVersionComplianceData = async (
-  orgName: string,
-  scopeId: string,
-  agColId: string,
-  agVersionNumber: number,
-  from: Date,
-  to: Date,
-) => {
-  const range = new URLSearchParams({
-    from: from.toISOString(),
-    to: to.toISOString(),
-  });
-  return await apiFetcher<IComplianceData>(
-    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}/data?${range}`,
-    { method: "GET" },
-  );
-};
-
-export const getSignatureStates = async (
+const getSignatureStates = async (
   signatureIds: string[],
   from: Date,
   to: Date,
@@ -87,7 +70,7 @@ export const getSignatureStates = async (
   );
 };
 
-export const getSignatureCompliance = async (
+const getSignatureCompliance = async (
   signatureIds: string[],
   from: Date,
   to: Date,
@@ -96,6 +79,53 @@ export const getSignatureCompliance = async (
     signatureComplianceQuery(signatureIds, from, to),
     toSignatureCompliance,
   );
+};
+
+export const getAgreementVersionCompliance = async (
+  signatures: ISignature[],
+  from: Date,
+  to: Date,
+): Promise<Result<IComplianceData>> => {
+  const signatureIds = signatures.map(({ signatureId }) => signatureId);
+  const [points, counts] = await Promise.all([
+    getSignatureStates(signatureIds, from, to),
+    getSignatureCompliance(signatureIds, from, to),
+  ]);
+  if (!points.ok) return points;
+  if (!counts.ok) return counts;
+
+  const percentage = (compliant: number, total: number) =>
+    total === 0 ? null : (100 * compliant) / total;
+
+  const data: IComplianceData = {};
+  for (const [guaranteeName, guaranteeSignatures] of Map.groupBy(
+    signatures,
+    ({ guarantee }) => guarantee.name,
+  )) {
+    const guaranteeSignatureIds = guaranteeSignatures.map(
+      ({ signatureId }) => signatureId,
+    );
+    const guaranteeCounts = counts.data.filter(({ signatureId }) =>
+      guaranteeSignatureIds.includes(signatureId),
+    );
+    const guaranteePoints = points.data.filter(({ signatureId }) =>
+      guaranteeSignatureIds.includes(signatureId),
+    );
+    const sum = (key: Exclude<keyof ISignatureCompliance, "signatureId">) =>
+      guaranteeCounts.reduce((acc, row) => acc + row[key], 0);
+
+    data[guaranteeName] = {
+      allTime: percentage(sum("compliant"), sum("total")),
+      selectedPeriod: percentage(sum("compliantInRange"), sum("totalInRange")),
+      bySignature: guaranteeCounts.map((row) => ({
+        signatureId: row.signatureId,
+        allTime: percentage(row.compliant, row.total),
+        selectedPeriod: percentage(row.compliantInRange, row.totalInRange),
+      })),
+      points: guaranteePoints,
+    };
+  }
+  return { ok: true, data };
 };
 
 export const getAgreementVersionGrafanaDashboard = async (

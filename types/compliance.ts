@@ -22,13 +22,16 @@ export interface ISignatureCompliance {
 }
 
 export interface IGuaranteeCompliance {
+  // compliance-gauge
   allTime: number | null;
   selectedPeriod: number | null;
+  // signature-compliance
   bySignature: {
     signatureId: string;
     allTime: number | null;
     selectedPeriod: number | null;
   }[];
+  // timeline-chart
   points: ICompliancePoint[];
 }
 
