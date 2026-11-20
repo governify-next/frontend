@@ -13,6 +13,14 @@ export interface ICompliancePoint {
   consolidated: boolean;
 }
 
+export interface ISignatureCompliance {
+  signatureId: string;
+  total: number;
+  compliant: number;
+  totalInRange: number;
+  compliantInRange: number;
+}
+
 export interface IGuaranteeCompliance {
   allTime: number | null;
   selectedPeriod: number | null;

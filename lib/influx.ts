@@ -1,7 +1,11 @@
 import "server-only";
 
-import { InfluxDBClient, type QParamType } from "@influxdata/influxdb3-client";
+import { InfluxDBClient } from "@influxdata/influxdb3-client";
 import { bootEnv } from "./bootConfig";
+import { Result } from "./utils/fetcher";
+import { getLogger } from "./utils/logger";
+
+const logger = getLogger().setTag("influx.ts");
 
 const client = new InfluxDBClient({
   host: bootEnv.INFLUX_URL,
@@ -10,7 +14,19 @@ const client = new InfluxDBClient({
   database: bootEnv.INFLUX_DATABASE,
 });
 
-export const queryInflux = (
+export const influxFetcher = async <Row, T>(
   sql: string,
-  params?: Record<string, QParamType>,
-) => client.query(sql, undefined, { type: "sql", params });
+  map: (row: Row) => T,
+): Promise<Result<T[]>> => {
+  try {
+    const rows = await Array.fromAsync(client.query(sql));
+    return { ok: true, data: rows.map((row) => map(row as Row)) };
+  } catch (error) {
+    logger.error(`Failed to query InfluxDB. Query: ${sql}.`, error);
+    return {
+      ok: false,
+      error: "Unknown error while querying data.",
+      status: 500,
+    };
+  }
+};

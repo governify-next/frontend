@@ -7,6 +7,9 @@ import {
 } from "@/types/agreement";
 import { IComplianceData } from "@/types/compliance";
 import { apiFetcher } from "../../lib/utils/fetcher";
+import { influxFetcher } from "@/lib/influx";
+import { signatureComplianceQuery, signatureStatesQuery } from "./queries";
+import { toCompliancePoint, toSignatureCompliance } from "./mappers";
 
 export const getAgreementCollections = async (orgName: string) => {
   return await apiFetcher<
@@ -70,6 +73,28 @@ export const getAgreementVersionComplianceData = async (
   return await apiFetcher<IComplianceData>(
     `${bootEnv.REPORTER_SERVICE_URL}/api/v1/dashboards/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(agColId)}/agreementVersions/${agVersionNumber}/data?${range}`,
     { method: "GET" },
+  );
+};
+
+export const getSignatureStates = async (
+  signatureIds: string[],
+  from: Date,
+  to: Date,
+) => {
+  return await influxFetcher(
+    signatureStatesQuery(signatureIds, from, to),
+    toCompliancePoint,
+  );
+};
+
+export const getSignatureCompliance = async (
+  signatureIds: string[],
+  from: Date,
+  to: Date,
+) => {
+  return await influxFetcher(
+    signatureComplianceQuery(signatureIds, from, to),
+    toSignatureCompliance,
   );
 };
 
