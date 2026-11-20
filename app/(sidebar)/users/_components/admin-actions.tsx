@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createUser } from "@/data/users/actions";
-import { ICreateIUserPayload, SystemRole } from "@/types/user.types";
+import { ICreateIUserPayload, SystemRole } from "@/types/user";
 import { CreateUserDialog } from "./add-form";
 
 export function UsersAdminActions({

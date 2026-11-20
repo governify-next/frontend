@@ -1,10 +1,6 @@
 import { AtSign, Mail } from "lucide-react";
 import { useAppForm } from "@/components/form";
-import {
-  ICreateIUserPayload,
-  SystemRole,
-  UserStatus,
-} from "@/types/user.types";
+import { ICreateIUserPayload, SystemRole, UserStatus } from "@/types/user";
 import {
   Dialog,
   DialogBody,

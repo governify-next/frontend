@@ -1,11 +1,6 @@
 import { AtSign, Mail } from "lucide-react";
 import { useAppForm } from "@/components/form";
-import {
-  IUserInfo,
-  IUserPayload,
-  SystemRole,
-  UserStatus,
-} from "@/types/user.types";
+import { IUserInfo, IUserPayload, SystemRole, UserStatus } from "@/types/user";
 import {
   Dialog,
   DialogBody,

@@ -1,5 +1,5 @@
 import { useAppForm } from "@/components/form";
-import { IUserInfo, IUserPayload } from "@/types/user.types";
+import { IUserInfo, IUserPayload } from "@/types/user";
 import {
   Dialog,
   DialogBody,

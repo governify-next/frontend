@@ -1,6 +1,6 @@
 "use client";
 
-import { SystemRole, UserStatus } from "@/types/user.types";
+import { SystemRole, UserStatus } from "@/types/user";
 import { FilterDropdown } from "@/components/filter/dropdown";
 import { SearchFilter } from "@/components/filter/search";
 import { useQueryStates } from "nuqs";

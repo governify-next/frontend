@@ -1,4 +1,4 @@
-import { IUserInfo, UserSearchFilters } from "@/types/user.types";
+import { IUserInfo, UserSearchFilters } from "@/types/user";
 import { bootEnv } from "../../lib/bootConfig";
 import { apiFetcher } from "../../lib/utils/fetcher";
 

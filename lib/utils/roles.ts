@@ -1,4 +1,4 @@
-import { SystemRole } from "@/types/user.types";
+import { SystemRole } from "@/types/user";
 import { enumOptions } from "./formatter";
 
 export const assignableRoleOptions = (currentUserRole: SystemRole) =>

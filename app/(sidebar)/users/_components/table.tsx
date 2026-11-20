@@ -6,7 +6,7 @@ import {
   IUserPayload,
   UserStatus,
   IBasicUserInfo,
-} from "@/types/user.types";
+} from "@/types/user";
 import { DataTable } from "@/components/data-table/data-table";
 import { useState } from "react";
 import {
@@ -23,10 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-  formatEnumLabel,
-  formatReadableDate,
-} from "@/lib/utils/formatter";
+import { formatEnumLabel, formatReadableDate } from "@/lib/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import {
   Ellipsis,
