@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { bootEnv } from "../bootConfig";
 import { LoginResponse, SessionTokens } from "@/types/auth";
-import { IBasicUserInfo } from "@/types/user.types";
+import { IBasicUserInfo } from "@/types/user";
 import { apiFetcher } from "../utils/fetcher";
 
 const cookieOptions = {

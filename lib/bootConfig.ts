@@ -19,6 +19,11 @@ export const bootEnv = {
   REPORTER_SERVICE_URL:
     process.env.REPORTER_SERVICE_URL || "http://localhost:5905",
 
+  // InfluxDB
+  INFLUX_URL: process.env.INFLUX_URL || "http://localhost:8181",
+  INFLUX_TOKEN: process.env.INFLUX_TOKEN || "",
+  INFLUX_DATABASE: process.env.INFLUX_DATABASE || "governify-next",
+
   // Cookie settings
   AUTH_ACCESS_COOKIE_NAME:
     process.env.AUTH_ACCESS_COOKIE_NAME ?? "governify_next_access_token",

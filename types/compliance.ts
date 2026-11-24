@@ -13,14 +13,25 @@ export interface ICompliancePoint {
   consolidated: boolean;
 }
 
+export interface ISignatureCompliance {
+  signatureId: string;
+  total: number;
+  compliant: number;
+  totalInRange: number;
+  compliantInRange: number;
+}
+
 export interface IGuaranteeCompliance {
+  // compliance-gauge
   allTime: number | null;
   selectedPeriod: number | null;
+  // signature-compliance
   bySignature: {
     signatureId: string;
     allTime: number | null;
     selectedPeriod: number | null;
   }[];
+  // timeline-chart
   points: ICompliancePoint[];
 }
 

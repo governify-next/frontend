@@ -1,5 +1,5 @@
 import { paginationSearchParams } from "@/lib/search/pagination";
-import { SystemRole, UserStatus } from "@/types/user.types";
+import { SystemRole, UserStatus } from "@/types/user";
 import { createLoader, parseAsString, parseAsStringLiteral } from "nuqs/server";
 
 export const userSearchParams = {

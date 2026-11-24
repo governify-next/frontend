@@ -1,5 +1,5 @@
 import { searchUsers } from "@/data/users/fetch";
-import { UserSearchFilters } from "@/types/user.types";
+import { UserSearchFilters } from "@/types/user";
 import { UsersTable } from "./_components/table";
 import { UsersFilters } from "./_components/filters";
 import { ErrorPage } from "@/components/errors";

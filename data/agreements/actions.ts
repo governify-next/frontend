@@ -10,19 +10,6 @@ import {
 } from "@/types/agreement";
 import { IComplianceState } from "@/types/compliance";
 
-export const toggleStateSyncForVersion = async (
-  enabled: boolean,
-  orgName: string,
-  scopeId: string,
-  collectionId: string,
-  versionNumber: number,
-) => {
-  return await apiFetcher<Record<string, unknown>>(
-    `${bootEnv.REPORTER_SERVICE_URL}/api/v1/influx/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states/sync?enabled=${enabled}`,
-    { method: "POST", body: { interval: 1_200_000, lookbackMs: 3_600_000 } },
-  );
-};
-
 export const toggleAutomaticTrackingForVersion = async (
   enabled: boolean,
   orgName: string,
@@ -30,13 +17,6 @@ export const toggleAutomaticTrackingForVersion = async (
   collectionId: string,
   versionNumber: number,
 ): Promise<Result<ITask[]>> => {
-  const syncResult = await toggleStateSyncForVersion(
-    enabled,
-    orgName,
-    scopeId,
-    collectionId,
-    versionNumber,
-  );
   const tasksUrl = `${bootEnv.REGISTRY_SERVICE_URL}/api/v1/organizations/${encodeURIComponent(orgName)}/scopes/${encodeURIComponent(scopeId)}/agreementCollections/${encodeURIComponent(collectionId)}/agreementVersions/${versionNumber}/tasks/states`;
   const consolidatedResult = await apiFetcher<ITask[]>(
     `${tasksUrl}/consolidated?enabled=${enabled}`,
@@ -47,7 +27,6 @@ export const toggleAutomaticTrackingForVersion = async (
     { method: "POST" },
   );
   // Attempt every task group, including on stop; surface partial failures to the UI.
-  if (!syncResult.ok) return syncResult;
   if (!consolidatedResult.ok) return consolidatedResult;
   if (!evolutiveResult.ok) return evolutiveResult;
   return {

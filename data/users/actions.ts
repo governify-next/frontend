@@ -1,10 +1,6 @@
 "use server";
 
-import {
-  ICreateIUserPayload,
-  IUserInfo,
-  IUserPayload,
-} from "@/types/user.types";
+import { ICreateIUserPayload, IUserInfo, IUserPayload } from "@/types/user";
 import { bootEnv } from "../../lib/bootConfig";
 import { apiFetcher } from "../../lib/utils/fetcher";
 

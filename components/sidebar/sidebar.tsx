@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SystemRole } from "@/types/user.types";
+import { SystemRole } from "@/types/user";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Suspense } from "react";

@@ -68,7 +68,7 @@ import type {
   IComplianceChartFocusedPoint,
   IComplianceChartMember,
   IComplianceChartPoint,
-} from "@/types/echarts.types";
+} from "@/types/echarts";
 
 export function TimelineChart({
   series,

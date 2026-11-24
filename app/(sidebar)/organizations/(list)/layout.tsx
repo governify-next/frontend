@@ -4,7 +4,7 @@ import { PageContent } from "@/components/page/page-content";
 import { BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth/session";
-import { SystemRole } from "@/types/user.types";
+import { SystemRole } from "@/types/user";
 import { OrganizationsAdminActions } from "./_components/admin-actions";
 
 async function OrganizationsActions() {

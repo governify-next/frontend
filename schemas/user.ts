@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SystemRole, UserStatus } from "@/types/user.types";
+import { SystemRole, UserStatus } from "@/types/user";
 
 export const userFormSchema = z.object({
   username: z

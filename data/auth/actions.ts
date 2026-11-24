@@ -5,7 +5,7 @@ import * as session from "@/lib/auth/session";
 import { bootEnv } from "@/lib/bootConfig";
 import type { LoginResponse } from "@/types/auth";
 import { apiFetcher } from "../../lib/utils/fetcher";
-import { IUserInfo, SystemRole } from "@/types/user.types";
+import { IUserInfo, SystemRole } from "@/types/user";
 import { IMembership } from "@/types/organization";
 
 async function getLoginSession(credentials: {
